@@ -1,0 +1,6 @@
+{
+  "name": "LoomFrog",
+  "description": "Brand DNA & Tone Consistency platform with client-side deterministic verification, dual-tier Gemini semantic audit, Canvas color loupe, and zero-server BYOK architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

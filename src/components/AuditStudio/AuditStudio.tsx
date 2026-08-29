@@ -1,0 +1,231 @@
+import React, { useState } from 'react';
+import { UnifiedInputPanel } from './UnifiedInputPanel';
+import { DiagnosticDashboard } from './DiagnosticDashboard';
+import { useKeyContext } from '../../context/KeyContext';
+import { runTier1DeterministicAudit } from '../../services/deterministicEngine';
+import { runTier2SemanticAudit, GeminiApiError } from '../../services/geminiSemanticEngine';
+import { computeAuditScoreMatrix } from '../../services/scoringEngine';
+import { AuditReport, DetectedInputType } from '../../types/brandDna';
+import { PRECOMPUTED_DEMO_AUDIT } from '../../data/sampleBrandProfiles';
+import { AlertCircle, History, Sparkles, Check } from 'lucide-react';
+import confetti from 'canvas-confetti';
+
+export const AuditStudio: React.FC = () => {
+  const {
+    apiKey,
+    hasApiKey,
+    isDemoMode,
+    selectedModel,
+    activeProfile,
+    currentDraftText,
+    setCurrentDraftText,
+    auditHistory,
+    addAuditToHistory,
+    setIsKeyModalOpen
+  } = useKeyContext();
+
+  const [currentReport, setCurrentReport] = useState<AuditReport | null>(
+    auditHistory[0] || PRECOMPUTED_DEMO_AUDIT
+  );
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditPhaseStep, setAuditPhaseStep] = useState(1);
+  const [auditPhaseLabel, setAuditPhaseLabel] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
+  const handleRunAudit = async (
+    textContent: string,
+    imageDataUrl?: string,
+    inputType: DetectedInputType = 'plain_text'
+  ) => {
+    setIsAuditing(true);
+    setErrorMessage(null);
+
+    try {
+      // Step 1: Tier 1 Local Regex scan
+      setAuditPhaseStep(1);
+      setAuditPhaseLabel('Running local client-side Regex rules...');
+      await new Promise((r) => setTimeout(r, 450));
+
+      const deterministic = await runTier1DeterministicAudit(
+        textContent,
+        imageDataUrl,
+        activeProfile
+      );
+
+      // Step 2: Sampling Canvas color distributions (if image)
+      setAuditPhaseStep(2);
+      setAuditPhaseLabel('Sampling Canvas color distributions & ΔE distances...');
+      await new Promise((r) => setTimeout(r, 450));
+
+      let semanticResult;
+
+      // Step 3: Querying Gemini API or Demo Simulation
+      setAuditPhaseStep(3);
+      setAuditPhaseLabel(
+        isDemoMode
+          ? 'Evaluating tone alignment in Demo Mode...'
+          : `Querying ${selectedModel} for semantic tone alignment...`
+      );
+
+      if (isDemoMode) {
+        await new Promise((r) => setTimeout(r, 800));
+
+        // If the user pasted the second sample (compliant) or text without banned words
+        const isCompliant =
+          textContent.toLowerCase().includes('apex cloud systems today unveiled') ||
+          (deterministic.textMatches.length === 0 && textContent.length > 50);
+
+        if (isCompliant) {
+          semanticResult = {
+            score: 95.0,
+            confidence: 0.96,
+            observations: []
+          };
+        } else {
+          // Precomputed realistic findings based on draft content
+          semanticResult = PRECOMPUTED_DEMO_AUDIT.semantic;
+        }
+      } else {
+        if (!hasApiKey) {
+          setIsKeyModalOpen(true);
+          throw new Error('No API key in memory. Please provide your Gemini API key or switch to Demo Mode.');
+        }
+
+        semanticResult = await runTier2SemanticAudit(
+          apiKey,
+          selectedModel,
+          textContent,
+          activeProfile,
+          imageDataUrl
+        );
+      }
+
+      // Step 4: Computing final compliance scoring matrix
+      setAuditPhaseStep(4);
+      setAuditPhaseLabel('Computing final compliance scoring matrix...');
+      await new Promise((r) => setTimeout(r, 350));
+
+      const scores = computeAuditScoreMatrix(deterministic, semanticResult);
+
+      const newReport: AuditReport = {
+        id: `audit-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        brandName: activeProfile.metadata.brandName,
+        brandVersion: activeProfile.metadata.brandVersion,
+        inputType,
+        inputSnippet: textContent ? textContent.substring(0, 140) + '...' : '[Visual Asset]',
+        scores,
+        deterministic,
+        semantic: semanticResult
+      };
+
+      setCurrentReport(newReport);
+      addAuditToHistory(newReport);
+
+      if (scores.sOverall >= 90) {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      }
+
+      showToast('Brand consistency audit completed successfully.');
+    } catch (err: any) {
+      if (err instanceof GeminiApiError) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage(err.message || 'An unexpected error occurred during the audit.');
+      }
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handleApplySuggestion = (originalQuote: string, replacementText: string) => {
+    if (!currentDraftText) return;
+
+    // Direct replacement or fuzzy context match
+    let updated = currentDraftText;
+    if (updated.includes(originalQuote)) {
+      updated = updated.replace(originalQuote, replacementText);
+    } else {
+      // Clean quotes and try replacing
+      const cleanQuote = originalQuote.replace(/^["']|["']$/g, '').trim();
+      if (updated.includes(cleanQuote)) {
+        updated = updated.replace(cleanQuote, replacementText);
+      } else {
+        // Fallback: append or replace closest match
+        updated = `${updated}\n\n[Applied Improvement]: ${replacementText}`;
+      }
+    }
+
+    setCurrentDraftText(updated);
+    showToast('Applied suggestion directly into draft editor.');
+  };
+
+  const handleClearAll = () => {
+    setCurrentDraftText('');
+    setCurrentReport(null);
+    showToast('Cleared input draft and diagnostic report.');
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Toast Notification (Liquid Neomorphic) */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 text-white text-xs font-bold shadow-[0_8px_32px_rgba(6,182,212,0.4)] animate-fade-in border border-white/20">
+          <Check className="w-4 h-4 text-cyan-200" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Error Alert */}
+      {errorMessage && (
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/60 via-[#0a1124]/80 to-[#02050f]/90 border border-rose-500/40 text-xs text-rose-200 flex items-center justify-between gap-3 shadow-[0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            onClick={() => setErrorMessage(null)}
+            className="text-rose-300 hover:text-white text-xs font-bold underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Main 2-Column Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Unified Input Panel (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          <UnifiedInputPanel
+            onRunAudit={handleRunAudit}
+            onClear={handleClearAll}
+            isAuditing={isAuditing}
+          />
+        </div>
+
+        {/* Right Column: Diagnostic Dashboard (7 cols) */}
+        <div className="lg:col-span-7 space-y-4">
+          <DiagnosticDashboard
+            report={currentReport}
+            isAuditing={isAuditing}
+            auditPhaseStep={auditPhaseStep}
+            auditPhaseLabel={auditPhaseLabel}
+            onApplySuggestion={handleApplySuggestion}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
