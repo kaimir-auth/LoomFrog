@@ -182,11 +182,13 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 6. User Custom Brand Profiles (Persisted locally)
   const [userBrandProfiles, setUserBrandProfiles] = useState<BrandDNAProfile[]>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_USER_PROFILES_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem(LOCAL_STORAGE_USER_PROFILES_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
         }
       }
     } catch {
@@ -197,8 +199,10 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [activeProfileName, setActiveProfileName] = useState<string>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_PROFILE_KEY);
-      if (saved) return saved;
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_PROFILE_KEY);
+        if (saved) return saved;
+      }
     } catch {
       // fallback
     }
@@ -211,10 +215,12 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 7. Audit History (Persisted locally)
   const [auditHistory, setAuditHistory] = useState<AuditReport[]>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
       }
     } catch {
       // fallback
