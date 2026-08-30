@@ -89,13 +89,17 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
             {displayScore.toFixed(displayScore % 1 === 0 ? 0 : 1)}
             {showPercentage && <span className="text-xs text-slate-400 ml-0.5">%</span>}
           </span>
-          <span className="text-[10px] font-mono text-cyan-400 -mt-0.5 font-semibold">{mathSymbol}</span>
+          {mathSymbol && (
+            <span className="text-[10px] font-lexend text-[#5eead4] -mt-0.5 font-medium tracking-wide">
+              {mathSymbol}
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="mt-2.5 text-center">
-        <div className="text-xs font-semibold text-white">{label}</div>
-        <div className="text-[10px] text-slate-400 line-clamp-1 max-w-[130px]">{description}</div>
+      <div className="mt-2.5 text-center px-1 w-full">
+        <div className="text-sm font-semibold text-white font-lexend">{label}</div>
+        <div className="text-[11px] text-slate-400 leading-snug mt-0.5">{description}</div>
       </div>
     </div>
   );

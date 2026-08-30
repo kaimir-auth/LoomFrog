@@ -68,21 +68,35 @@ export const DiffCard: React.FC<DiffCardProps> = ({
     }, 2000);
   };
 
+  // Format rule label nicely (e.g., "R-TONE-01" -> "Tone", "R-PRECISION-02" -> "Precision", "R-CLARITY-03" -> "Clarity")
+  const getRuleCategoryLabel = (id: string) => {
+    const upper = id.toUpperCase();
+    if (upper.includes('TONE')) return 'Tone';
+    if (upper.includes('PRECISION')) return 'Precision';
+    if (upper.includes('CLARITY')) return 'Clarity';
+    if (upper.includes('COLOR') || upper.includes('VIS')) return 'Visual';
+    if (upper.includes('VOCAB') || upper.includes('TERM')) return 'Precision';
+    // Fallback: clean up any leading R- and trailing numbers
+    return id.replace(/^R-?/i, '').replace(/-\d+$/, '');
+  };
+
+  const ruleLabel = getRuleCategoryLabel(ruleId);
+
   return (
     <div className={`p-5 rounded-3xl transition-all duration-300 ${
       isApplied 
         ? 'border-2 border-teal-400 bg-teal-950/30 shadow-[0_0_30px_rgba(45,212,191,0.4)]' 
         : 'neo-liquid-card'
     }`}>
-      {/* Top Header with Rule ID & Badges */}
+      {/* Top Header with Category Word on left and Severity Badge on right */}
       <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${badge.classes}`}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-sm font-bold text-white font-lexend tracking-wide">
+            {ruleLabel}
+          </span>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${badge.classes}`}>
             {badge.icon}
             {badge.label}
-          </span>
-          <span className="text-xs font-mono font-medium text-slate-300 bg-[#02050f] px-2.5 py-1 rounded-lg border border-cyan-500/20 shadow-inner">
-            {ruleId}
           </span>
         </div>
 

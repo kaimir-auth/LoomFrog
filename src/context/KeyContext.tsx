@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { BrandDNAProfile, AuditReport, LifecycleState } from '../types/brandDna';
-import { DEFAULT_BRAND_PROFILES, PRECOMPUTED_DEMO_AUDIT } from '../data/sampleBrandProfiles';
+import { DEFAULT_BRAND_PROFILES, PRECOMPUTED_DEMO_AUDIT, DEMO_SAMPLE_DRAFTS } from '../data/sampleBrandProfiles';
 import { DEFAULT_MODEL } from '../services/geminiSemanticEngine';
 
 interface KeyContextType {
@@ -15,6 +15,18 @@ interface KeyContextType {
   setIsDemoMode: (val: boolean) => void;
   toggleDemoMode: () => void;
 
+  // Onboarding Modal State
+  isOnboardingModalOpen: boolean;
+  setIsOnboardingModalOpen: (open: boolean) => void;
+  hasCompletedOnboarding: boolean;
+  setHasCompletedOnboarding: (completed: boolean) => void;
+
+  // Demo Output Prompt Modal State
+  isDemoOutputPromptOpen: boolean;
+  setIsDemoOutputPromptOpen: (open: boolean) => void;
+  generateDemoOutput: () => void;
+  dismissDemoOutputPrompt: () => void;
+
   // Model Selection
   selectedModel: string;
   setSelectedModel: (model: string) => void;
@@ -24,7 +36,10 @@ interface KeyContextType {
   activeProfile: BrandDNAProfile;
   setActiveProfileById: (brandName: string) => void;
   saveBrandProfile: (profile: BrandDNAProfile) => void;
+  renameBrandProfile: (oldName: string, newName: string) => boolean;
   deleteBrandProfile: (brandName: string) => void;
+  addBrandSource: (brandName: string, url: string) => void;
+  removeBrandSource: (brandName: string, sourceId: string) => void;
   setProfileLifecycleState: (brandName: string, state: LifecycleState) => void;
   importProfilesFromJson: (jsonStr: string) => boolean;
   exportProfilesToJson: () => string;
@@ -35,9 +50,11 @@ interface KeyContextType {
   addAuditToHistory: (report: AuditReport) => void;
   clearAuditHistory: () => void;
 
-  // Current draft state
+  // Current draft & report state
   currentDraftText: string;
   setCurrentDraftText: (text: string) => void;
+  currentReport: AuditReport | null;
+  setCurrentReport: (report: AuditReport | null) => void;
 
   // UI Navigation
   activeTab: 'audit' | 'brand_dna' | 'privacy';
@@ -51,6 +68,7 @@ interface KeyContextType {
 const LOCAL_STORAGE_PROFILES_KEY = 'loomfrog_brand_profiles_v1';
 const LOCAL_STORAGE_HISTORY_KEY = 'loomfrog_audit_history_v1';
 const LOCAL_STORAGE_ACTIVE_PROFILE_KEY = 'loomfrog_active_profile_name';
+const LOCAL_STORAGE_ONBOARDING_KEY = 'loomfrog_onboarding_completed_v1';
 
 const KeyContext = createContext<KeyContextType | undefined>(undefined);
 
@@ -69,10 +87,27 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const hasApiKey = Boolean(apiKey && apiKey.length > 5);
 
   // 2. Demo Mode
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(true); // default to true so user immediately experiences interactive UI
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
+
+  // Demo Output Prompt State
+  const [isDemoOutputPromptOpen, setIsDemoOutputPromptOpen] = useState<boolean>(false);
+
+  // Onboarding Modal State - Opens on app launch
+  const [hasCompletedOnboarding, setHasCompletedOnboardingState] = useState<boolean>(false);
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState<boolean>(true);
+
+  const setHasCompletedOnboarding = (completed: boolean) => {
+    setHasCompletedOnboardingState(completed);
+  };
 
   const toggleDemoMode = () => {
-    setIsDemoMode((prev) => !prev);
+    setIsDemoMode((prev) => {
+      const nextVal = !prev;
+      if (nextVal) {
+        setIsDemoOutputPromptOpen(true);
+      }
+      return nextVal;
+    });
   };
 
   // 3. Model Configuration
@@ -82,10 +117,24 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [activeTab, setActiveTab] = useState<'audit' | 'brand_dna' | 'privacy'>('audit');
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
 
-  // 5. Current Draft in editor
-  const [currentDraftText, setCurrentDraftText] = useState<string>(
-    `Hey team! We are thrilled to announce that our new platform will supercharge your entire workflow with pure magic! It is a total game changer that provides cheap cloud compute for everyone. With cross-system synergy, deployment is easy-peasy and delivers unmatched results instantly.`
-  );
+  // 5. Current Draft & Report in editor (clean slate by default)
+  const [currentDraftText, setCurrentDraftText] = useState<string>('');
+  const [currentReport, setCurrentReport] = useState<AuditReport | null>(null);
+
+  // Demo Prompt Handlers
+  const generateDemoOutput = () => {
+    setIsDemoMode(true);
+    setCurrentDraftText(DEMO_SAMPLE_DRAFTS[0].content);
+    setCurrentReport(PRECOMPUTED_DEMO_AUDIT);
+    setIsDemoOutputPromptOpen(false);
+  };
+
+  const dismissDemoOutputPrompt = () => {
+    setIsDemoMode(true);
+    setCurrentDraftText('');
+    setCurrentReport(null);
+    setIsDemoOutputPromptOpen(false);
+  };
 
   // 6. Brand Profiles (Persisted locally)
   const [brandProfiles, setBrandProfiles] = useState<BrandDNAProfile[]>(() => {
@@ -181,6 +230,86 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
+  const renameBrandProfile = (oldName: string, newName: string): boolean => {
+    const trimmedNew = newName.trim();
+    if (!trimmedNew || oldName === trimmedNew) return false;
+
+    // Check if another profile already has the new name
+    const exists = brandProfiles.some(
+      (p) => p.metadata.brandName.toLowerCase() === trimmedNew.toLowerCase() && p.metadata.brandName !== oldName
+    );
+    if (exists) return false;
+
+    setBrandProfiles((prev) =>
+      prev.map((p) => {
+        if (p.metadata.brandName === oldName) {
+          return {
+            ...p,
+            metadata: {
+              ...p.metadata,
+              brandName: trimmedNew,
+              updatedAt: new Date().toISOString()
+            }
+          };
+        }
+        return p;
+      })
+    );
+
+    if (activeProfileName === oldName) {
+      setActiveProfileName(trimmedNew);
+    }
+    return true;
+  };
+
+  const addBrandSource = (brandName: string, url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    setBrandProfiles((prev) =>
+      prev.map((p) => {
+        if (p.metadata.brandName === brandName) {
+          const sources = p.sources || [];
+          if (sources.some((s) => s.url.toLowerCase() === trimmed.toLowerCase())) {
+            return p; // duplicate
+          }
+          const newSource = {
+            id: `src_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            url: trimmed,
+            addedAt: new Date().toISOString(),
+            status: 'active' as const
+          };
+          return {
+            ...p,
+            sources: [...sources, newSource],
+            metadata: {
+              ...p.metadata,
+              updatedAt: new Date().toISOString()
+            }
+          };
+        }
+        return p;
+      })
+    );
+  };
+
+  const removeBrandSource = (brandName: string, sourceId: string) => {
+    setBrandProfiles((prev) =>
+      prev.map((p) => {
+        if (p.metadata.brandName === brandName) {
+          return {
+            ...p,
+            sources: (p.sources || []).filter((s) => s.id !== sourceId),
+            metadata: {
+              ...p.metadata,
+              updatedAt: new Date().toISOString()
+            }
+          };
+        }
+        return p;
+      })
+    );
+  };
+
   const deleteBrandProfile = (brandName: string) => {
     if (brandProfiles.length <= 1) return;
     setBrandProfiles((prev) => prev.filter((p) => p.metadata.brandName !== brandName));
@@ -266,13 +395,20 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isDemoMode,
         setIsDemoMode,
         toggleDemoMode,
+        isOnboardingModalOpen,
+        setIsOnboardingModalOpen,
+        hasCompletedOnboarding,
+        setHasCompletedOnboarding,
         selectedModel,
         setSelectedModel,
         brandProfiles,
         activeProfile,
         setActiveProfileById,
         saveBrandProfile,
+        renameBrandProfile,
         deleteBrandProfile,
+        addBrandSource,
+        removeBrandSource,
         setProfileLifecycleState,
         importProfilesFromJson,
         exportProfilesToJson,
@@ -282,6 +418,12 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         clearAuditHistory,
         currentDraftText,
         setCurrentDraftText,
+        currentReport,
+        setCurrentReport,
+        isDemoOutputPromptOpen,
+        setIsDemoOutputPromptOpen,
+        generateDemoOutput,
+        dismissDemoOutputPrompt,
         activeTab,
         setActiveTab,
         isKeyModalOpen,

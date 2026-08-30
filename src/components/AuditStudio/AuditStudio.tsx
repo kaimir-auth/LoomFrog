@@ -19,14 +19,13 @@ export const AuditStudio: React.FC = () => {
     activeProfile,
     currentDraftText,
     setCurrentDraftText,
+    currentReport,
+    setCurrentReport,
     auditHistory,
     addAuditToHistory,
     setIsKeyModalOpen
   } = useKeyContext();
 
-  const [currentReport, setCurrentReport] = useState<AuditReport | null>(
-    auditHistory[0] || PRECOMPUTED_DEMO_AUDIT
-  );
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditPhaseStep, setAuditPhaseStep] = useState(1);
   const [auditPhaseLabel, setAuditPhaseLabel] = useState('');
@@ -153,23 +152,44 @@ export const AuditStudio: React.FC = () => {
   const handleApplySuggestion = (originalQuote: string, replacementText: string) => {
     if (!currentDraftText) return;
 
-    // Direct replacement or fuzzy context match
     let updated = currentDraftText;
+    const cleanQuote = originalQuote.replace(/^["'“”‘’]|["'“”‘’]$/g, '').trim();
+
     if (updated.includes(originalQuote)) {
       updated = updated.replace(originalQuote, replacementText);
+    } else if (cleanQuote && updated.includes(cleanQuote)) {
+      updated = updated.replace(cleanQuote, replacementText);
     } else {
-      // Clean quotes and try replacing
-      const cleanQuote = originalQuote.replace(/^["']|["']$/g, '').trim();
-      if (updated.includes(cleanQuote)) {
-        updated = updated.replace(cleanQuote, replacementText);
+      // Normalized whitespace matching
+      const normalizedDraft = updated.replace(/\s+/g, ' ');
+      const normalizedQuote = cleanQuote.replace(/\s+/g, ' ');
+      const matchIndex = normalizedDraft.toLowerCase().indexOf(normalizedQuote.toLowerCase());
+
+      if (matchIndex !== -1) {
+        // Find approximate position in original string
+        const words = normalizedQuote.split(' ');
+        const firstWord = words[0];
+        const lastWord = words[words.length - 1];
+        const startPos = updated.toLowerCase().indexOf(firstWord.toLowerCase());
+        const endPos = updated.toLowerCase().lastIndexOf(lastWord.toLowerCase()) + lastWord.length;
+
+        if (startPos !== -1 && endPos > startPos) {
+          updated = updated.substring(0, startPos) + replacementText + updated.substring(endPos);
+        } else {
+          updated = updated.replace(new RegExp(escapeRegExp(cleanQuote), 'i'), replacementText);
+        }
       } else {
-        // Fallback: append or replace closest match
-        updated = `${updated}\n\n[Applied Improvement]: ${replacementText}`;
+        // Fallback: replace any overlapping phrase or append
+        updated = `${updated}\n\n[Applied Suggestion]: ${replacementText}`;
       }
     }
 
     setCurrentDraftText(updated);
     showToast('Applied suggestion directly into draft editor.');
+  };
+
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   };
 
   const handleClearAll = () => {

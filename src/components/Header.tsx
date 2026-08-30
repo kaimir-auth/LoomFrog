@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Sparkles, Key, Cpu, FileCheck, Layers } from 'lucide-react';
+import { Shield, Sparkles, Key, Cpu, FileCheck, Layers, HelpCircle } from 'lucide-react';
 import { useKeyContext } from '../context/KeyContext';
 import { AVAILABLE_MODELS } from '../services/geminiSemanticEngine';
 import { LoomFrogLogo } from './LoomFrogLogo';
@@ -14,6 +14,7 @@ export const Header: React.FC = () => {
     activeTab,
     setActiveTab,
     setIsKeyModalOpen,
+    setIsOnboardingModalOpen,
     activeProfile,
     brandProfiles,
     setActiveProfileById
@@ -62,7 +63,17 @@ export const Header: React.FC = () => {
             </select>
           </div>
 
-          {/* Demo Mode / Live API Mode Indicator (Clean Pill badge with Dot) */}
+          {/* Guide / 4-Step Quick Tour */}
+          <button
+            onClick={() => setIsOnboardingModalOpen(true)}
+            className="col-span-1 sm:col-auto inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl text-[11px] font-semibold bg-[#02050f]/80 text-slate-300 border border-slate-700/60 hover:text-white hover:border-cyan-500/40 transition-all cursor-pointer truncate min-w-0"
+            title="Open 4-Step LoomFrog Guide"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span>Guide</span>
+          </button>
+
+          {/* Demo Mode / Live API Mode Indicator */}
           <div
             onClick={toggleDemoMode}
             className={`col-span-1 sm:col-auto cursor-pointer inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl text-[11px] font-semibold border transition-all duration-300 backdrop-blur-md active:scale-95 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)] truncate min-w-0 ${

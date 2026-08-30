@@ -1,41 +1,94 @@
 import React, { useState } from 'react';
-import { Sparkles, X, AlertCircle, RefreshCw } from 'lucide-react';
+import { Sparkles, X, AlertCircle, RefreshCw, Globe, Link2, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { extractBrandDNAWithAI, GeminiApiError } from '../../services/geminiSemanticEngine';
+import { extractWebpage, WebExtractionError, isValidHttpUrl, normalizeUrl } from '../../services/webExtractor';
 import { BrandDNAProfile } from '../../types/brandDna';
 
 interface AiExtractModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProfileExtracted: (profile: Partial<BrandDNAProfile>) => void;
+  existingSources?: Array<{ id: string; url: string }>;
 }
 
-export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose, onProfileExtracted }) => {
+export const AiExtractModal: React.FC<AiExtractModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onProfileExtracted,
+  existingSources = []
+}) => {
   const { apiKey, hasApiKey, selectedModel, isDemoMode, setIsKeyModalOpen } = useKeyContext();
 
   const [rawText, setRawText] = useState('');
+  const [sourcesList, setSourcesList] = useState<string[]>(() => existingSources.map((s) => s.url));
+  const [newSourceUrl, setNewSourceUrl] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [extractionStatus, setExtractionStatus] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
+  const handleAddSourceUrl = () => {
+    const trimmed = newSourceUrl.trim();
+    if (!trimmed) return;
+    const normalized = normalizeUrl(trimmed);
+    if (!isValidHttpUrl(normalized)) {
+      setError('Please provide a valid web URL (e.g. https://company.com)');
+      return;
+    }
+    if (sourcesList.includes(normalized)) {
+      setError('This URL is already added to source ingestion list.');
+      return;
+    }
+    setSourcesList([...sourcesList, normalized]);
+    setNewSourceUrl('');
+    setError(null);
+  };
+
+  const handleRemoveSourceUrl = (idx: number) => {
+    setSourcesList(sourcesList.filter((_, i) => i !== idx));
+  };
+
   const handleExtract = async () => {
-    if (!rawText.trim()) return;
+    if (!rawText.trim() && sourcesList.length === 0) {
+      setError('Please provide brand guideline text or at least one brand source URL.');
+      return;
+    }
 
     setIsExtracting(true);
     setError(null);
+    setExtractionStatus('Ingesting brand sources and narrative...');
 
     try {
+      // 1. Ingest all URLs with resilient error handling
+      const fetchedSourceTexts: string[] = [];
+      for (const url of sourcesList) {
+        setExtractionStatus(`Reading web source: ${url}...`);
+        try {
+          const webData = await extractWebpage(url);
+          fetchedSourceTexts.push(`--- WEB SOURCE: ${url} (${webData.title}) ---\n${webData.fullFormattedText}\n`);
+        } catch (err: any) {
+          console.warn(`Could not read URL source ${url}:`, err);
+          fetchedSourceTexts.push(`--- WEB SOURCE (FAILED TO FETCH): ${url} ---\nNote: Could not reach live endpoint directly.\n`);
+        }
+      }
+
+      const combinedCorpus = [
+        rawText.trim() ? `--- MANUAL BRAND GUIDELINES / NOTES ---\n${rawText.trim()}\n` : '',
+        ...fetchedSourceTexts
+      ].join('\n\n');
+
       if (isDemoMode) {
-        // Simulated AI extraction in Demo Mode
-        await new Promise((r) => setTimeout(r, 1200));
+        setExtractionStatus('Synthesizing Brand DNA schema (Demo Engine)...');
+        await new Promise((r) => setTimeout(r, 1500));
         const sampleExtracted: Partial<BrandDNAProfile> = {
           metadata: {
             brandName: 'Nova FinTech Group',
             brandVersion: '1.0.0',
             schemaVersion: '1.0',
             updatedAt: new Date().toISOString(),
-            description: 'AI-generated Brand DNA from unstructured brand book memo.'
+            description: 'AI-generated Brand DNA from unstructured brand guidelines and web sources.'
           },
           lifecycleState: 'AI_GENERATED',
           voice: {
@@ -84,7 +137,13 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
               weight: 2.0,
               evaluatorType: 'Deterministic'
             }
-          ]
+          ],
+          sources: sourcesList.map((url, i) => ({
+            id: `src_init_${i}`,
+            url,
+            addedAt: new Date().toISOString(),
+            status: 'active'
+          }))
         };
         onProfileExtracted(sampleExtracted);
         onClose();
@@ -96,7 +155,17 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
         throw new Error('API key required for live AI extraction.');
       }
 
-      const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, rawText);
+      setExtractionStatus(`Synthesizing Brand DNA with ${selectedModel}...`);
+      const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, combinedCorpus);
+      
+      // Attach ingested sources
+      extracted.sources = sourcesList.map((url, i) => ({
+        id: `src_${Date.now()}_${i}`,
+        url,
+        addedAt: new Date().toISOString(),
+        status: 'active'
+      }));
+
       onProfileExtracted(extracted);
       onClose();
     } catch (err: any) {
@@ -107,21 +176,22 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
       }
     } finally {
       setIsExtracting(false);
+      setExtractionStatus(null);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-xl rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.9)] overflow-hidden">
+      <div className="relative w-full max-w-2xl rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.9)] overflow-hidden max-h-[90vh] flex flex-col">
         {/* Top Header */}
-        <div className="flex items-center justify-between p-6 border-b border-cyan-500/20 bg-[#030816]/70">
+        <div className="flex items-center justify-between p-6 border-b border-cyan-500/20 bg-[#030816]/70 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]">
               <Sparkles className="w-5 h-5 text-cyan-200" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white font-lexend">AI Brand DNA Extractor</h2>
-              <p className="text-xs text-slate-400">Convert raw guidelines into structured machine-readable JSON</p>
+              <p className="text-xs text-slate-400">Ingest brand guidelines, text documents, and public URLs</p>
             </div>
           </div>
           <button
@@ -132,8 +202,8 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-4">
+        {/* Scrollable Content */}
+        <div className="p-6 space-y-4 overflow-y-auto flex-1">
           {error && (
             <div className="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
@@ -141,6 +211,58 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
             </div>
           )}
 
+          {/* Web Ingestion URLs */}
+          <div>
+            <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-teal-400" />
+              <span>Brand Source URLs (Websites, Brand Guidelines, Style Guides)</span>
+            </label>
+
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="url"
+                value={newSourceUrl}
+                onChange={(e) => setNewSourceUrl(e.target.value)}
+                placeholder="https://company.com/brand or https://company.com"
+                className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white placeholder-slate-500"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddSourceUrl()}
+              />
+              <button
+                type="button"
+                onClick={handleAddSourceUrl}
+                className="px-3.5 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border border-teal-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Source</span>
+              </button>
+            </div>
+
+            {sourcesList.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                {sourcesList.map((url, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-2 rounded-xl bg-[#02050f]/80 border border-teal-500/20 text-xs"
+                  >
+                    <div className="flex items-center gap-2 text-slate-300 truncate">
+                      <Link2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      <span className="truncate">{url}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSourceUrl(idx)}
+                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
+                      title="Remove source"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Raw Text Input */}
           <div>
             <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend">
               Paste Brand Guidelines, Style Guide, or Corporate Narrative
@@ -148,11 +270,18 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
             <textarea
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
-              rows={8}
+              rows={6}
               placeholder="e.g. Acme Corp is an enterprise AI infrastructure company. Our tone is authoritative, humble, and engineering-first. We never use buzzwords like 'supercharge' or 'game changer'. Our brand colors are deep navy (#040918), cyan (#06B6D4) and prismarine (#2DD4BF)..."
               className="w-full p-4 rounded-2xl neo-liquid-input text-xs text-white placeholder-slate-500"
             />
           </div>
+
+          {isExtracting && extractionStatus && (
+            <div className="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-2 animate-pulse">
+              <RefreshCw className="w-4 h-4 animate-spin text-cyan-400 shrink-0" />
+              <span>{extractionStatus}</span>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-cyan-500/10">
             <button
@@ -178,18 +307,18 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({ isOpen, onClose,
               <button
                 type="button"
                 onClick={handleExtract}
-                disabled={isExtracting || !rawText.trim()}
+                disabled={isExtracting || (!rawText.trim() && sourcesList.length === 0)}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isExtracting ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    Extracting Schema...
+                    <span>Extracting Schema...</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-                    Extract Brand DNA
+                    <span>Extract Brand DNA</span>
                   </>
                 )}
               </button>

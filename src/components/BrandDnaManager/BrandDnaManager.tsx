@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useKeyContext } from '../../context/KeyContext';
 import { LifecycleStepper } from './LifecycleStepper';
 import { AiExtractModal } from './AiExtractModal';
-import { BrandDNAProfile, BrandRule, ForbiddenTerm, LifecycleState } from '../../types/brandDna';
+import { BrandDNAProfile, BrandRule, LifecycleState, BrandSource } from '../../types/brandDna';
+import { extractWebpage, isValidHttpUrl, normalizeUrl, ExtractedWebpageData } from '../../services/webExtractor';
 import {
   Plus,
   Trash2,
@@ -11,14 +12,20 @@ import {
   Sparkles,
   CheckCircle2,
   Shield,
-  Save,
   Palette,
   Sliders,
   FileText,
   Volume2,
   AlertTriangle,
   Flame,
-  RotateCcw
+  RotateCcw,
+  Globe,
+  ExternalLink,
+  Edit2,
+  Check,
+  X,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 
 export const BrandDnaManager: React.FC = () => {
@@ -28,6 +35,9 @@ export const BrandDnaManager: React.FC = () => {
     setActiveProfileById,
     saveBrandProfile,
     deleteBrandProfile,
+    renameBrandProfile,
+    addBrandSource,
+    removeBrandSource,
     setProfileLifecycleState,
     importProfilesFromJson,
     exportProfilesToJson,
@@ -36,8 +46,15 @@ export const BrandDnaManager: React.FC = () => {
 
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [selectedBrandName, setSelectedBrandName] = useState(activeProfile.metadata.brandName);
-  const [activeTabSub, setActiveTabSub] = useState<'voice' | 'vocabulary' | 'colors' | 'rules' | 'raw_json'>('voice');
+  const [activeTabSub, setActiveTabSub] = useState<'voice' | 'vocabulary' | 'colors' | 'rules' | 'sources'>('voice');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // Renaming state
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameInput, setRenameInput] = useState('');
+
+  // Delete modal state
+  const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
 
   // New item inputs
   const [newForbiddenTerm, setNewForbiddenTerm] = useState('');
@@ -46,6 +63,10 @@ export const BrandDnaManager: React.FC = () => {
   const [newToneAttr, setNewToneAttr] = useState('');
   const [newPrimaryHex, setNewPrimaryHex] = useState('#06B6D4');
   const [newSecondaryHex, setNewSecondaryHex] = useState('#2DD4BF');
+
+  // Source URL inputs
+  const [newSourceUrl, setNewSourceUrl] = useState('');
+  const [sourceFetchStatus, setSourceFetchStatus] = useState<Record<string, { loading: boolean; data?: ExtractedWebpageData; error?: string }>>({});
 
   const currentProfile =
     brandProfiles.find((p) => p.metadata.brandName === selectedBrandName) || activeProfile;
@@ -69,6 +90,64 @@ export const BrandDnaManager: React.FC = () => {
     };
     saveBrandProfile(updated);
     showStatus('Brand DNA profile saved.');
+  };
+
+  // Renaming Profile
+  const handleStartRename = () => {
+    setRenameInput(currentProfile.metadata.brandName);
+    setIsRenaming(true);
+  };
+
+  const handleSaveRename = () => {
+    const trimmed = renameInput.trim();
+    if (!trimmed || trimmed === currentProfile.metadata.brandName) {
+      setIsRenaming(false);
+      return;
+    }
+    const success = renameBrandProfile(currentProfile.metadata.brandName, trimmed);
+    if (success) {
+      setSelectedBrandName(trimmed);
+      showStatus(`Renamed brand profile to "${trimmed}".`);
+    } else {
+      showStatus('A brand with that name already exists.');
+    }
+    setIsRenaming(false);
+  };
+
+  // Brand Sources Management
+  const handleAddSource = async () => {
+    const trimmed = newSourceUrl.trim();
+    if (!trimmed) return;
+    const normalized = normalizeUrl(trimmed);
+    if (!isValidHttpUrl(normalized)) {
+      showStatus('Please enter a valid URL (e.g. https://company.com)');
+      return;
+    }
+
+    addBrandSource(currentProfile.metadata.brandName, normalized);
+    setNewSourceUrl('');
+    showStatus(`Added brand source URL.`);
+  };
+
+  const handleTestFetchSource = async (sourceId: string, url: string) => {
+    setSourceFetchStatus((prev) => ({
+      ...prev,
+      [sourceId]: { loading: true }
+    }));
+
+    try {
+      const data = await extractWebpage(url);
+      setSourceFetchStatus((prev) => ({
+        ...prev,
+        [sourceId]: { loading: false, data }
+      }));
+      showStatus(`Successfully fetched content for ${url}`);
+    } catch (err: any) {
+      setSourceFetchStatus((prev) => ({
+        ...prev,
+        [sourceId]: { loading: false, error: err.message || 'Failed to fetch webpage.' }
+      }));
+    }
   };
 
   const handleAddForbiddenTerm = () => {
@@ -252,10 +331,12 @@ export const BrandDnaManager: React.FC = () => {
           weight: 2.0,
           evaluatorType: 'Semantic'
         }
-      ]
+      ],
+      sources: []
     };
     saveBrandProfile(newProf);
     setSelectedBrandName(newName);
+    showStatus(`Created new profile "${newName}".`);
   };
 
   const handleExportJson = () => {
@@ -303,11 +384,47 @@ export const BrandDnaManager: React.FC = () => {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {profileToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-md rounded-3xl neo-liquid-panel p-6 space-y-4 shadow-2xl border border-rose-500/30">
+            <div className="flex items-center gap-3 text-rose-400">
+              <AlertTriangle className="w-6 h-6" />
+              <h3 className="text-base font-bold text-white">Delete Brand Profile?</h3>
+            </div>
+            <p className="text-xs text-slate-300">
+              Are you sure you want to permanently delete <strong className="text-white">&ldquo;{profileToDelete}&rdquo;</strong>? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setProfileToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteBrandProfile(profileToDelete);
+                  setProfileToDelete(null);
+                  showStatus(`Deleted brand profile.`);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer shadow-lg shadow-rose-600/30"
+              >
+                Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* AI Extraction Modal */}
       <AiExtractModal
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
         onProfileExtracted={handleAiExtractedProfile}
+        existingSources={currentProfile.sources || []}
       />
 
       {/* Top Header & Actions */}
@@ -317,7 +434,7 @@ export const BrandDnaManager: React.FC = () => {
             Brand DNA Manager
           </h1>
           <p className="text-xs text-slate-400">
-            Define, calibrate, and lock machine-readable brand guidelines, rulesets, and color matrices.
+            Define, calibrate, and lock machine-readable brand guidelines, rulesets, web sources, and color matrices.
           </p>
         </div>
 
@@ -328,7 +445,7 @@ export const BrandDnaManager: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-            AI Extract from Text
+            AI Ingestion &amp; Extraction
           </button>
 
           {/* New Profile */}
@@ -372,19 +489,59 @@ export const BrandDnaManager: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
           <label className="text-xs font-bold text-cyan-200 font-lexend shrink-0">Selected Profile:</label>
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            <select
-              value={selectedBrandName}
-              onChange={(e) => {
-                setSelectedBrandName(e.target.value);
-              }}
-              className="px-3.5 py-2 rounded-xl neo-liquid-input text-xs font-bold text-white cursor-pointer w-full sm:w-auto max-w-full truncate"
-            >
-              {brandProfiles.map((p) => (
-                <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#040a1b] text-white">
-                  {p.metadata.brandName} (v{p.metadata.brandVersion}) &bull; [{p.lifecycleState}]
-                </option>
-              ))}
-            </select>
+            {isRenaming ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="text"
+                  value={renameInput}
+                  onChange={(e) => setRenameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSaveRename()}
+                  className="px-3 py-1.5 rounded-xl neo-liquid-input text-xs font-bold text-white font-mono"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveRename}
+                  className="p-1.5 rounded-lg bg-teal-500 text-black hover:bg-teal-400 cursor-pointer"
+                  title="Save Name"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsRenaming(false)}
+                  className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
+                  title="Cancel"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={selectedBrandName}
+                  onChange={(e) => {
+                    setSelectedBrandName(e.target.value);
+                  }}
+                  className="px-3.5 py-2 rounded-xl neo-liquid-input text-xs font-bold text-white cursor-pointer w-full sm:w-auto max-w-full truncate"
+                >
+                  {brandProfiles.map((p) => (
+                    <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#040a1b] text-white">
+                      {p.metadata.brandName} (v{p.metadata.brandVersion}) &bull; [{p.lifecycleState}]
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={handleStartRename}
+                  className="p-2 rounded-xl text-slate-400 hover:text-cyan-300 bg-[#02050f]/80 border border-cyan-500/20 transition-colors"
+                  title="Rename Brand Profile"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             {currentProfile.lifecycleState === 'ACTIVE' && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/35 text-xs font-bold backdrop-blur-md shadow-sm shrink-0">
@@ -435,11 +592,7 @@ export const BrandDnaManager: React.FC = () => {
 
           {brandProfiles.length > 1 && (
             <button
-              onClick={() => {
-                if (confirm(`Delete "${currentProfile.metadata.brandName}"?`)) {
-                  deleteBrandProfile(currentProfile.metadata.brandName);
-                }
-              }}
+              onClick={() => setProfileToDelete(currentProfile.metadata.brandName)}
               className="p-2.5 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/30 transition-all cursor-pointer shrink-0"
               title="Delete Profile"
             >
@@ -468,7 +621,7 @@ export const BrandDnaManager: React.FC = () => {
             }`}
           >
             <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
-            Voice &amp; Formality
+            <span>Voice &amp; Formality</span>
           </button>
 
           <button
@@ -478,7 +631,7 @@ export const BrandDnaManager: React.FC = () => {
             }`}
           >
             <FileText className="w-3.5 h-3.5 text-rose-400" />
-            Forbidden &amp; Preferred Vocabulary
+            <span>Forbidden &amp; Preferred Vocabulary</span>
           </button>
 
           <button
@@ -488,7 +641,7 @@ export const BrandDnaManager: React.FC = () => {
             }`}
           >
             <Palette className="w-3.5 h-3.5 text-teal-400" />
-            Color Palette &amp; Matrix
+            <span>Color Palette &amp; Matrix</span>
           </button>
 
           <button
@@ -498,9 +651,149 @@ export const BrandDnaManager: React.FC = () => {
             }`}
           >
             <Sliders className="w-3.5 h-3.5 text-blue-400" />
-            Evaluation Rules ({currentProfile.rules?.length || 0})
+            <span>Evaluation Rules ({currentProfile.rules?.length || 0})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTabSub('sources')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
+              activeTabSub === 'sources' ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Brand Sources &amp; URLs ({currentProfile.sources?.length || 0})</span>
           </button>
         </div>
+
+        {/* Tab 5: Brand Sources & Web Ingestion */}
+        {activeTabSub === 'sources' && (
+          <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider font-mono flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-emerald-400" />
+                  <span>Ingested Brand Source URLs</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Add official website pages, press centers, or public brand books. LoomFrog extracts live copy and links them directly to this Brand DNA.
+                </p>
+              </div>
+            </div>
+
+            {/* Add URL Form */}
+            <div className="p-4 rounded-2xl bg-[#02050f]/80 border border-emerald-500/20 space-y-3">
+              <label className="block text-xs font-semibold text-slate-200">
+                Add New Public Brand Source URL
+              </label>
+              <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                <input
+                  type="url"
+                  value={newSourceUrl}
+                  onChange={(e) => setNewSourceUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddSource()}
+                  placeholder="https://acme.com or https://acme.com/about"
+                  className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddSource}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Attach Source</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Sources List */}
+            <div className="space-y-3">
+              {!currentProfile.sources || currentProfile.sources.length === 0 ? (
+                <div className="p-8 text-center border border-dashed border-slate-800 rounded-2xl">
+                  <Globe className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                  <p className="text-xs text-slate-400">No web sources linked to this profile yet.</p>
+                  <p className="text-[11px] text-slate-500 mt-1">Add a URL above to verify tone and consistency across live web properties.</p>
+                </div>
+              ) : (
+                currentProfile.sources.map((source) => {
+                  const fetchInfo = sourceFetchStatus[source.id];
+                  return (
+                    <div
+                      key={source.id}
+                      className="p-4 rounded-2xl bg-[#02050f]/90 border border-emerald-500/20 space-y-3 shadow-md"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 truncate">
+                          <Globe className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span className="text-xs font-mono text-white font-semibold truncate">{source.url}</span>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-slate-400 hover:text-cyan-300"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                          <button
+                            type="button"
+                            onClick={() => handleTestFetchSource(source.id, source.url)}
+                            disabled={fetchInfo?.loading}
+                            className="px-3 py-1 rounded-lg bg-cyan-950/50 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                          >
+                            {fetchInfo?.loading ? (
+                              <>
+                                <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
+                                <span>Testing...</span>
+                              </>
+                            ) : (
+                              <>
+                                <RefreshCw className="w-3 h-3 text-cyan-400" />
+                                <span>Test Web Extraction</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => removeBrandSource(currentProfile.metadata.brandName, source.id)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer"
+                            title="Remove Source"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Live Inspection Card if fetched */}
+                      {fetchInfo?.data && (
+                        <div className="p-3 rounded-xl bg-[#030a1c] border border-cyan-500/30 text-xs space-y-1.5 animate-fade-in">
+                          <div className="flex items-center justify-between text-teal-300 font-semibold text-[11px]">
+                            <span>Page Title: {fetchInfo.data.title}</span>
+                            <span className="font-mono">{fetchInfo.data.wordCount} words detected</span>
+                          </div>
+                          {fetchInfo.data.headings.length > 0 && (
+                            <p className="text-[11px] text-slate-300 truncate">
+                              <span className="text-slate-400">Headings:</span> {fetchInfo.data.headings.slice(0, 4).join(' • ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {fetchInfo?.error && (
+                        <div className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                          <span>{fetchInfo.error}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Tab 1: Voice & Formality */}
         {activeTabSub === 'voice' && (

@@ -8,13 +8,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { KeyProvider, useKeyContext } from './context/KeyContext';
 import { Header } from './components/Header';
 import { KeyModal } from './components/KeyModal';
+import { OnboardingModal } from './components/OnboardingModal';
+import { DemoOutputPromptModal } from './components/DemoOutputPromptModal';
 import { AuditStudio } from './components/AuditStudio/AuditStudio';
 import { BrandDnaManager } from './components/BrandDnaManager/BrandDnaManager';
 import { PrivacyPanel } from './components/PrivacyPanel/PrivacyPanel';
 import { LoomFrogIcon } from './components/LoomFrogLogo';
 
 function MainAppContent() {
-  const { activeTab } = useKeyContext();
+  const { activeTab, isOnboardingModalOpen, setIsOnboardingModalOpen } = useKeyContext();
 
   return (
     <div className="min-h-screen bg-[#02050f] text-[#f8fafc] flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden">
@@ -33,6 +35,11 @@ function MainAppContent() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
         <KeyModal />
+        <OnboardingModal
+          isOpen={isOnboardingModalOpen}
+          onClose={() => setIsOnboardingModalOpen(false)}
+        />
+        <DemoOutputPromptModal />
 
         <main className="flex-1 pb-10">
           <AnimatePresence mode="wait">

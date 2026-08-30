@@ -33,6 +33,15 @@ export interface ColorPaletteConfig {
 export type RuleCategory = 'Text' | 'Visual' | 'Global';
 export type EvaluatorType = 'Deterministic' | 'Semantic';
 
+export interface BrandSource {
+  id: string;
+  url: string;
+  title?: string;
+  addedAt: string;
+  status?: 'active' | 'error' | 'pending';
+  errorMsg?: string;
+}
+
 export interface BrandRule {
   ruleId: string;
   category: RuleCategory;
@@ -48,6 +57,7 @@ export interface BrandDNAProfile {
   vocabulary: VocabularyConfig;
   colors: ColorPaletteConfig;
   rules: BrandRule[];
+  sources?: BrandSource[];
 }
 
 export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
@@ -106,7 +116,7 @@ export interface AuditScoreMatrix {
   overallRatingLabel: 'EXEMPLARY' | 'ALIGNED' | 'NEEDS_REVIEW' | 'CRITICAL_MISALIGNMENT';
 }
 
-export type DetectedInputType = 'plain_text' | 'document' | 'spreadsheet' | 'image';
+export type DetectedInputType = 'plain_text' | 'document' | 'spreadsheet' | 'image' | 'webpage';
 
 export interface ExtractedInputData {
   type: DetectedInputType;
@@ -115,6 +125,9 @@ export interface ExtractedInputData {
   textContent?: string;
   imageDataUrl?: string;
   rawImageFile?: File;
+  sourceUrl?: string;
+  pageTitle?: string;
+  detectedColors?: string[];
   sourceLocationMap?: Array<{ line: number; sourceRef: string }>;
 }
 
