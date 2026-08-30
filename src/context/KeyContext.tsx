@@ -27,12 +27,22 @@ interface KeyContextType {
   generateDemoOutput: () => void;
   dismissDemoOutputPrompt: () => void;
 
+  // API Key Verified Success Modal State
+  isApiKeySuccessModalOpen: boolean;
+  setIsApiKeySuccessModalOpen: (open: boolean) => void;
+
+  // Create Profile Modal State
+  isCreateProfileModalOpen: boolean;
+  setIsCreateProfileModalOpen: (open: boolean) => void;
+  createNewBrandProfile: (name: string) => BrandDNAProfile;
+
   // Model Selection
   selectedModel: string;
   setSelectedModel: (model: string) => void;
 
   // Brand Profiles (Persisted locally in localStorage)
   brandProfiles: BrandDNAProfile[];
+  userBrandProfiles: BrandDNAProfile[];
   activeProfile: BrandDNAProfile;
   setActiveProfileById: (brandName: string) => void;
   saveBrandProfile: (profile: BrandDNAProfile) => void;
@@ -65,10 +75,37 @@ interface KeyContextType {
   setIsKeyModalOpen: (open: boolean) => void;
 }
 
-const LOCAL_STORAGE_PROFILES_KEY = 'loomfrog_brand_profiles_v1';
+const LOCAL_STORAGE_USER_PROFILES_KEY = 'loomfrog_user_brand_profiles_v1';
 const LOCAL_STORAGE_HISTORY_KEY = 'loomfrog_audit_history_v1';
 const LOCAL_STORAGE_ACTIVE_PROFILE_KEY = 'loomfrog_active_profile_name';
 const LOCAL_STORAGE_ONBOARDING_KEY = 'loomfrog_onboarding_completed_v1';
+
+export const BLANK_BRAND_PROFILE: BrandDNAProfile = {
+  metadata: {
+    brandName: 'Untitled Brand',
+    brandVersion: '1.0.0',
+    schemaVersion: '1.0',
+    updatedAt: new Date().toISOString(),
+    description: 'Custom brand profile'
+  },
+  lifecycleState: 'DRAFT',
+  voice: {
+    primaryTone: 'Confident, clear, and authentic',
+    formalityScore: 0.7,
+    toneAttributes: ['Clear', 'Professional']
+  },
+  vocabulary: {
+    forbidden: [],
+    preferred: []
+  },
+  colors: {
+    primaryHex: ['#06B6D4'],
+    secondaryHex: ['#2DD4BF'],
+    strictCompliance: false
+  },
+  rules: [],
+  sources: []
+};
 
 const KeyContext = createContext<KeyContextType | undefined>(undefined);
 
@@ -91,6 +128,12 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Demo Output Prompt State
   const [isDemoOutputPromptOpen, setIsDemoOutputPromptOpen] = useState<boolean>(false);
+
+  // API Key Verified Success Modal State
+  const [isApiKeySuccessModalOpen, setIsApiKeySuccessModalOpen] = useState<boolean>(false);
+
+  // Create Profile Modal State
+  const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = useState<boolean>(false);
 
   // Onboarding Modal State - Opens on app launch
   const [hasCompletedOnboarding, setHasCompletedOnboardingState] = useState<boolean>(false);
@@ -136,20 +179,20 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsDemoOutputPromptOpen(false);
   };
 
-  // 6. Brand Profiles (Persisted locally)
-  const [brandProfiles, setBrandProfiles] = useState<BrandDNAProfile[]>(() => {
+  // 6. User Custom Brand Profiles (Persisted locally)
+  const [userBrandProfiles, setUserBrandProfiles] = useState<BrandDNAProfile[]>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
+      const saved = localStorage.getItem(LOCAL_STORAGE_USER_PROFILES_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           return parsed;
         }
       }
     } catch {
       // fallback
     }
-    return DEFAULT_BRAND_PROFILES;
+    return [];
   });
 
   const [activeProfileName, setActiveProfileName] = useState<string>(() => {
@@ -161,6 +204,9 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
     return DEFAULT_BRAND_PROFILES[0]?.metadata.brandName || 'Apex Cloud Systems';
   });
+
+  // Effective brand profiles based on demo mode vs live API mode
+  const brandProfiles: BrandDNAProfile[] = isDemoMode ? DEFAULT_BRAND_PROFILES : userBrandProfiles;
 
   // 7. Audit History (Persisted locally)
   const [auditHistory, setAuditHistory] = useState<AuditReport[]>(() => {
@@ -176,14 +222,14 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return [PRECOMPUTED_DEMO_AUDIT];
   });
 
-  // Sync Profiles to LocalStorage
+  // Sync User Profiles to LocalStorage
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(brandProfiles));
+      localStorage.setItem(LOCAL_STORAGE_USER_PROFILES_KEY, JSON.stringify(userBrandProfiles));
     } catch (e) {
-      console.warn('Failed to save profiles to localStorage', e);
+      console.warn('Failed to save user profiles to localStorage', e);
     }
-  }, [brandProfiles]);
+  }, [userBrandProfiles]);
 
   // Sync Active Profile Name to LocalStorage
   useEffect(() => {
@@ -206,14 +252,70 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const activeProfile =
     brandProfiles.find((p) => p.metadata.brandName === activeProfileName) ||
     brandProfiles[0] ||
-    DEFAULT_BRAND_PROFILES[0];
+    BLANK_BRAND_PROFILE;
 
   const setActiveProfileById = (brandName: string) => {
     setActiveProfileName(brandName);
   };
 
+  const createNewBrandProfile = (name: string): BrandDNAProfile => {
+    const trimmed = name.trim();
+    const newProf: BrandDNAProfile = {
+      metadata: {
+        brandName: trimmed,
+        brandVersion: '1.0.0',
+        schemaVersion: '1.0',
+        updatedAt: new Date().toISOString(),
+        description: 'New custom brand profile draft.'
+      },
+      lifecycleState: 'DRAFT',
+      voice: {
+        primaryTone: 'Confident, clear, and authentic',
+        formalityScore: 0.7,
+        toneAttributes: ['Clear', 'Direct', 'Engaging']
+      },
+      vocabulary: {
+        forbidden: [],
+        preferred: []
+      },
+      colors: {
+        primaryHex: ['#040918', '#06B6D4'],
+        secondaryHex: ['#2DD4BF', '#0284C7'],
+        strictCompliance: false
+      },
+      rules: [
+        {
+          ruleId: 'R-VOCAB-01',
+          category: 'Text',
+          description: 'Zero tolerance for unapproved or forbidden buzzwords.',
+          weight: 2.5,
+          evaluatorType: 'Deterministic'
+        },
+        {
+          ruleId: 'R-TONE-01',
+          category: 'Text',
+          description: 'Maintain authentic and clear voice tone across messaging.',
+          weight: 2.0,
+          evaluatorType: 'Semantic'
+        }
+      ],
+      sources: []
+    };
+
+    if (isDemoMode) {
+      setIsDemoMode(false);
+    }
+
+    setUserBrandProfiles((prev) => {
+      const filtered = prev.filter((p) => p.metadata.brandName !== trimmed);
+      return [newProf, ...filtered];
+    });
+    setActiveProfileName(trimmed);
+    return newProf;
+  };
+
   const saveBrandProfile = (updatedProfile: BrandDNAProfile) => {
-    setBrandProfiles((prev) => {
+    setUserBrandProfiles((prev) => {
       const existingIdx = prev.findIndex((p) => p.metadata.brandName === updatedProfile.metadata.brandName);
       if (existingIdx >= 0) {
         const copy = [...prev];
@@ -235,12 +337,12 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!trimmedNew || oldName === trimmedNew) return false;
 
     // Check if another profile already has the new name
-    const exists = brandProfiles.some(
+    const exists = userBrandProfiles.some(
       (p) => p.metadata.brandName.toLowerCase() === trimmedNew.toLowerCase() && p.metadata.brandName !== oldName
     );
     if (exists) return false;
 
-    setBrandProfiles((prev) =>
+    setUserBrandProfiles((prev) =>
       prev.map((p) => {
         if (p.metadata.brandName === oldName) {
           return {
@@ -265,7 +367,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addBrandSource = (brandName: string, url: string) => {
     const trimmed = url.trim();
     if (!trimmed) return;
-    setBrandProfiles((prev) =>
+    setUserBrandProfiles((prev) =>
       prev.map((p) => {
         if (p.metadata.brandName === brandName) {
           const sources = p.sources || [];
@@ -293,7 +395,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const removeBrandSource = (brandName: string, sourceId: string) => {
-    setBrandProfiles((prev) =>
+    setUserBrandProfiles((prev) =>
       prev.map((p) => {
         if (p.metadata.brandName === brandName) {
           return {
@@ -311,18 +413,19 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const deleteBrandProfile = (brandName: string) => {
-    if (brandProfiles.length <= 1) return;
-    setBrandProfiles((prev) => prev.filter((p) => p.metadata.brandName !== brandName));
+    setUserBrandProfiles((prev) => prev.filter((p) => p.metadata.brandName !== brandName));
     if (activeProfileName === brandName) {
-      const remaining = brandProfiles.filter((p) => p.metadata.brandName !== brandName);
+      const remaining = userBrandProfiles.filter((p) => p.metadata.brandName !== brandName);
       if (remaining[0]) {
         setActiveProfileName(remaining[0].metadata.brandName);
+      } else {
+        setActiveProfileName('');
       }
     }
   };
 
   const setProfileLifecycleState = (brandName: string, newState: LifecycleState) => {
-    setBrandProfiles((prev) =>
+    setUserBrandProfiles((prev) =>
       prev.map((p) => {
         if (p.metadata.brandName === brandName) {
           // If setting to ACTIVE, demote other ACTIVE profiles to APPROVED
@@ -348,7 +451,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (validProfiles.length === 0) return false;
 
-      setBrandProfiles((prev) => {
+      setUserBrandProfiles((prev) => {
         const merged = [...prev];
         validProfiles.forEach((newP) => {
           const idx = merged.findIndex((m) => m.metadata.brandName === newP.metadata.brandName);
@@ -373,7 +476,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const resetToDefaultProfiles = () => {
-    setBrandProfiles(DEFAULT_BRAND_PROFILES);
+    setUserBrandProfiles(DEFAULT_BRAND_PROFILES);
     setActiveProfileName(DEFAULT_BRAND_PROFILES[0].metadata.brandName);
   };
 
@@ -402,6 +505,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         selectedModel,
         setSelectedModel,
         brandProfiles,
+        userBrandProfiles,
         activeProfile,
         setActiveProfileById,
         saveBrandProfile,
@@ -413,6 +517,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         importProfilesFromJson,
         exportProfilesToJson,
         resetToDefaultProfiles,
+        createNewBrandProfile,
         auditHistory,
         addAuditToHistory,
         clearAuditHistory,
@@ -424,6 +529,10 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setIsDemoOutputPromptOpen,
         generateDemoOutput,
         dismissDemoOutputPrompt,
+        isApiKeySuccessModalOpen,
+        setIsApiKeySuccessModalOpen,
+        isCreateProfileModalOpen,
+        setIsCreateProfileModalOpen,
         activeTab,
         setActiveTab,
         isKeyModalOpen,

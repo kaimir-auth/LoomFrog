@@ -13,6 +13,7 @@ export const KeyModal: React.FC = () => {
     setIsKeyModalOpen,
     isDemoMode,
     setIsDemoMode,
+    setIsApiKeySuccessModalOpen,
     selectedModel,
     setSelectedModel
   } = useKeyContext();
@@ -32,7 +33,8 @@ export const KeyModal: React.FC = () => {
       setTimeout(() => {
         setIsSavedFlash(false);
         setIsKeyModalOpen(false);
-      }, 1000);
+        setIsApiKeySuccessModalOpen(true);
+      }, 500);
     }
   };
 

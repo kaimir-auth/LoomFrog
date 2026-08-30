@@ -35,15 +35,21 @@ export const Header: React.FC = () => {
           <div className="col-span-1 sm:col-auto flex items-center gap-1.5 bg-[#02050f]/80 px-2.5 sm:px-3 py-1.5 rounded-2xl border border-cyan-500/20 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)] min-w-0">
             <span className="text-[11px] text-cyan-300 font-bold font-mono shrink-0">DNA:</span>
             <select
-              value={activeProfile.metadata.brandName}
+              value={activeProfile?.metadata?.brandName || ''}
               onChange={(e) => setActiveProfileById(e.target.value)}
               className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer pr-1 truncate w-full"
             >
-              {brandProfiles.map((p) => (
-                <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#040918] text-white">
-                  {p.metadata.brandName} (v{p.metadata.brandVersion})
+              {brandProfiles.length === 0 ? (
+                <option value="" className="bg-[#040918] text-slate-400">
+                  + Create Brand Profile
                 </option>
-              ))}
+              ) : (
+                brandProfiles.map((p) => (
+                  <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#040918] text-white">
+                    {p.metadata.brandName} (v{p.metadata.brandVersion})
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

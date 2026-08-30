@@ -41,13 +41,21 @@ export const BrandDnaManager: React.FC = () => {
     setProfileLifecycleState,
     importProfilesFromJson,
     exportProfilesToJson,
-    resetToDefaultProfiles
+    resetToDefaultProfiles,
+    setIsCreateProfileModalOpen
   } = useKeyContext();
 
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
-  const [selectedBrandName, setSelectedBrandName] = useState(activeProfile.metadata.brandName);
+  const [selectedBrandName, setSelectedBrandName] = useState(activeProfile?.metadata?.brandName || '');
   const [activeTabSub, setActiveTabSub] = useState<'voice' | 'vocabulary' | 'colors' | 'rules' | 'sources'>('voice');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // Sync selected profile name if activeProfile changes or on initial render
+  React.useEffect(() => {
+    if (activeProfile?.metadata?.brandName) {
+      setSelectedBrandName(activeProfile.metadata.brandName);
+    }
+  }, [activeProfile?.metadata?.brandName]);
 
   // Renaming state
   const [isRenaming, setIsRenaming] = useState(false);
@@ -450,7 +458,7 @@ export const BrandDnaManager: React.FC = () => {
 
           {/* New Profile */}
           <button
-            onClick={handleCreateNewProfile}
+            onClick={() => setIsCreateProfileModalOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm shrink-0"
           >
             <Plus className="w-3.5 h-3.5 text-teal-400" />
@@ -482,8 +490,31 @@ export const BrandDnaManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Profile Selector & Activation Banner */}
-      <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+      {brandProfiles.length === 0 ? (
+        <div className="p-10 rounded-3xl neo-liquid-panel text-center space-y-5 border border-cyan-500/20 my-8">
+          <div className="w-16 h-16 rounded-3xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.25)]">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <div className="max-w-md mx-auto space-y-2">
+            <h3 className="text-lg font-bold text-white font-lexend">No Brand DNA Profiles Configured</h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Your API Key is synchronized. Create your first custom Brand DNA profile to establish machine-readable tone guidelines, forbidden buzzwords, and diagnostic metrics.
+            </p>
+          </div>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <button
+              onClick={() => setIsCreateProfileModalOpen(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer active:scale-95 transition-all"
+            >
+              <Plus className="w-4 h-4 text-cyan-200" />
+              <span>Create Brand DNA Profile</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Profile Selector & Activation Banner */}
+          <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
@@ -1221,6 +1252,8 @@ export const BrandDnaManager: React.FC = () => {
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 };

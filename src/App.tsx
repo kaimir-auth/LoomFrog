@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { KeyProvider, useKeyContext } from './context/KeyContext';
 import { Header } from './components/Header';
 import { KeyModal } from './components/KeyModal';
+import { ApiKeySuccessModal } from './components/ApiKeySuccessModal';
+import { CreateProfileModal } from './components/CreateProfileModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { DemoOutputPromptModal } from './components/DemoOutputPromptModal';
 import { AuditStudio } from './components/AuditStudio/AuditStudio';
@@ -35,6 +37,8 @@ function MainAppContent() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
         <KeyModal />
+        <ApiKeySuccessModal />
+        <CreateProfileModal />
         <OnboardingModal
           isOpen={isOnboardingModalOpen}
           onClose={() => setIsOnboardingModalOpen(false)}
