@@ -1,5 +1,5 @@
 // Service Worker for LoomFrog PWA
-const CACHE_NAME = 'loomfrog-v3';
+const CACHE_NAME = 'loomfrog-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
