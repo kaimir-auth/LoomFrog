@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
       {/* TIER 1: Upper Ribbon (Brand Identity + Engine Controls) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyan-500/10">
         {/* Left: Brandmark & Custom Frog Logo */}
-        <div className="cursor-pointer group" onClick={() => setActiveTab('audit')}>
+        <div className="cursor-pointer group" onClick={() => setActiveTab('landing')} title="LoomFrog — Return to Overview">
           <LoomFrogLogo size="md" />
         </div>
 
@@ -133,6 +133,18 @@ export const Header: React.FC = () => {
       {/* TIER 2: Lower Ribbon (Dedicated Main Navigation Bar) */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar w-full">
         <nav className="inline-flex items-center gap-1 sm:gap-1.5 bg-[#02050f]/90 p-1 sm:p-1.5 rounded-2xl border border-cyan-500/20 shadow-[inset_2px_2px_8px_rgba(0,0,0,0.8),0_4px_16px_rgba(0,0,0,0.5)] shrink-0 min-w-max">
+          <button
+            onClick={() => setActiveTab('landing')}
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer shrink-0 ${
+              activeTab === 'landing'
+                ? 'neo-liquid-pill-active text-white'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            Overview
+          </button>
+
           <button
             onClick={() => setActiveTab('audit')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer shrink-0 ${

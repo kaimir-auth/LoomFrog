@@ -1,0 +1,37 @@
+{
+  "name": "LoomFrog — Brand DNA & Tone Consistency",
+  "short_name": "LoomFrog",
+  "description": "Zero-Server Brand DNA & Tone Consistency Platform with client-side deterministic verification and Gemini semantic audits.",
+  "start_url": "/LoomFrog/",
+  "scope": "/LoomFrog/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0F17",
+  "theme_color": "#0B0F17",
+  "icons": [
+    {
+      "src": "/LoomFrog/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/LoomFrog/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/LoomFrog/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/LoomFrog/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -67,8 +67,8 @@ interface KeyContextType {
   setCurrentReport: (report: AuditReport | null) => void;
 
   // UI Navigation
-  activeTab: 'audit' | 'brand_dna' | 'privacy';
-  setActiveTab: (tab: 'audit' | 'brand_dna' | 'privacy') => void;
+  activeTab: 'landing' | 'audit' | 'brand_dna' | 'privacy';
+  setActiveTab: (tab: 'landing' | 'audit' | 'brand_dna' | 'privacy') => void;
 
   // Key Modal Control
   isKeyModalOpen: boolean;
@@ -135,9 +135,9 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Create Profile Modal State
   const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = useState<boolean>(false);
 
-  // Onboarding Modal State - Opens on app launch
+  // Onboarding Modal State - Opens on guide click or user prompt
   const [hasCompletedOnboarding, setHasCompletedOnboardingState] = useState<boolean>(false);
-  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState<boolean>(true);
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState<boolean>(false);
 
   const setHasCompletedOnboarding = (completed: boolean) => {
     setHasCompletedOnboardingState(completed);
@@ -157,7 +157,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
 
   // 4. Navigation
-  const [activeTab, setActiveTab] = useState<'audit' | 'brand_dna' | 'privacy'>('audit');
+  const [activeTab, setActiveTab] = useState<'landing' | 'audit' | 'brand_dna' | 'privacy'>('landing');
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
 
   // 5. Current Draft & Report in editor (clean slate by default)
