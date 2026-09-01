@@ -170,7 +170,7 @@ export const PrivacyPanel: React.FC = () => {
             <div>
               <h4 className="font-bold text-cyan-300 mb-1 font-lexend">Client-Side Isolation Verification</h4>
               <p className="text-slate-300 leading-relaxed">
-                When you paste text, drop a Word doc (.docx), or inspect a visual asset, all tokenization, regex matching, and canvas color extractions occur directly inside your browser’s JavaScript thread. No draft data passes through any middleman or third-party tracking servers.
+                When you paste text, drop a document (.docx, .txt, .md), spreadsheet (.xlsx, .csv), or visual asset (.png, .jpg, .webp), all tokenization, regex matching, and canvas color extractions occur directly inside your browser’s JavaScript thread. No draft data passes through any middleman or third-party tracking servers.
               </p>
             </div>
           )}

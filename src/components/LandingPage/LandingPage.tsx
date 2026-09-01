@@ -357,14 +357,14 @@ export const LandingPage: React.FC = () => {
 
           {/* Exact Section Copy */}
           <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-10">
-            Supports text, Word documents, spreadsheets, and images. No account required. No usage limits — you control your own Gemini quota.
+            Supports text, Markdown, Word documents, spreadsheets, and images. No account required. No usage limits — you control your own Gemini quota.
           </p>
 
           {/* Supported format badges */}
           <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1F2937] border border-slate-700 text-xs font-mono text-slate-200">
               <FileText className="w-4 h-4 text-cyan-400" />
-              <span>Documents (.docx, .txt)</span>
+              <span>Documents (.docx, .txt, .md)</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1F2937] border border-slate-700 text-xs font-mono text-slate-200">
               <FileSpreadsheet className="w-4 h-4 text-teal-400" />

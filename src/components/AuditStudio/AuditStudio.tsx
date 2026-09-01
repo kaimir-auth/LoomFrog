@@ -42,7 +42,8 @@ export const AuditStudio: React.FC = () => {
   const handleRunAudit = async (
     textContent: string,
     imageDataUrl?: string,
-    inputType: DetectedInputType = 'plain_text'
+    inputType: DetectedInputType = 'plain_text',
+    contentContext?: string
   ) => {
     setIsAuditing(true);
     setErrorMessage(null);
@@ -103,7 +104,8 @@ export const AuditStudio: React.FC = () => {
           selectedModel,
           textContent,
           activeProfile,
-          imageDataUrl
+          imageDataUrl,
+          contentContext
         );
       }
 
@@ -121,6 +123,7 @@ export const AuditStudio: React.FC = () => {
         brandVersion: activeProfile.metadata.brandVersion,
         inputType,
         inputSnippet: textContent ? textContent.substring(0, 140) + '...' : '[Visual Asset]',
+        contentContext: contentContext?.trim() || undefined,
         scores,
         deterministic,
         semantic: semanticResult

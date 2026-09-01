@@ -9,7 +9,7 @@ import { DEMO_SAMPLE_DRAFTS } from '../../data/sampleBrandProfiles';
 import { DetectedInputType, DeterministicTextMatch } from '../../types/brandDna';
 
 interface UnifiedInputPanelProps {
-  onRunAudit: (text: string, imageDataUrl?: string, inputType?: DetectedInputType) => void;
+  onRunAudit: (text: string, imageDataUrl?: string, inputType?: DetectedInputType, contentContext?: string) => void;
   onClear?: () => void;
   isAuditing: boolean;
 }
@@ -20,6 +20,8 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
   const { currentDraftText, setCurrentDraftText, activeProfile, isDemoMode } = useKeyContext();
 
   const [inputMode, setInputMode] = useState<InputMode>('text');
+  const [contentContext, setContentContext] = useState<string>('');
+  const [showContextNudge, setShowContextNudge] = useState<boolean>(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [extractedFileName, setExtractedFileName] = useState<string | null>(null);
   const [detectedType, setDetectedType] = useState<DetectedInputType>('plain_text');
@@ -96,6 +98,8 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
   const handleClear = () => {
     setCurrentDraftText('');
+    setContentContext('');
+    setShowContextNudge(false);
     setExtractedImageDataUrl(null);
     setExtractedFileName(null);
     setDetectedType('plain_text');
@@ -147,13 +151,20 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
     }
   };
 
-  const handleExecuteAudit = () => {
+  const handleExecuteAudit = (bypassNudge = false) => {
+    if (!contentContext.trim() && !bypassNudge) {
+      setShowContextNudge(true);
+      return;
+    }
+
+    setShowContextNudge(false);
+
     if (inputMode === 'visual' && extractedImageDataUrl) {
-      onRunAudit('', extractedImageDataUrl, 'image');
+      onRunAudit('', extractedImageDataUrl, 'image', contentContext.trim());
     } else if (inputMode === 'url' && urlData) {
-      onRunAudit(urlData.fullFormattedText, undefined, 'webpage');
+      onRunAudit(urlData.fullFormattedText, undefined, 'webpage', contentContext.trim());
     } else if (currentDraftText.trim()) {
-      onRunAudit(currentDraftText, undefined, detectedType);
+      onRunAudit(currentDraftText, undefined, detectedType, contentContext.trim());
     }
   };
 
@@ -289,6 +300,40 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
         )}
       </div>
 
+      {/* Content Context Field (Optional for semantic Tier 2 AI engine) */}
+      <div className="p-3.5 sm:p-4 rounded-2xl neo-liquid-panel border border-cyan-500/20 space-y-1.5 shadow-sm">
+        <div className="flex items-center justify-between">
+          <label htmlFor="content-context-input" className="text-xs font-semibold text-slate-200">
+            Tell us about the content
+          </label>
+          {contentContext && (
+            <button
+              type="button"
+              onClick={() => {
+                setContentContext('');
+                setShowContextNudge(false);
+              }}
+              className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+            >
+              Clear Context
+            </button>
+          )}
+        </div>
+        <div className="relative">
+          <input
+            id="content-context-input"
+            type="text"
+            value={contentContext}
+            onChange={(e) => {
+              setContentContext(e.target.value);
+              if (showContextNudge) setShowContextNudge(false);
+            }}
+            placeholder="e.g. 'Landing page hero copy', 'Client invitation draft', 'Instagram caption'"
+            className="w-full px-4 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none transition-all"
+          />
+        </div>
+      </div>
+
       {/* Main Input Canvas Zone */}
       <div
         onDragOver={onDragOver}
@@ -303,7 +348,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
         <input
           ref={fileInputRef}
           type="file"
-          accept=".txt,.docx,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp"
+          accept=".docx,.txt,.md,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp"
           onChange={handleFileInputChange}
           className="hidden"
         />
@@ -589,7 +634,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                     if (detectedType === 'image') setDetectedType('plain_text');
                   }}
                   rows={10}
-                  placeholder="Type or paste your draft copy here, or drop a Word document, spreadsheet, or image..."
+                  placeholder="Type or paste your draft copy here, or drop a document (.docx, .txt, .md), spreadsheet (.xlsx, .csv), or image (.png, .jpg, .webp)..."
                   className="w-full p-4 rounded-2xl neo-liquid-input text-sm text-slate-100 placeholder-slate-500 leading-relaxed resize-y font-sans transition-all"
                 />
               </div>
@@ -604,7 +649,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                   className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition-colors"
                 >
                   <Upload className="w-3.5 h-3.5 text-cyan-400" />
-                  Upload Document (.docx, .txt, .xlsx, .csv)
+                  Upload Document (.docx, .txt, .md, .xlsx, .csv)
                 </button>
               </div>
 
@@ -616,6 +661,38 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
           </div>
         )}
       </div>
+
+      {/* Context Nudge Alert Banner (Dismissible) */}
+      {showContextNudge && (
+        <div className="p-3.5 rounded-2xl bg-[#08182b] border border-cyan-500/40 text-xs text-cyan-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg animate-fade-in">
+          <div className="flex items-start sm:items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5 sm:mt-0" />
+            <span>
+              Adding context helps the AI judge tone more accurately. Continue without it?
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setShowContextNudge(false);
+                const el = document.getElementById('content-context-input');
+                el?.focus();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+            >
+              Add Context
+            </button>
+            <button
+              type="button"
+              onClick={() => handleExecuteAudit(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-cyan-500/25 hover:bg-cyan-500/40 text-cyan-200 border border-cyan-400/40 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+            >
+              Continue Anyway
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

@@ -25,7 +25,7 @@ export async function extractInputData(fileOrText: File | string): Promise<Extra
   const fileName = file.name.toLowerCase();
   const fileSize = file.size;
 
-  // 1. Text files (.txt, .md)
+  // 1. Text and Markdown files (.txt, .md)
   if (fileName.endsWith('.txt') || fileName.endsWith('.md')) {
     try {
       const text = await file.text();
@@ -36,7 +36,7 @@ export async function extractInputData(fileOrText: File | string): Promise<Extra
         textContent: text.trim()
       };
     } catch (err) {
-      throw new FileExtractionError(`Failed to read text file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw new FileExtractionError(`Failed to read text/markdown file: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
 
@@ -102,8 +102,8 @@ export async function extractInputData(fileOrText: File | string): Promise<Extra
     }
   }
 
-  // 4. Image files (.png, .jpg, .jpeg, .webp, .svg)
-  if (file.type.startsWith('image/') || /\.(png|jpg|jpeg|webp|svg)$/i.test(fileName)) {
+  // 4. Image files (.png, .jpg, .jpeg, .webp)
+  if (file.type.startsWith('image/') || /\.(png|jpg|jpeg|webp)$/i.test(fileName)) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -122,5 +122,5 @@ export async function extractInputData(fileOrText: File | string): Promise<Extra
     });
   }
 
-  throw new FileExtractionError(`Unsupported file format "${file.name}". Please provide .txt, .docx, .xlsx, .csv, .png, .jpg, or .webp.`);
+  throw new FileExtractionError(`Unsupported file format "${file.name}". Please provide .docx, .txt, .md, .xlsx, .csv, .png, .jpg, or .webp.`);
 }

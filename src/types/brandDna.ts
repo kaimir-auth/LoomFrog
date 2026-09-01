@@ -138,6 +138,7 @@ export interface AuditReport {
   brandVersion: string;
   inputType: DetectedInputType;
   inputSnippet: string;
+  contentContext?: string;
   scores: AuditScoreMatrix;
   deterministic: DeterministicResult;
   semantic: SemanticResult;
