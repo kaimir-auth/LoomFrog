@@ -45,7 +45,7 @@ export const BrandDnaManager: React.FC = () => {
     setIsCreateProfileModalOpen
   } = useKeyContext();
 
-  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(true);
   const [selectedBrandName, setSelectedBrandName] = useState(activeProfile?.metadata?.brandName || '');
   const [activeTabSub, setActiveTabSub] = useState<'voice' | 'vocabulary' | 'colors' | 'rules' | 'sources'>('voice');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
