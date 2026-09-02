@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
-import { Sparkles, X, AlertCircle, RefreshCw, Globe, Link2, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import {
+  Sparkles,
+  X,
+  AlertCircle,
+  RefreshCw,
+  Globe,
+  Link2,
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  Upload,
+  FileText,
+  HelpCircle,
+  CheckCircle2,
+  Compass
+} from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { extractBrandDNAWithAI, GeminiApiError } from '../../services/geminiSemanticEngine';
-import { extractWebpage, WebExtractionError, isValidHttpUrl, normalizeUrl } from '../../services/webExtractor';
+import { isValidHttpUrl, normalizeUrl } from '../../services/webExtractor';
 import { BrandDNAProfile } from '../../types/brandDna';
 
 interface AiExtractModalProps {
@@ -12,134 +27,185 @@ interface AiExtractModalProps {
   existingSources?: Array<{ id: string; url: string }>;
 }
 
-export const AiExtractModal: React.FC<AiExtractModalProps> = ({ 
-  isOpen, 
-  onClose, 
+interface UploadedImage {
+  id: string;
+  name: string;
+  size: number;
+  dataUrl: string;
+}
+
+const SAMPLE_PROMPT = `We build developer-first edge security infrastructure called NovaMesh.
+Our target audience is distributed systems engineers, security architects, and CTOs.
+Tone & Voice: Authoritative, pragmatic, humble, and low-latency. We speak in clear engineering terminology, zero marketing fluff.
+Forbidden Terms: Never say "revolutionary", "game changing", "supercharge", or "100% unhackable".
+Preferred Terms: Use "cryptographically verified", "zero-overhead", "deterministic latency", and "resilient".
+Visual Aesthetic: Dark cybernetic minimalism — deep obsidian (#020617), electric cyan (#06B6D4), and emerald pulse (#10B981).
+Formality: Around 85% — professional and technically rigorous.`;
+
+export const AiExtractModal: React.FC<AiExtractModalProps> = ({
+  isOpen,
+  onClose,
   onProfileExtracted,
   existingSources = []
 }) => {
   const { apiKey, hasApiKey, selectedModel, isDemoMode, setIsKeyModalOpen } = useKeyContext();
 
-  const [rawText, setRawText] = useState('');
-  const [sourcesList, setSourcesList] = useState<string[]>(() => existingSources.map((s) => s.url));
-  const [newSourceUrl, setNewSourceUrl] = useState('');
+  const [freeformText, setFreeformText] = useState('');
+  const [urlsList, setUrlsList] = useState<string[]>(() => existingSources.map((s) => s.url));
+  const [newUrl, setNewUrl] = useState('');
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [extractionStatus, setExtractionStatus] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
-  const handleAddSourceUrl = () => {
-    const trimmed = newSourceUrl.trim();
+  const handleAddUrl = () => {
+    const trimmed = newUrl.trim();
     if (!trimmed) return;
     const normalized = normalizeUrl(trimmed);
     if (!isValidHttpUrl(normalized)) {
       setError('Please provide a valid web URL (e.g. https://company.com)');
       return;
     }
-    if (sourcesList.includes(normalized)) {
-      setError('This URL is already added to source ingestion list.');
+    if (urlsList.includes(normalized)) {
+      setError('This URL is already added.');
       return;
     }
-    setSourcesList([...sourcesList, normalized]);
-    setNewSourceUrl('');
+    setUrlsList([...urlsList, normalized]);
+    setNewUrl('');
     setError(null);
   };
 
-  const handleRemoveSourceUrl = (idx: number) => {
-    setSourcesList(sourcesList.filter((_, i) => i !== idx));
+  const handleRemoveUrl = (idx: number) => {
+    setUrlsList(urlsList.filter((_, i) => i !== idx));
   };
 
-  const handleExtract = async () => {
-    if (!rawText.trim() && sourcesList.length === 0) {
-      setError('Please provide brand guideline text or at least one brand source URL.');
+  const handleImageFiles = (files: FileList | null) => {
+    if (!files) return;
+    setError(null);
+
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith('image/')) {
+        setError('Only image files (PNG, JPG, WebP, SVG) are supported.');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`"${file.name}" exceeds the 5MB image size limit.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        setImages((prev) => [
+          ...prev,
+          {
+            id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+            name: file.name,
+            size: file.size,
+            dataUrl
+          }
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveImage = (id: string) => {
+    setImages(images.filter((img) => img.id !== id));
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    handleImageFiles(e.dataTransfer.files);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleGenerate = async () => {
+    if (!freeformText.trim() && urlsList.length === 0 && images.length === 0) {
+      setError('Please provide a conversational description, at least one URL, or a reference image.');
       return;
     }
 
     setIsExtracting(true);
     setError(null);
-    setExtractionStatus('Ingesting brand sources and narrative...');
+    setExtractionStatus('Synthesizing Brand DNA from conversational inputs...');
 
     try {
-      // 1. Ingest all URLs with resilient error handling
-      const fetchedSourceTexts: string[] = [];
-      for (const url of sourcesList) {
-        setExtractionStatus(`Reading web source: ${url}...`);
-        try {
-          const webData = await extractWebpage(url);
-          fetchedSourceTexts.push(`--- WEB SOURCE: ${url} (${webData.title}) ---\n${webData.fullFormattedText}\n`);
-        } catch (err: any) {
-          console.warn(`Could not read URL source ${url}:`, err);
-          fetchedSourceTexts.push(`--- WEB SOURCE (FAILED TO FETCH): ${url} ---\nNote: Could not reach live endpoint directly.\n`);
-        }
-      }
-
-      const combinedCorpus = [
-        rawText.trim() ? `--- MANUAL BRAND GUIDELINES / NOTES ---\n${rawText.trim()}\n` : '',
-        ...fetchedSourceTexts
-      ].join('\n\n');
-
       if (isDemoMode) {
-        setExtractionStatus('Synthesizing Brand DNA schema (Demo Engine)...');
+        setExtractionStatus('Drafting candidate Brand DNA profile (Demo Engine)...');
         await new Promise((r) => setTimeout(r, 1500));
         const sampleExtracted: Partial<BrandDNAProfile> = {
           metadata: {
-            brandName: 'Nova FinTech Group',
+            brandName: freeformText.toLowerCase().includes('novamesh') ? 'NovaMesh Security' : 'LoomFrog Benchmark',
             brandVersion: '1.0.0',
             schemaVersion: '1.0',
             updatedAt: new Date().toISOString(),
-            description: 'AI-generated Brand DNA from unstructured brand guidelines and web sources.'
+            description: 'AI-generated candidate profile from conversational brand narrative and visual assets.'
           },
           lifecycleState: 'AI_GENERATED',
           voice: {
-            primaryTone: 'Trustworthy, innovative, institutional-grade, customer-focused',
-            formalityScore: 0.88,
-            toneAttributes: ['Regulatory confidence', 'Clear financial metrics', 'Empowering simplicity', 'Zero jargon']
+            primaryTone: 'Pragmatic, authoritative, engineering-first, and low-latency',
+            formalityScore: 0.85,
+            toneAttributes: ['Direct precision', 'Technical rigor', 'Zero buzzwords', 'Empowering clarity']
           },
           vocabulary: {
             forbidden: [
-              { term: 'get rich quick', reason: 'Misleading consumer claim violating compliance.' },
-              { term: 'guaranteed returns', reason: 'Regulatory risk without explicit statutory disclosures.' },
-              { term: 'crypto moon', reason: 'Unprofessional speculative colloquialism.' },
-              { term: 'cheap', reason: 'Use "transparent, low-cost fee structure".' }
+              { term: 'revolutionary', reason: 'Overused marketing buzzword lacking substance.' },
+              { term: 'game changing', reason: 'Unverifiable promotional exaggeration.' },
+              { term: 'supercharge', reason: 'Vague cliché forbidden in technical communications.' },
+              { term: '100% unhackable', reason: 'Dangerous absolute claim violating security best practices.' }
             ],
             preferred: [
-              'Institutional-grade security',
-              'Transparent ledger',
-              'Fiduciary responsibility',
-              'Real-time reconciliation'
+              'Cryptographically verified',
+              'Deterministic latency',
+              'Resilient architecture',
+              'Zero-overhead runtime'
             ]
           },
           colors: {
-            primaryHex: ['#040918', '#06B6D4', '#2DD4BF'],
-            secondaryHex: ['#0284C7', '#64748B'],
-            strictCompliance: true
+            primaryHex: ['#020617', '#06B6D4', '#10B981'],
+            secondaryHex: ['#0F172A', '#64748B'],
+            strictCompliance: false
           },
           rules: [
             {
               ruleId: 'R-VOCAB-01',
               category: 'Text',
-              description: 'Zero tolerance for speculative or non-compliant financial marketing promises.',
+              description: 'Zero tolerance for speculative marketing hype and forbidden buzzwords.',
               weight: 3.0,
               evaluatorType: 'Deterministic'
             },
             {
               ruleId: 'R-TONE-01',
               category: 'Text',
-              description: 'Strict adherence to fiduciary tone and institutional confidence.',
+              description: 'Maintain humble, rigorous engineering tone without hyperbole.',
               weight: 2.5,
               evaluatorType: 'Semantic'
             },
             {
               ruleId: 'R-COLOR-01',
               category: 'Visual',
-              description: 'Deep navy, Electric Blue, and Cyan palette compliance.',
+              description: 'Adhere to dark obsidian (#020617) and cyber cyan/emerald accent matrix.',
               weight: 2.0,
-              evaluatorType: 'Deterministic'
+              evaluatorType: 'Semantic'
             }
           ],
-          sources: sourcesList.map((url, i) => ({
-            id: `src_init_${i}`,
+          sources: urlsList.map((url, i) => ({
+            id: `src_${Date.now()}_${i}`,
             url,
             addedAt: new Date().toISOString(),
             status: 'active'
@@ -152,14 +218,19 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
       if (!hasApiKey) {
         setIsKeyModalOpen(true);
-        throw new Error('API key required for live AI extraction.');
+        throw new Error('API key required for AI profile generation.');
       }
 
       setExtractionStatus(`Synthesizing Brand DNA with ${selectedModel}...`);
-      const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, combinedCorpus);
-      
-      // Attach ingested sources
-      extracted.sources = sourcesList.map((url, i) => ({
+
+      const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, {
+        freeformText: freeformText.trim(),
+        urls: urlsList,
+        images: images.map((img) => img.dataUrl)
+      });
+
+      // Attach ingested reference URLs to the profile
+      extracted.sources = urlsList.map((url, i) => ({
         id: `src_${Date.now()}_${i}`,
         url,
         addedAt: new Date().toISOString(),
@@ -172,7 +243,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
       if (err instanceof GeminiApiError) {
         setError(err.message);
       } else {
-        setError(err.message || 'Failed to extract Brand DNA profile.');
+        setError(err.message || 'Failed to generate Brand DNA profile.');
       }
     } finally {
       setIsExtracting(false);
@@ -180,18 +251,29 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
     }
   };
 
+  const hasAnyInput = freeformText.trim().length > 0 || urlsList.length > 0 || images.length > 0;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.9)] overflow-hidden max-h-[90vh] flex flex-col">
-        {/* Top Header */}
-        <div className="flex items-center justify-between p-6 border-b border-cyan-500/20 bg-[#030816]/70 shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-2xl rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.95)] overflow-hidden max-h-[92vh] flex flex-col border border-cyan-500/25">
+        {/* Modal Top Header */}
+        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-cyan-500/20 bg-[#030816]/80 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-              <Sparkles className="w-5 h-5 text-cyan-200" />
+            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+              <Sparkles className="w-5 h-5 text-cyan-100" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white font-lexend">AI Brand DNA Extractor</h2>
-              <p className="text-xs text-slate-400">Ingest brand guidelines, text documents, and public URLs</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-white font-lexend">
+                  Draft Brand DNA with AI
+                </h2>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Conversational Engine
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Describe your brand in plain words, paste reference URLs, or attach images — no manual form required.
+              </p>
             </div>
           </div>
           <button
@@ -202,57 +284,84 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="p-6 space-y-4 overflow-y-auto flex-1">
+        {/* Scrollable Form Body */}
+        <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
           {error && (
-            <div className="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+            <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2.5 animate-fade-in">
               <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Web Ingestion URLs */}
-          <div>
-            <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-teal-400" />
-              <span>Brand Source URLs (Websites, Brand Guidelines, Style Guides)</span>
-            </label>
+          {/* 1. Freeform Conversational Textarea */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-cyan-200 font-lexend flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Describe Your Brand in Plain Language</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setFreeformText(SAMPLE_PROMPT)}
+                className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium cursor-pointer transition-colors"
+              >
+                Insert Example
+              </button>
+            </div>
+            <textarea
+              value={freeformText}
+              onChange={(e) => setFreeformText(e.target.value)}
+              rows={5}
+              placeholder="Tell us about your brand in your own words — what do you build? Who is your audience? How should you sound (e.g. bold, technical, conversational)? What words do you hate or love? What is your visual aesthetic?"
+              className="w-full p-4 rounded-2xl neo-liquid-input text-xs text-white placeholder-slate-500 leading-relaxed focus:outline-none"
+            />
+          </div>
 
-            <div className="flex items-center gap-2 mb-2">
+          {/* 2. Optional Reference URLs (Server-Side Gemini URL Context) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-teal-200 font-lexend flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-teal-400" />
+                <span>Reference Websites &amp; Links <span className="text-slate-400 font-normal font-sans">(Optional)</span></span>
+              </label>
+              <span className="text-[10px] text-teal-300/80 font-mono">Gemini URL Context</span>
+            </div>
+
+            <div className="flex items-center gap-2">
               <input
                 type="url"
-                value={newSourceUrl}
-                onChange={(e) => setNewSourceUrl(e.target.value)}
-                placeholder="https://company.com/brand or https://company.com"
+                value={newUrl}
+                onChange={(e) => setNewUrl(e.target.value)}
+                placeholder="https://company.com or https://company.com/about"
                 className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white placeholder-slate-500"
-                onKeyDown={(e) => e.key === 'Enter' && handleAddSourceUrl()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
               />
               <button
                 type="button"
-                onClick={handleAddSourceUrl}
+                onClick={handleAddUrl}
                 className="px-3.5 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border border-teal-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Source</span>
+                <span>Add URL</span>
               </button>
             </div>
 
-            {sourcesList.length > 0 && (
-              <div className="space-y-1.5 mb-3">
-                {sourcesList.map((url, idx) => (
+            {urlsList.length > 0 && (
+              <div className="space-y-1.5 pt-1">
+                {urlsList.map((url, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-2 rounded-xl bg-[#02050f]/80 border border-teal-500/20 text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#02050f]/80 border border-teal-500/20 text-xs"
                   >
                     <div className="flex items-center gap-2 text-slate-300 truncate">
                       <Link2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                      <span className="truncate">{url}</span>
+                      <span className="truncate font-mono text-[11px] text-teal-200">{url}</span>
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleRemoveSourceUrl(idx)}
-                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
-                      title="Remove source"
+                      onClick={() => handleRemoveUrl(idx)}
+                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
+                      title="Remove URL"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -262,68 +371,128 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
             )}
           </div>
 
-          {/* Raw Text Input */}
-          <div>
-            <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend">
-              Paste Brand Guidelines, Style Guide, or Corporate Narrative
-            </label>
-            <textarea
-              value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
-              rows={6}
-              placeholder="e.g. Acme Corp is an enterprise AI infrastructure company. Our tone is authoritative, humble, and engineering-first. We never use buzzwords like 'supercharge' or 'game changer'. Our brand colors are deep navy (#040918), cyan (#06B6D4) and prismarine (#2DD4BF)..."
-              className="w-full p-4 rounded-2xl neo-liquid-input text-xs text-white placeholder-slate-500"
-            />
+          {/* 3. Optional Reference Images (Multimodal) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-cyan-200 font-lexend flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Brand Visual Assets &amp; Photos <span className="text-slate-400 font-normal font-sans">(Optional)</span></span>
+              </label>
+              <span className="text-[10px] text-cyan-300/80 font-mono">Multimodal Extraction</span>
+            </div>
+
+            {/* Drop Zone */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+              className={`p-4 rounded-2xl border-2 border-dashed transition-all text-center cursor-pointer ${
+                isDragging
+                  ? 'border-cyan-400 bg-cyan-950/30'
+                  : 'border-cyan-500/20 bg-[#02050f]/60 hover:bg-[#02050f]/90 hover:border-cyan-400/40'
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                onChange={(e) => handleImageFiles(e.target.files)}
+                className="hidden"
+              />
+              <div className="flex flex-col items-center justify-center gap-1.5">
+                <Upload className="w-5 h-5 text-cyan-400" />
+                <p className="text-xs text-slate-300">
+                  <strong className="text-cyan-300">Click to upload</strong> or drag &amp; drop brand imagery
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Logos, marketing assets, or design screenshots (PNG, JPG, WebP up to 5MB)
+                </p>
+              </div>
+            </div>
+
+            {/* Uploaded Images Thumbnails */}
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                {images.map((img) => (
+                  <div
+                    key={img.id}
+                    className="relative group rounded-xl bg-[#02050f] border border-cyan-500/30 p-1.5 flex items-center gap-2 overflow-hidden"
+                  >
+                    <img
+                      src={img.dataUrl}
+                      alt={img.name}
+                      referrerPolicy="no-referrer"
+                      className="w-10 h-10 rounded-lg object-cover bg-black/50 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] text-slate-200 truncate font-medium">{img.name}</p>
+                      <p className="text-[10px] text-slate-500 font-mono">
+                        {(img.size / 1024).toFixed(0)} KB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage(img.id);
+                      }}
+                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
+                      title="Remove image"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Extraction Progress Status */}
           {isExtracting && extractionStatus && (
-            <div className="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-2 animate-pulse">
+            <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-2.5 animate-pulse">
               <RefreshCw className="w-4 h-4 animate-spin text-cyan-400 shrink-0" />
               <span>{extractionStatus}</span>
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-cyan-500/10">
-            <button
-              type="button"
-              onClick={() => {
-                setRawText(
-                  `Nova FinTech: We are an institutional wealth platform. Tone must be authoritative and compliance-adherent. Banned terms: 'get rich quick', 'guaranteed returns', 'crypto moon', 'cheap'. Primary colors: Deep Navy (#040918), Cyan (#06B6D4), Prismarine (#2DD4BF). Formality should be 0.90.`
-                );
-              }}
-              className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium cursor-pointer text-left"
-            >
-              Insert Sample Guidelines
-            </button>
-
-            <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded-2xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleExtract}
-                disabled={isExtracting || (!rawText.trim() && sourcesList.length === 0)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg disabled:opacity-50 transition-all cursor-pointer"
-              >
-                {isExtracting ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Extracting Schema...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-                    <span>Extract Brand DNA</span>
-                  </>
-                )}
-              </button>
-            </div>
+          {/* Bottom Human-in-the-loop Notification */}
+          <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+            <Compass className="w-4 h-4 text-teal-400 shrink-0" />
+            <span>
+              The AI drafts a candidate profile at <strong className="text-teal-300">AI-Generated</strong> status. You can review and tune every rule before approving it for live audits.
+            </span>
           </div>
+        </div>
+
+        {/* Modal Footer Controls */}
+        <div className="flex items-center justify-end gap-2.5 p-4 sm:p-5 border-t border-cyan-500/20 bg-[#030816]/90 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={isExtracting || !hasAnyInput}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer"
+          >
+            {isExtracting ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Synthesizing Profile...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3.5 h-3.5 text-cyan-100" />
+                <span>Draft Brand DNA Profile</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

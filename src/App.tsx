@@ -99,8 +99,6 @@ function MainAppContent() {
               <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.9)] animate-ping"></span>
                 <span className="text-slate-200 font-semibold">In-Memory Key Isolation</span>
-                <span className="text-slate-600">&bull;</span>
-                <span className="text-slate-400">Dual-Tier Verification</span>
               </div>
             </div>
           </footer>

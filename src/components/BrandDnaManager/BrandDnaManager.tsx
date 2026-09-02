@@ -453,7 +453,7 @@ export const BrandDnaManager: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-            AI Ingestion &amp; Extraction
+            Draft Profile with AI
           </button>
 
           {/* New Profile */}
@@ -501,13 +501,20 @@ export const BrandDnaManager: React.FC = () => {
               Your API Key is synchronized. Create your first custom Brand DNA profile to establish machine-readable tone guidelines, forbidden buzzwords, and diagnostic metrics.
             </p>
           </div>
-          <div className="pt-2 flex items-center justify-center gap-3">
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <button
-              onClick={() => setIsCreateProfileModalOpen(true)}
+              onClick={() => setIsAiModalOpen(true)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer active:scale-95 transition-all"
             >
-              <Plus className="w-4 h-4 text-cyan-200" />
-              <span>Create Brand DNA Profile</span>
+              <Sparkles className="w-4 h-4 text-cyan-200" />
+              <span>Draft Profile with AI</span>
+            </button>
+            <button
+              onClick={() => setIsCreateProfileModalOpen(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md cursor-pointer active:scale-95 transition-all"
+            >
+              <Plus className="w-4 h-4 text-teal-400" />
+              <span>Blank Profile</span>
             </button>
           </div>
         </div>
@@ -633,13 +640,14 @@ export const BrandDnaManager: React.FC = () => {
         </div>
       </div>
 
-      {/* 5-Stage Interactive Lifecycle Stepper */}
+      {/* 6-Stage Interactive Lifecycle Stepper (Visual Step 1 + 5 Real States) */}
       <LifecycleStepper
         currentState={currentProfile.lifecycleState}
         onAdvanceState={(newState: LifecycleState) => {
           setProfileLifecycleState(currentProfile.metadata.brandName, newState);
           showStatus(`Advanced stage to ${newState}`);
         }}
+        onOpenAiExtract={() => setIsAiModalOpen(true)}
       />
 
       {/* Ruleset Editor Sub-Tabs */}
