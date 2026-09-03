@@ -13,7 +13,8 @@ import {
   FileText,
   HelpCircle,
   CheckCircle2,
-  Compass
+  Compass,
+  Key
 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { extractBrandDNAWithAI, GeminiApiError } from '../../services/geminiSemanticEngine';
@@ -140,88 +141,18 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
       return;
     }
 
+    // Explicit check: Live AI Brand DNA synthesis requires a real Gemini API key
+    if (isDemoMode || !hasApiKey) {
+      setError('This feature requires a real API key — not available in Demo Mode. Please set your Google Gemini API key to draft custom profiles with AI, or click "Draft Demo Sample Profile" below.');
+      return;
+    }
+
     setIsExtracting(true);
     setError(null);
-    setExtractionStatus('Synthesizing Brand DNA from conversational inputs...');
+    setExtractionStatus(`Connecting to Google Gemini (${selectedModel})...`);
 
     try {
-      if (isDemoMode) {
-        setExtractionStatus('Drafting candidate Brand DNA profile (Demo Engine)...');
-        await new Promise((r) => setTimeout(r, 1500));
-        const sampleExtracted: Partial<BrandDNAProfile> = {
-          metadata: {
-            brandName: freeformText.toLowerCase().includes('novamesh') ? 'NovaMesh Security' : 'LoomFrog Benchmark',
-            brandVersion: '1.0.0',
-            schemaVersion: '1.0',
-            updatedAt: new Date().toISOString(),
-            description: 'AI-generated candidate profile from conversational brand narrative and visual assets.'
-          },
-          lifecycleState: 'AI_GENERATED',
-          voice: {
-            primaryTone: 'Pragmatic, authoritative, engineering-first, and low-latency',
-            formalityScore: 0.85,
-            toneAttributes: ['Direct precision', 'Technical rigor', 'Zero buzzwords', 'Empowering clarity']
-          },
-          vocabulary: {
-            forbidden: [
-              { term: 'revolutionary', reason: 'Overused marketing buzzword lacking substance.' },
-              { term: 'game changing', reason: 'Unverifiable promotional exaggeration.' },
-              { term: 'supercharge', reason: 'Vague cliché forbidden in technical communications.' },
-              { term: '100% unhackable', reason: 'Dangerous absolute claim violating security best practices.' }
-            ],
-            preferred: [
-              'Cryptographically verified',
-              'Deterministic latency',
-              'Resilient architecture',
-              'Zero-overhead runtime'
-            ]
-          },
-          colors: {
-            primaryHex: ['#020617', '#06B6D4', '#10B981'],
-            secondaryHex: ['#0F172A', '#64748B'],
-            strictCompliance: false
-          },
-          rules: [
-            {
-              ruleId: 'R-VOCAB-01',
-              category: 'Text',
-              description: 'Zero tolerance for speculative marketing hype and forbidden buzzwords.',
-              weight: 3.0,
-              evaluatorType: 'Deterministic'
-            },
-            {
-              ruleId: 'R-TONE-01',
-              category: 'Text',
-              description: 'Maintain humble, rigorous engineering tone without hyperbole.',
-              weight: 2.5,
-              evaluatorType: 'Semantic'
-            },
-            {
-              ruleId: 'R-COLOR-01',
-              category: 'Visual',
-              description: 'Adhere to dark obsidian (#020617) and cyber cyan/emerald accent matrix.',
-              weight: 2.0,
-              evaluatorType: 'Semantic'
-            }
-          ],
-          sources: urlsList.map((url, i) => ({
-            id: `src_${Date.now()}_${i}`,
-            url,
-            addedAt: new Date().toISOString(),
-            status: 'active'
-          }))
-        };
-        onProfileExtracted(sampleExtracted);
-        onClose();
-        return;
-      }
-
-      if (!hasApiKey) {
-        setIsKeyModalOpen(true);
-        throw new Error('API key required for AI profile generation.');
-      }
-
-      setExtractionStatus(`Synthesizing Brand DNA with ${selectedModel}...`);
+      setExtractionStatus(`Synthesizing Brand DNA rules with ${selectedModel}...`);
 
       const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, {
         freeformText: freeformText.trim(),
@@ -243,8 +174,101 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
       if (err instanceof GeminiApiError) {
         setError(err.message);
       } else {
-        setError(err.message || 'Failed to generate Brand DNA profile.');
+        setError(err.message || 'Failed to generate Brand DNA profile. Please verify your API key and connection.');
       }
+    } finally {
+      setIsExtracting(false);
+      setExtractionStatus(null);
+    }
+  };
+
+  const handleGenerateDemoSample = async () => {
+    setIsExtracting(true);
+    setError(null);
+    setExtractionStatus('Drafting candidate Brand DNA profile (Demo Simulation Engine)...');
+
+    try {
+      await new Promise((r) => setTimeout(r, 1200));
+
+      const inputNameMatch = freeformText.match(/(?:brand|called|named|company|is|for)\s+([A-Z][a-zA-Z0-9_-]+)/i);
+      const derivedBrandName = inputNameMatch?.[1]
+        ? `${inputNameMatch[1]} AI`
+        : freeformText.toLowerCase().includes('novamesh')
+        ? 'NovaMesh Security'
+        : freeformText.trim().length > 3
+        ? 'Custom Brand DNA (Demo)'
+        : 'LoomFrog Benchmark';
+
+      const sampleExtracted: Partial<BrandDNAProfile> = {
+        metadata: {
+          brandName: derivedBrandName,
+          brandVersion: '1.0.0',
+          schemaVersion: '1.0',
+          updatedAt: new Date().toISOString(),
+          description: freeformText.trim()
+            ? `Demo profile generated from prompt: "${freeformText.slice(0, 90)}..."`
+            : 'AI-generated candidate profile from conversational brand narrative and visual assets.'
+        },
+        lifecycleState: 'AI_GENERATED',
+        voice: {
+          primaryTone: 'Pragmatic, authoritative, engineering-first, and low-latency',
+          formalityScore: 0.85,
+          toneAttributes: ['Direct precision', 'Technical rigor', 'Zero buzzwords', 'Empowering clarity']
+        },
+        vocabulary: {
+          forbidden: [
+            { term: 'revolutionary', reason: 'Overused marketing buzzword lacking substance.' },
+            { term: 'game changing', reason: 'Unverifiable promotional exaggeration.' },
+            { term: 'supercharge', reason: 'Vague cliché forbidden in technical communications.' },
+            { term: '100% unhackable', reason: 'Dangerous absolute claim violating security best practices.' }
+          ],
+          preferred: [
+            'Cryptographically verified',
+            'Deterministic latency',
+            'Resilient architecture',
+            'Zero-overhead runtime'
+          ]
+        },
+        colors: {
+          primaryHex: ['#020617', '#06B6D4', '#10B981'],
+          secondaryHex: ['#0F172A', '#64748B'],
+          strictCompliance: false
+        },
+        rules: [
+          {
+            ruleId: 'R-VOCAB-01',
+            category: 'Text',
+            description: 'Zero tolerance for speculative marketing hype and forbidden buzzwords.',
+            weight: 3.0,
+            evaluatorType: 'Deterministic'
+          },
+          {
+            ruleId: 'R-TONE-01',
+            category: 'Text',
+            description: 'Maintain humble, rigorous engineering tone without hyperbole.',
+            weight: 2.5,
+            evaluatorType: 'Semantic'
+          },
+          {
+            ruleId: 'R-COLOR-01',
+            category: 'Visual',
+            description: 'Adhere to dark obsidian (#020617) and cyber cyan/emerald accent matrix.',
+            weight: 2.0,
+            evaluatorType: 'Semantic'
+          }
+        ],
+        sources: urlsList.map((url, i) => ({
+          id: `src_${Date.now()}_${i}`,
+          url,
+          addedAt: new Date().toISOString(),
+          status: 'active'
+        }))
+      };
+
+      onProfileExtracted(sampleExtracted);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate demo sample profile.');
     } finally {
       setIsExtracting(false);
       setExtractionStatus(null);
@@ -286,10 +310,73 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
         {/* Scrollable Form Body */}
         <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
+          {/* Demo Mode or Live Mode Notification Ribbon */}
+          {isDemoMode || !hasApiKey ? (
+            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold text-amber-300">Live AI Synthesis Requires Gemini API Key</div>
+                  <div className="text-[11px] text-amber-200/80 mt-0.5 leading-relaxed">
+                    You are in <strong className="text-amber-200">Demo Mode</strong>. Conversational AI extraction requires a real Gemini API key. Set your API key to draft custom profiles from your inputs, or use the sample demo draft button below.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsKeyModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/50 text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <Key className="w-3.5 h-3.5" />
+                <span>Set API Key</span>
+              </button>
+            </div>
+          ) : (
+            <div className="p-3 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-cyan-200 flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span className="text-[11px]">
+                  Live Gemini Engine Active: <strong className="text-white font-mono">{selectedModel}</strong>
+                </span>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
+                Live API
+              </span>
+            </div>
+          )}
+
+          {/* Visible Error Banner */}
           {error && (
-            <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2.5 animate-fade-in">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-              <span>{error}</span>
+            <div className="p-4 rounded-2xl bg-rose-950/50 border border-rose-500/50 text-xs text-rose-200 space-y-2.5 animate-fade-in shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400 mt-0.5" />
+                <span className="leading-relaxed">{error}</span>
+              </div>
+              {(isDemoMode || !hasApiKey) && (
+                <div className="pl-6.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsKeyModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 text-[11px] font-bold cursor-pointer transition-colors"
+                  >
+                    <Key className="w-3.5 h-3.5" />
+                    <span>Open API Key Settings</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Prominent Loading / Progress State Card */}
+          {isExtracting && (
+            <div className="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-3 animate-pulse shadow-[0_0_25px_rgba(6,182,212,0.25)]">
+              <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
+              <div className="space-y-0.5">
+                <div className="font-bold text-white font-lexend">Synthesizing Brand DNA Profile...</div>
+                <div className="text-[11px] text-cyan-300 font-mono">
+                  {extractionStatus || 'Extracting tone attributes, vocabulary rules, and brand palette...'}
+                </div>
+              </div>
             </div>
           )}
 
@@ -449,14 +536,6 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
             )}
           </div>
 
-          {/* Extraction Progress Status */}
-          {isExtracting && extractionStatus && (
-            <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-2.5 animate-pulse">
-              <RefreshCw className="w-4 h-4 animate-spin text-cyan-400 shrink-0" />
-              <span>{extractionStatus}</span>
-            </div>
-          )}
-
           {/* Bottom Human-in-the-loop Notification */}
           <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-[11px] text-slate-300 flex items-center gap-2">
             <Compass className="w-4 h-4 text-teal-400 shrink-0" />
@@ -467,32 +546,49 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex items-center justify-end gap-2.5 p-4 sm:p-5 border-t border-cyan-500/20 bg-[#030816]/90 shrink-0">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleGenerate}
-            disabled={isExtracting || !hasAnyInput}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer"
-          >
-            {isExtracting ? (
-              <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Synthesizing Profile...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-3.5 h-3.5 text-cyan-100" />
-                <span>Draft Brand DNA Profile</span>
-              </>
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 sm:p-5 border-t border-cyan-500/20 bg-[#030816]/90 shrink-0">
+          <div>
+            {(isDemoMode || !hasApiKey) && (
+              <button
+                type="button"
+                onClick={handleGenerateDemoSample}
+                disabled={isExtracting}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-teal-300 bg-teal-950/40 hover:bg-teal-900/50 border border-teal-500/40 transition-all cursor-pointer disabled:opacity-50"
+                title="Generate a sample profile instantly without a Gemini API key"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+                <span>Draft Demo Sample Profile</span>
+              </button>
             )}
-          </button>
+          </div>
+          <div className="flex items-center justify-end gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isExtracting}
+              className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={isExtracting || !hasAnyInput}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer"
+            >
+              {isExtracting ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Synthesizing Profile...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-100" />
+                  <span>Draft Brand DNA Profile</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -209,14 +209,17 @@ async function callGeminiApi(
       }
 
       const responseData = await response.json();
-      const rawText = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+      const parts = responseData.candidates?.[0]?.content?.parts;
+      const textPart = Array.isArray(parts) ? parts.find((p: any) => typeof p?.text === 'string') : null;
+      const rawText = textPart?.text || parts?.[0]?.text;
 
       if (!rawText) {
         throw new GeminiApiError('Gemini API returned an empty candidate response.', 'MALFORMED_JSON');
       }
 
       try {
-        return JSON.parse(rawText);
+        const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+        return JSON.parse(cleanedText);
       } catch (parseError) {
         throw new GeminiApiError('Malformed JSON payload received from Gemini model.', 'MALFORMED_JSON');
       }

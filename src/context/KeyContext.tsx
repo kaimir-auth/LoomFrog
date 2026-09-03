@@ -186,7 +186,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const saved = localStorage.getItem(LOCAL_STORAGE_USER_PROFILES_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed;
           }
         }
@@ -194,7 +194,7 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {
       // fallback
     }
-    return [];
+    return DEFAULT_BRAND_PROFILES;
   });
 
   const [activeProfileName, setActiveProfileName] = useState<string>(() => {
@@ -209,8 +209,8 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return DEFAULT_BRAND_PROFILES[0]?.metadata.brandName || 'Apex Cloud Systems';
   });
 
-  // Effective brand profiles based on demo mode vs live API mode
-  const brandProfiles: BrandDNAProfile[] = isDemoMode ? DEFAULT_BRAND_PROFILES : userBrandProfiles;
+  // Effective brand profiles: user profiles take precedence, initialized with defaults
+  const brandProfiles: BrandDNAProfile[] = userBrandProfiles.length > 0 ? userBrandProfiles : DEFAULT_BRAND_PROFILES;
 
   // 7. Audit History (Persisted locally)
   const [auditHistory, setAuditHistory] = useState<AuditReport[]>(() => {
@@ -321,8 +321,9 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const saveBrandProfile = (updatedProfile: BrandDNAProfile) => {
+    const brandName = updatedProfile.metadata.brandName;
     setUserBrandProfiles((prev) => {
-      const existingIdx = prev.findIndex((p) => p.metadata.brandName === updatedProfile.metadata.brandName);
+      const existingIdx = prev.findIndex((p) => p.metadata.brandName === brandName);
       if (existingIdx >= 0) {
         const copy = [...prev];
         copy[existingIdx] = {
@@ -334,8 +335,11 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
         return copy;
       }
-      return [...prev, updatedProfile];
+      return [updatedProfile, ...prev];
     });
+    if (brandName) {
+      setActiveProfileName(brandName);
+    }
   };
 
   const renameBrandProfile = (oldName: string, newName: string): boolean => {

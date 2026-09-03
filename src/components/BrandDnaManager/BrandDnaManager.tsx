@@ -377,8 +377,11 @@ export const BrandDnaManager: React.FC = () => {
   const handleAiExtractedProfile = (extracted: Partial<BrandDNAProfile>) => {
     if (extracted.metadata?.brandName) {
       saveBrandProfile(extracted as BrandDNAProfile);
+      setActiveProfileById(extracted.metadata.brandName);
       setSelectedBrandName(extracted.metadata.brandName);
       showStatus(`Imported AI-generated profile: ${extracted.metadata.brandName}`);
+    } else {
+      showStatus('Failed to import profile: missing brand name metadata.');
     }
   };
 
