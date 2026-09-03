@@ -58,6 +58,8 @@ export interface BrandDNAProfile {
   colors: ColorPaletteConfig;
   rules: BrandRule[];
   sources?: BrandSource[];
+  usedModel?: string;
+  fallbackNotice?: string;
 }
 
 export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
@@ -106,6 +108,9 @@ export interface SemanticResult {
   observations: ObservationItem[];
   score: number; // 0 to 100
   confidence: number; // 0.0 to 1.0
+  usedModel?: string;
+  originalModel?: string;
+  fallbackNotice?: string;
 }
 
 export interface AuditScoreMatrix {
@@ -142,4 +147,6 @@ export interface AuditReport {
   scores: AuditScoreMatrix;
   deterministic: DeterministicResult;
   semantic: SemanticResult;
+  usedModel?: string;
+  fallbackNotice?: string;
 }

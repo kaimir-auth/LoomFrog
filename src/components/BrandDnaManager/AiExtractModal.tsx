@@ -14,7 +14,8 @@ import {
   HelpCircle,
   CheckCircle2,
   Compass,
-  Key
+  Key,
+  Cpu
 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { extractBrandDNAWithAI, GeminiApiError, AVAILABLE_MODELS } from '../../services/geminiSemanticEngine';
@@ -154,11 +155,16 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
     try {
       setExtractionStatus(`Synthesizing Brand DNA rules with ${selectedModel}...`);
 
-      const extracted = await extractBrandDNAWithAI(apiKey, selectedModel, {
-        freeformText: freeformText.trim(),
-        urls: urlsList,
-        images: images.map((img) => img.dataUrl)
-      });
+      const extracted = await extractBrandDNAWithAI(
+        apiKey,
+        selectedModel,
+        {
+          freeformText: freeformText.trim(),
+          urls: urlsList,
+          images: images.map((img) => img.dataUrl)
+        },
+        (status) => setExtractionStatus(status)
+      );
 
       // Attach ingested reference URLs to the profile
       extracted.sources = urlsList.map((url, i) => ({
@@ -337,19 +343,51 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                 <span>Set API Key</span>
               </button>
             </div>
-          ) : (
-            <div className="p-3 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-cyan-200 flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span className="text-[11px]">
-                  Live Gemini Engine Active: <strong className="text-white font-mono">{selectedModel}</strong>
-                </span>
+          ) : null}
+
+          {/* Visible Model Selector Dropdown Bar */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-[#040918] to-[#02050f] border border-cyan-500/30 text-xs text-cyan-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
+                <Cpu className="w-4 h-4" />
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
-                Live API
-              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white font-lexend text-xs">
+                    Gemini Engine Model
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
+                    {hasApiKey && !isDemoMode ? 'Live API' : 'Demo Mode'}
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-400 mt-0.5">
+                  Automatic fallback chain enabled: <span className="font-mono text-cyan-300/80">gemini-3.6-flash &rarr; gemini-2.5-pro &rarr; gemini-3.7-flash</span>
+                </div>
+              </div>
             </div>
-          )}
+
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+              <span className="text-[11px] text-slate-300 font-medium">Model:</span>
+              <div className="flex items-center gap-1.5 bg-[#02050f] px-2.5 py-1.5 rounded-xl border border-cyan-500/40 shadow-inner">
+                <select
+                  id="brand-dna-modal-model-select"
+                  value={selectedModel}
+                  onChange={(e) => {
+                    setSelectedModel(e.target.value);
+                    setError(null);
+                  }}
+                  className="bg-transparent text-cyan-300 font-mono text-xs focus:outline-none cursor-pointer"
+                  title="Select AI Model"
+                >
+                  {AVAILABLE_MODELS.map((m) => (
+                    <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                      {m.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
 
           {/* Visible Error Banner */}
           {error && (

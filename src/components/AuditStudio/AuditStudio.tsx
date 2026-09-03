@@ -106,7 +106,8 @@ export const AuditStudio: React.FC = () => {
           textContent,
           activeProfile,
           imageDataUrl,
-          contentContext
+          contentContext,
+          (status) => setAuditPhaseLabel(status)
         );
       }
 
@@ -127,7 +128,9 @@ export const AuditStudio: React.FC = () => {
         contentContext: contentContext?.trim() || undefined,
         scores,
         deterministic,
-        semantic: semanticResult
+        semantic: semanticResult,
+        usedModel: semanticResult.usedModel || selectedModel,
+        fallbackNotice: semanticResult.fallbackNotice
       };
 
       setCurrentReport(newReport);
@@ -141,7 +144,11 @@ export const AuditStudio: React.FC = () => {
         });
       }
 
-      showToast('Brand consistency audit completed successfully.');
+      if (semanticResult.fallbackNotice) {
+        showToast(semanticResult.fallbackNotice);
+      } else {
+        showToast('Brand consistency audit completed successfully.');
+      }
     } catch (err: any) {
       if (err instanceof GeminiApiError) {
         setErrorMessage(err.message);

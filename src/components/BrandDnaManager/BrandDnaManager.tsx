@@ -374,12 +374,20 @@ export const BrandDnaManager: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const [activeFallbackNotice, setActiveFallbackNotice] = useState<string | null>(null);
+
   const handleAiExtractedProfile = (extracted: Partial<BrandDNAProfile>) => {
     if (extracted.metadata?.brandName) {
       saveBrandProfile(extracted as BrandDNAProfile);
       setActiveProfileById(extracted.metadata.brandName);
       setSelectedBrandName(extracted.metadata.brandName);
-      showStatus(`Imported AI-generated profile: ${extracted.metadata.brandName}`);
+      if (extracted.fallbackNotice) {
+        setActiveFallbackNotice(extracted.fallbackNotice);
+        showStatus(`${extracted.fallbackNotice} Drafted: ${extracted.metadata.brandName}`);
+      } else {
+        setActiveFallbackNotice(null);
+        showStatus(`Imported AI-generated profile: ${extracted.metadata.brandName}`);
+      }
     } else {
       showStatus('Failed to import profile: missing brand name metadata.');
     }
@@ -523,6 +531,30 @@ export const BrandDnaManager: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* Fallback Notice Banner if Model Fallback Occurred */}
+          {(activeFallbackNotice || currentProfile.fallbackNotice) && (
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/60 via-[#040918] to-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">
+              <div className="flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="leading-relaxed font-medium">
+                  {activeFallbackNotice || currentProfile.fallbackNotice}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                  Fallback Model Used
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveFallbackNotice(null)}
+                  className="text-amber-300/80 hover:text-white text-xs underline cursor-pointer"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Profile Selector & Activation Banner */}
           <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />

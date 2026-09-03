@@ -9,6 +9,32 @@ export const AVAILABLE_MODELS = [
   { id: 'gemini-3.7-flash', name: 'Gemini 3.7 Flash', speed: 'Advanced' }
 ];
 
+export const MODEL_FALLBACK_CHAIN: readonly string[] = [
+  'gemini-3.6-flash',
+  'gemini-2.5-pro',
+  'gemini-3.7-flash'
+] as const;
+
+export function getFallbackChainForModel(initialModel: string): string[] {
+  const chain: string[] = [];
+  if (initialModel && initialModel.trim()) {
+    chain.push(initialModel.trim());
+  }
+  for (const m of MODEL_FALLBACK_CHAIN) {
+    if (!chain.includes(m)) {
+      chain.push(m);
+    }
+  }
+  return chain;
+}
+
+export interface GeminiApiCallResult<T = any> {
+  data: T;
+  usedModel: string;
+  originalModel: string;
+  fallbackNotice?: string;
+}
+
 export class GeminiApiError extends Error {
   statusCode?: number;
   errorType: 'INVALID_KEY' | 'RATE_LIMIT' | 'QUOTA_EXHAUSTED' | 'MALFORMED_JSON' | 'OFFLINE' | 'MODEL_DEPRECATED' | 'GENERIC';
@@ -94,7 +120,7 @@ const BRAND_DNA_EXTRACT_SCHEMA = {
 };
 
 /**
- * Executes direct client-side fetch to Gemini API with exponential backoff
+ * Executes direct client-side fetch to Gemini API with automatic model fallback chain
  */
 async function callGeminiApi(
   apiKey: string,
@@ -102,13 +128,16 @@ async function callGeminiApi(
   systemInstruction: string,
   userPrompt: string,
   schema: object,
-  optionsOrImageBase64?: string | { imageBase64?: string; imagesBase64?: string[]; tools?: any[] }
-): Promise<any> {
+  optionsOrImageBase64?: string | {
+    imageBase64?: string;
+    imagesBase64?: string[];
+    tools?: any[];
+    onStatusUpdate?: (status: string) => void;
+  }
+): Promise<GeminiApiCallResult> {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     throw new GeminiApiError('Offline Mode Active: No internet connection detected.', 'OFFLINE');
   }
-
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const contents: any[] = [];
   const parts: any[] = [];
@@ -116,6 +145,7 @@ async function callGeminiApi(
   // Parse image options (supports legacy string param or options object with multiple images)
   const imageList: string[] = [];
   let tools: any[] | undefined;
+  let onStatusUpdate: ((status: string) => void) | undefined;
 
   if (typeof optionsOrImageBase64 === 'string' && optionsOrImageBase64) {
     imageList.push(optionsOrImageBase64);
@@ -128,6 +158,9 @@ async function callGeminiApi(
     }
     if (optionsOrImageBase64.tools) {
       tools = optionsOrImageBase64.tools;
+    }
+    if (typeof optionsOrImageBase64.onStatusUpdate === 'function') {
+      onStatusUpdate = optionsOrImageBase64.onStatusUpdate;
     }
   }
 
@@ -147,122 +180,217 @@ async function callGeminiApi(
   parts.push({ text: userPrompt });
   contents.push({ parts });
 
-  const requestBody: any = {
-    contents,
-    systemInstruction: {
-      parts: [{ text: systemInstruction }]
-    },
-    generationConfig: {
-      temperature: 0.2,
-      topP: 0.95,
-      responseMimeType: 'application/json',
-      responseSchema: schema
+  const initialModel = model || DEFAULT_MODEL;
+  const modelsToTry = getFallbackChainForModel(initialModel);
+  const failureHistory: Array<{ model: string; error: string; status?: number }> = [];
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModel = modelsToTry[i];
+    const isLastModel = i === modelsToTry.length - 1;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+
+    const currentRequestBody: any = {
+      contents,
+      systemInstruction: {
+        parts: [{ text: systemInstruction }]
+      },
+      generationConfig: {
+        temperature: 0.2,
+        topP: 0.95,
+        responseMimeType: 'application/json',
+        responseSchema: schema
+      }
+    };
+
+    if (tools && tools.length > 0) {
+      currentRequestBody.tools = tools;
     }
-  };
 
-  if (tools && tools.length > 0) {
-    requestBody.tools = tools;
-  }
-
-  let retryCount = 0;
-  const maxRetries = 3;
-
-  while (retryCount <= maxRetries) {
     try {
-      const response = await fetch(endpoint, {
+      let response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(currentRequestBody)
       });
+
+      // Special handling: if endpoint rejects url_context tools with 400, retry once without tools on this same model
+      if (!response.ok && response.status === 400 && currentRequestBody.tools) {
+        delete currentRequestBody.tools;
+        const retryRes = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentRequestBody)
+        });
+        if (retryRes.ok) {
+          response = retryRes;
+        }
+      }
 
       if (!response.ok) {
         const errorJson = await response.json().catch(() => ({}));
         const status = response.status;
-        const errorMessage = errorJson.error?.message || response.statusText;
+        const errorMessage = errorJson.error?.message || response.statusText || `HTTP ${status}`;
 
-        // Model deprecation / 404 Not Found handling
-        if (
-          status === 404 ||
-          errorMessage.toLowerCase().includes('no longer available') ||
-          errorMessage.toLowerCase().includes('is not found for api version') ||
-          errorMessage.toLowerCase().includes('is not supported for generatecontent') ||
-          errorMessage.toLowerCase().includes('model not found')
-        ) {
+        // -------------------------------------------------------------
+        // When NOT to fall back:
+        // -------------------------------------------------------------
+        // 1. API Key errors (HTTP 401 or HTTP 403, or 400 mentioning API key)
+        // This is an invalid key issue, not a model availability issue. Surface immediately.
+        if (status === 401 || status === 403 || (status === 400 && errorMessage.toLowerCase().includes('api key'))) {
           throw new GeminiApiError(
-            'The selected AI model is no longer available. Please choose a different model from the selector above.',
-            'MODEL_DEPRECATED',
+            'API Key Invalid or Expired. Please check your key in API Key Settings.',
+            'INVALID_KEY',
             status
           );
         }
 
-        if (status === 400 || status === 403) {
-          if (errorMessage.toLowerCase().includes('api key') || status === 403) {
-            throw new GeminiApiError('API Key Invalid or Expired. Please check your key in API Key Settings.', 'INVALID_KEY', status);
-          }
+        // 2. HTTP 400 (Bad Request / Schema error / Malformed payload)
+        // Real bug in request itself. Never silently swap models.
+        if (status === 400) {
+          throw new GeminiApiError(
+            `Gemini Request Error (HTTP 400): ${errorMessage}`,
+            'GENERIC',
+            400
+          );
         }
 
-        // If tools like url_context are not supported on a specific model endpoint or payload format, retry without tools
-        if (status === 400 && tools && tools.length > 0 && requestBody.tools) {
-          delete requestBody.tools;
-          continue;
+        // -------------------------------------------------------------
+        // When TO fall back to the next model in the chain:
+        // - HTTP 503 (Server overloaded / high demand / UNAVAILABLE)
+        // - HTTP 429 (Rate limited / Quota exhausted on this model)
+        // - HTTP 404 (Model deprecated / unavailable / not found)
+        // - HTTP 500, 502, 504 (Transient server errors)
+        // -------------------------------------------------------------
+        const isDeprecation404 =
+          status === 404 ||
+          errorMessage.toLowerCase().includes('no longer available') ||
+          errorMessage.toLowerCase().includes('is not found for api version') ||
+          errorMessage.toLowerCase().includes('is not supported for generatecontent') ||
+          errorMessage.toLowerCase().includes('model not found');
+
+        const isFallbackEligible =
+          status === 503 ||
+          status === 429 ||
+          status === 500 ||
+          status === 502 ||
+          status === 504 ||
+          isDeprecation404 ||
+          errorMessage.toLowerCase().includes('resourceexhausted') ||
+          errorMessage.toLowerCase().includes('overloaded') ||
+          errorMessage.toLowerCase().includes('capacity');
+
+        failureHistory.push({ model: currentModel, error: errorMessage, status });
+
+        if (isFallbackEligible && !isLastModel) {
+          const nextModel = modelsToTry[i + 1];
+          const reasonLabel = status === 503
+            ? 'temporarily overloaded (503)'
+            : status === 429
+            ? 'rate limited (429)'
+            : isDeprecation404
+            ? 'unavailable / deprecated (404)'
+            : `server error (${status})`;
+
+          const notice = `${currentModel} was ${reasonLabel}. Automatically falling back to ${nextModel}...`;
+          onStatusUpdate?.(notice);
+          console.warn(`[Gemini Fallback] ${notice} (${errorMessage})`);
+          continue; // advance to next model in the chain
         }
 
-        if (status === 429) {
-          if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('resourceexhausted')) {
-            throw new GeminiApiError('Daily Gemini Quota Exhausted for this API key. Switch to local checks or provide a paid key.', 'QUOTA_EXHAUSTED', status);
-          }
-
-          // Rate limit backoff
-          if (retryCount < maxRetries) {
-            const delay = Math.pow(2, retryCount) * 1000;
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            retryCount++;
-            continue;
-          }
-          throw new GeminiApiError('Rate limit exceeded. Please wait a moment and retry.', 'RATE_LIMIT', status);
+        // If this was the last model in the chain, fail with comprehensive chain summary
+        if (isLastModel) {
+          const chainSummary = modelsToTry.join(' → ');
+          throw new GeminiApiError(
+            `All models in the fallback chain failed (${chainSummary}). Last error on ${currentModel} (HTTP ${status}): ${errorMessage}`,
+            isDeprecation404 ? 'MODEL_DEPRECATED' : status === 429 ? 'RATE_LIMIT' : 'GENERIC',
+            status
+          );
         }
 
-        throw new GeminiApiError(`Gemini API Error (${status}): ${errorMessage}`, 'GENERIC', status);
+        // Any other non-400 error before last model: attempt next model in chain
+        const nextModel = modelsToTry[i + 1];
+        const notice = `${currentModel} encountered error (${status}), falling back to ${nextModel}...`;
+        onStatusUpdate?.(notice);
+        console.warn(`[Gemini Fallback] ${notice}`);
+        continue;
       }
 
+      // Successful HTTP response: parse body
       const responseData = await response.json();
       const parts = responseData.candidates?.[0]?.content?.parts;
       const textPart = Array.isArray(parts) ? parts.find((p: any) => typeof p?.text === 'string') : null;
       const rawText = textPart?.text || parts?.[0]?.text;
 
       if (!rawText) {
+        failureHistory.push({ model: currentModel, error: 'Empty candidate text', status: 200 });
+        if (!isLastModel) {
+          const nextModel = modelsToTry[i + 1];
+          onStatusUpdate?.(`${currentModel} returned empty response, falling back to ${nextModel}...`);
+          continue;
+        }
         throw new GeminiApiError('Gemini API returned an empty candidate response.', 'MALFORMED_JSON');
       }
 
+      let parsedData: any;
       try {
         const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-        return JSON.parse(cleanedText);
-      } catch (parseError) {
+        parsedData = JSON.parse(cleanedText);
+      } catch {
+        failureHistory.push({ model: currentModel, error: 'Malformed JSON response', status: 200 });
+        if (!isLastModel) {
+          const nextModel = modelsToTry[i + 1];
+          onStatusUpdate?.(`${currentModel} returned invalid JSON, falling back to ${nextModel}...`);
+          continue;
+        }
         throw new GeminiApiError('Malformed JSON payload received from Gemini model.', 'MALFORMED_JSON');
       }
-    } catch (err: any) {
-      if (err instanceof GeminiApiError) {
-        throw err;
+
+      // Check if fallback was used
+      const fallbackNotice = currentModel !== initialModel
+        ? `Note: ${initialModel} was temporarily unavailable, so this request used ${currentModel} instead.`
+        : undefined;
+
+      return {
+        data: parsedData,
+        usedModel: currentModel,
+        originalModel: initialModel,
+        fallbackNotice
+      };
+
+    } catch (networkOrThrownErr: any) {
+      if (networkOrThrownErr instanceof GeminiApiError) {
+        // If it's INVALID_KEY or HTTP 400 or already all models failed, throw immediately
+        if (
+          networkOrThrownErr.errorType === 'INVALID_KEY' ||
+          networkOrThrownErr.statusCode === 400 ||
+          networkOrThrownErr.message.startsWith('All models in the fallback chain failed')
+        ) {
+          throw networkOrThrownErr;
+        }
       }
-      const errStr = (err?.message || '').toLowerCase();
-      if (errStr.includes('404') || errStr.includes('no longer available') || errStr.includes('model not found')) {
-        throw new GeminiApiError(
-          'The selected AI model is no longer available. Please choose a different model from the selector above.',
-          'MODEL_DEPRECATED',
-          404
-        );
-      }
-      if (retryCount < maxRetries) {
-        const delay = Math.pow(2, retryCount) * 1000;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        retryCount++;
+
+      const errMsg = networkOrThrownErr?.message || 'Network fetch failure';
+      failureHistory.push({ model: currentModel, error: errMsg });
+
+      if (!isLastModel) {
+        const nextModel = modelsToTry[i + 1];
+        const notice = `${currentModel} network error, falling back to ${nextModel}...`;
+        onStatusUpdate?.(notice);
+        console.warn(`[Gemini Fallback] ${notice}`, networkOrThrownErr);
         continue;
       }
-      throw new GeminiApiError(err.message || 'Network error communicating with Gemini API.', 'GENERIC');
+
+      const chainSummary = modelsToTry.join(' → ');
+      throw new GeminiApiError(
+        `All models in the fallback chain failed (${chainSummary}). Network error on ${currentModel}: ${errMsg}`,
+        'GENERIC'
+      );
     }
   }
+
+  throw new GeminiApiError('Gemini API call failed across all candidate models in fallback chain.', 'GENERIC');
 }
 
 /**
@@ -274,7 +402,8 @@ export async function runTier2SemanticAudit(
   draftContent: string,
   activeBrandDNA: BrandDNAProfile,
   imageDataUrl?: string,
-  contentContext?: string
+  contentContext?: string,
+  onStatusUpdate?: (status: string) => void
 ): Promise<SemanticResult> {
   const contextDirective = contentContext && contentContext.trim()
     ? `\nThe user has described this content as: '${contentContext.trim()}'. Consider this stated purpose when evaluating tone, formality, and voice alignment — do not evaluate the content as if its purpose were unknown.`
@@ -304,15 +433,19 @@ ${draftContent || '[Visual Asset Audit - Check visual mood against brand DNA]'}
 </untrusted_user_draft>
 `;
 
-  const rawJson: LoomFrogObservationPayload = await callGeminiApi(
+  const apiResult = await callGeminiApi(
     apiKey,
     model || DEFAULT_MODEL,
     systemInstruction,
     userPrompt,
     OBSERVATIONS_SCHEMA,
-    imageDataUrl
+    {
+      imageBase64: imageDataUrl,
+      onStatusUpdate
+    }
   );
 
+  const rawJson: LoomFrogObservationPayload = apiResult.data;
   const observations: ObservationItem[] = rawJson?.observations || [];
 
   // Calculate S_sem score using weighted semantic rules
@@ -327,7 +460,10 @@ ${draftContent || '[Visual Asset Audit - Check visual mood against brand DNA]'}
     return {
       observations: [],
       score: 100,
-      confidence: 0.95
+      confidence: 0.95,
+      usedModel: apiResult.usedModel,
+      originalModel: apiResult.originalModel,
+      fallbackNotice: apiResult.fallbackNotice
     };
   }
 
@@ -353,7 +489,10 @@ ${draftContent || '[Visual Asset Audit - Check visual mood against brand DNA]'}
   return {
     observations,
     score: sSem,
-    confidence: Math.round(avgConfidence * 100) / 100
+    confidence: Math.round(avgConfidence * 100) / 100,
+    usedModel: apiResult.usedModel,
+    originalModel: apiResult.originalModel,
+    fallbackNotice: apiResult.fallbackNotice
   };
 }
 
@@ -369,8 +508,9 @@ export interface ConversationalBrandInput {
 export async function extractBrandDNAWithAI(
   apiKey: string,
   model: string,
-  input: ConversationalBrandInput | string
-): Promise<Partial<BrandDNAProfile>> {
+  input: ConversationalBrandInput | string,
+  onStatusUpdate?: (status: string) => void
+): Promise<Partial<BrandDNAProfile> & { usedModel?: string; originalModel?: string; fallbackNotice?: string }> {
   const isStringInput = typeof input === 'string';
   const freeformText = isStringInput ? input : (input.freeformText || '');
   const urls = isStringInput ? [] : (input.urls || []);
@@ -412,7 +552,7 @@ ${promptSections.join('\n\n')}
 
   const tools = urls.length > 0 ? [{ url_context: {} }] : undefined;
 
-  const extracted: any = await callGeminiApi(
+  const apiResult = await callGeminiApi(
     apiKey,
     model || DEFAULT_MODEL,
     systemInstruction,
@@ -420,9 +560,12 @@ ${promptSections.join('\n\n')}
     BRAND_DNA_EXTRACT_SCHEMA,
     {
       imagesBase64: images,
-      tools
+      tools,
+      onStatusUpdate
     }
   );
+
+  const extracted: any = apiResult.data;
 
   return {
     metadata: {
@@ -447,6 +590,8 @@ ${promptSections.join('\n\n')}
       secondaryHex: extracted.secondaryHex || ['#2DD4BF', '#64748B'],
       strictCompliance: false
     },
-    rules: extracted.rules || []
+    rules: extracted.rules || [],
+    usedModel: apiResult.usedModel,
+    fallbackNotice: apiResult.fallbackNotice
   };
 }
