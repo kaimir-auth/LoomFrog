@@ -3,7 +3,7 @@ import { UnifiedInputPanel } from './UnifiedInputPanel';
 import { DiagnosticDashboard } from './DiagnosticDashboard';
 import { useKeyContext } from '../../context/KeyContext';
 import { runTier1DeterministicAudit } from '../../services/deterministicEngine';
-import { runTier2SemanticAudit, GeminiApiError } from '../../services/geminiSemanticEngine';
+import { runTier2SemanticAudit, GeminiApiError, AVAILABLE_MODELS } from '../../services/geminiSemanticEngine';
 import { computeAuditScoreMatrix } from '../../services/scoringEngine';
 import { AuditReport, DetectedInputType } from '../../types/brandDna';
 import { PRECOMPUTED_DEMO_AUDIT } from '../../data/sampleBrandProfiles';
@@ -16,6 +16,7 @@ export const AuditStudio: React.FC = () => {
     hasApiKey,
     isDemoMode,
     selectedModel,
+    setSelectedModel,
     activeProfile,
     currentDraftText,
     setCurrentDraftText,
@@ -144,6 +145,12 @@ export const AuditStudio: React.FC = () => {
     } catch (err: any) {
       if (err instanceof GeminiApiError) {
         setErrorMessage(err.message);
+      } else if (
+        err?.message?.includes('404') ||
+        err?.message?.toLowerCase()?.includes('no longer available') ||
+        err?.message?.toLowerCase()?.includes('not found')
+      ) {
+        setErrorMessage('The selected AI model is no longer available. Please choose a different model from the selector above.');
       } else {
         setErrorMessage(err.message || 'An unexpected error occurred during the audit.');
       }
@@ -213,17 +220,38 @@ export const AuditStudio: React.FC = () => {
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/60 via-[#0a1124]/80 to-[#02050f]/90 border border-rose-500/40 text-xs text-rose-200 flex items-center justify-between gap-3 shadow-[0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-            <span>{errorMessage}</span>
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/60 via-[#0a1124]/80 to-[#02050f]/90 border border-rose-500/40 text-xs text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+          <div className="flex items-start sm:items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+            <span className="leading-relaxed">{errorMessage}</span>
           </div>
-          <button
-            onClick={() => setErrorMessage(null)}
-            className="text-rose-300 hover:text-white text-xs font-bold underline cursor-pointer"
-          >
-            Dismiss
-          </button>
+          <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+            {errorMessage.includes('no longer available') && (
+              <div className="flex items-center gap-1.5 bg-[#040918] px-2.5 py-1 rounded-xl border border-cyan-500/30">
+                <span className="text-[10px] text-slate-400">Switch:</span>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => {
+                    setSelectedModel(e.target.value);
+                    setErrorMessage(null);
+                  }}
+                  className="bg-transparent text-cyan-300 text-xs focus:outline-none cursor-pointer font-mono"
+                >
+                  {AVAILABLE_MODELS.map((m) => (
+                    <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                      {m.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-rose-300 hover:text-white text-xs font-bold underline cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
 

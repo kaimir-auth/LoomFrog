@@ -156,6 +156,13 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 3. Model Configuration
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
 
+  // Automatically migrate any legacy/deprecated model selection (e.g. gemini-2.5-flash) to DEFAULT_MODEL
+  useEffect(() => {
+    if (selectedModel === 'gemini-2.5-flash') {
+      setSelectedModel(DEFAULT_MODEL);
+    }
+  }, [selectedModel]);
+
   // 4. Navigation
   const [activeTab, setActiveTab] = useState<'landing' | 'audit' | 'brand_dna' | 'privacy'>('landing');
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);

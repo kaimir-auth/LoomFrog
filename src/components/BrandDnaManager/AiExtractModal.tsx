@@ -17,7 +17,7 @@ import {
   Key
 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
-import { extractBrandDNAWithAI, GeminiApiError } from '../../services/geminiSemanticEngine';
+import { extractBrandDNAWithAI, GeminiApiError, AVAILABLE_MODELS } from '../../services/geminiSemanticEngine';
 import { isValidHttpUrl, normalizeUrl } from '../../services/webExtractor';
 import { BrandDNAProfile } from '../../types/brandDna';
 
@@ -49,7 +49,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
   onProfileExtracted,
   existingSources = []
 }) => {
-  const { apiKey, hasApiKey, selectedModel, isDemoMode, setIsKeyModalOpen } = useKeyContext();
+  const { apiKey, hasApiKey, selectedModel, setSelectedModel, isDemoMode, setIsKeyModalOpen } = useKeyContext();
 
   const [freeformText, setFreeformText] = useState('');
   const [urlsList, setUrlsList] = useState<string[]>(() => existingSources.map((s) => s.url));
@@ -173,6 +173,12 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
     } catch (err: any) {
       if (err instanceof GeminiApiError) {
         setError(err.message);
+      } else if (
+        err?.message?.includes('404') ||
+        err?.message?.toLowerCase()?.includes('no longer available') ||
+        err?.message?.toLowerCase()?.includes('not found')
+      ) {
+        setError('The selected AI model is no longer available. Please choose a different model from the selector above.');
       } else {
         setError(err.message || 'Failed to generate Brand DNA profile. Please verify your API key and connection.');
       }
@@ -352,6 +358,25 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                 <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400 mt-0.5" />
                 <span className="leading-relaxed">{error}</span>
               </div>
+              {error.includes('no longer available') && (
+                <div className="pl-6.5 flex items-center gap-2">
+                  <span className="text-[11px] text-slate-300">Choose active model:</span>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => {
+                      setSelectedModel(e.target.value);
+                      setError(null);
+                    }}
+                    className="bg-[#040918] text-cyan-300 border border-cyan-500/40 text-xs rounded-xl px-2.5 py-1 focus:outline-none cursor-pointer font-mono"
+                  >
+                    {AVAILABLE_MODELS.map((m) => (
+                      <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                        {m.id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {(isDemoMode || !hasApiKey) && (
                 <div className="pl-6.5">
                   <button

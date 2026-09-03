@@ -1,19 +1,23 @@
 import { BrandDNAProfile, LoomFrogObservationPayload, ObservationItem, SemanticResult } from '../types/brandDna';
 
-export const DEFAULT_MODEL = 'gemini-2.5-flash';
+export const DEFAULT_MODEL = 'gemini-3.6-flash';
 export const FALLBACK_MODEL = 'gemini-2.5-pro';
 
 export const AVAILABLE_MODELS = [
-  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash (Recommended - Ultra Fast)', speed: 'Fastest' },
+  { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash (Recommended - Ultra Fast)', speed: 'Fastest' },
   { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (Deep Reasoning)', speed: 'High Precision' },
   { id: 'gemini-3.7-flash', name: 'Gemini 3.7 Flash', speed: 'Advanced' }
 ];
 
 export class GeminiApiError extends Error {
   statusCode?: number;
-  errorType: 'INVALID_KEY' | 'RATE_LIMIT' | 'QUOTA_EXHAUSTED' | 'MALFORMED_JSON' | 'OFFLINE' | 'GENERIC';
+  errorType: 'INVALID_KEY' | 'RATE_LIMIT' | 'QUOTA_EXHAUSTED' | 'MALFORMED_JSON' | 'OFFLINE' | 'MODEL_DEPRECATED' | 'GENERIC';
 
-  constructor(message: string, errorType: 'INVALID_KEY' | 'RATE_LIMIT' | 'QUOTA_EXHAUSTED' | 'MALFORMED_JSON' | 'OFFLINE' | 'GENERIC', statusCode?: number) {
+  constructor(
+    message: string,
+    errorType: 'INVALID_KEY' | 'RATE_LIMIT' | 'QUOTA_EXHAUSTED' | 'MALFORMED_JSON' | 'OFFLINE' | 'MODEL_DEPRECATED' | 'GENERIC',
+    statusCode?: number
+  ) {
     super(message);
     this.name = 'GeminiApiError';
     this.errorType = errorType;
@@ -178,6 +182,21 @@ async function callGeminiApi(
         const status = response.status;
         const errorMessage = errorJson.error?.message || response.statusText;
 
+        // Model deprecation / 404 Not Found handling
+        if (
+          status === 404 ||
+          errorMessage.toLowerCase().includes('no longer available') ||
+          errorMessage.toLowerCase().includes('is not found for api version') ||
+          errorMessage.toLowerCase().includes('is not supported for generatecontent') ||
+          errorMessage.toLowerCase().includes('model not found')
+        ) {
+          throw new GeminiApiError(
+            'The selected AI model is no longer available. Please choose a different model from the selector above.',
+            'MODEL_DEPRECATED',
+            status
+          );
+        }
+
         if (status === 400 || status === 403) {
           if (errorMessage.toLowerCase().includes('api key') || status === 403) {
             throw new GeminiApiError('API Key Invalid or Expired. Please check your key in API Key Settings.', 'INVALID_KEY', status);
@@ -226,6 +245,14 @@ async function callGeminiApi(
     } catch (err: any) {
       if (err instanceof GeminiApiError) {
         throw err;
+      }
+      const errStr = (err?.message || '').toLowerCase();
+      if (errStr.includes('404') || errStr.includes('no longer available') || errStr.includes('model not found')) {
+        throw new GeminiApiError(
+          'The selected AI model is no longer available. Please choose a different model from the selector above.',
+          'MODEL_DEPRECATED',
+          404
+        );
       }
       if (retryCount < maxRetries) {
         const delay = Math.pow(2, retryCount) * 1000;
