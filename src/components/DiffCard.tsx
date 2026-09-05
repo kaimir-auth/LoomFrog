@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { Check, Sparkles, AlertTriangle, AlertCircle, Info, ArrowRight } from 'lucide-react';
 import { SeverityLevel } from '../types/brandDna';
+import { BorderGlow, GlowColor } from './BorderGlow';
 
 interface DiffCardProps {
   ruleId: string;
@@ -82,13 +83,27 @@ export const DiffCard: React.FC<DiffCardProps> = ({
 
   const ruleLabel = getRuleCategoryLabel(ruleId);
 
+  const glowColor: GlowColor = isApplied
+    ? 'teal'
+    : severity === 'CRITICAL' || severity === 'HIGH'
+    ? 'rose'
+    : severity === 'MEDIUM'
+    ? 'amber'
+    : 'cyan';
+
   return (
-    <div className={`p-5 rounded-3xl transition-all duration-300 ${
-      isApplied 
-        ? 'border-2 border-teal-400 bg-teal-950/30 shadow-[0_0_30px_rgba(45,212,191,0.4)]' 
-        : 'neo-liquid-card'
-    }`}>
-      {/* Top Header with Category Word on left and Severity Badge on right */}
+    <BorderGlow
+      borderRadius="rounded-3xl"
+      glowColor={glowColor}
+      active={isApplied}
+      intensity={severity === 'CRITICAL' ? 'strong' : 'medium'}
+    >
+      <div className={`p-5 rounded-3xl transition-all duration-300 ${
+        isApplied 
+          ? 'border-2 border-teal-400 bg-teal-950/30 shadow-[0_0_30px_rgba(45,212,191,0.4)]' 
+          : 'neo-liquid-card'
+      }`}>
+        {/* Top Header with Category Word on left and Severity Badge on right */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2.5">
           <span className="text-sm font-bold text-white font-lexend tracking-wide">
@@ -159,5 +174,6 @@ export const DiffCard: React.FC<DiffCardProps> = ({
         </button>
       </div>
     </div>
+    </BorderGlow>
   );
 };

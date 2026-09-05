@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useKeyContext } from '../../context/KeyContext';
 import { LifecycleStepper } from './LifecycleStepper';
 import { AiExtractModal } from './AiExtractModal';
+import { BorderGlow } from '../BorderGlow';
 import { BrandDNAProfile, BrandRule, LifecycleState, BrandSource } from '../../types/brandDna';
 import { extractWebpage, isValidHttpUrl, normalizeUrl, ExtractedWebpageData } from '../../services/webExtractor';
 import {
@@ -406,35 +407,37 @@ export const BrandDnaManager: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {profileToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-md rounded-3xl neo-liquid-panel p-6 space-y-4 shadow-2xl border border-rose-500/30">
-            <div className="flex items-center gap-3 text-rose-400">
-              <AlertTriangle className="w-6 h-6" />
-              <h3 className="text-base font-bold text-white">Delete Brand Profile?</h3>
+          <BorderGlow borderRadius="rounded-3xl" glowColor="rose" className="w-full max-w-md">
+            <div className="relative w-full rounded-3xl neo-liquid-panel p-6 space-y-4 shadow-2xl border border-rose-500/30">
+              <div className="flex items-center gap-3 text-rose-400">
+                <AlertTriangle className="w-6 h-6" />
+                <h3 className="text-base font-bold text-white">Delete Brand Profile?</h3>
+              </div>
+              <p className="text-xs text-slate-300">
+                Are you sure you want to permanently delete <strong className="text-white">&ldquo;{profileToDelete}&rdquo;</strong>? This action cannot be undone.
+              </p>
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setProfileToDelete(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteBrandProfile(profileToDelete);
+                    setProfileToDelete(null);
+                    showStatus(`Deleted brand profile.`);
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer shadow-lg shadow-rose-600/30"
+                >
+                  Confirm Delete
+                </button>
+              </div>
             </div>
-            <p className="text-xs text-slate-300">
-              Are you sure you want to permanently delete <strong className="text-white">&ldquo;{profileToDelete}&rdquo;</strong>? This action cannot be undone.
-            </p>
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={() => setProfileToDelete(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  deleteBrandProfile(profileToDelete);
-                  setProfileToDelete(null);
-                  showStatus(`Deleted brand profile.`);
-                }}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer shadow-lg shadow-rose-600/30"
-              >
-                Confirm Delete
-              </button>
-            </div>
-          </div>
+          </BorderGlow>
         </div>
       )}
 
@@ -502,33 +505,35 @@ export const BrandDnaManager: React.FC = () => {
       </div>
 
       {brandProfiles.length === 0 ? (
-        <div className="p-10 rounded-3xl neo-liquid-panel text-center space-y-5 border border-cyan-500/20 my-8">
-          <div className="w-16 h-16 rounded-3xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.25)]">
-            <Sparkles className="w-8 h-8" />
+        <BorderGlow borderRadius="rounded-3xl" glowColor="cyan" className="max-w-xl mx-auto my-8">
+          <div className="p-10 rounded-3xl neo-liquid-panel text-center space-y-5 border border-cyan-500/20">
+            <div className="w-16 h-16 rounded-3xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.25)]">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <div className="max-w-md mx-auto space-y-2">
+              <h3 className="text-lg font-bold text-white font-lexend">No Brand DNA Profiles Configured</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Your API Key is synchronized. Create your first custom Brand DNA profile to establish machine-readable tone guidelines, forbidden buzzwords, and diagnostic metrics.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => setIsAiModalOpen(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer active:scale-95 transition-all"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-200" />
+                <span>Draft Profile with AI</span>
+              </button>
+              <button
+                onClick={() => setIsCreateProfileModalOpen(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md cursor-pointer active:scale-95 transition-all"
+              >
+                <Plus className="w-4 h-4 text-teal-400" />
+                <span>Blank Profile</span>
+              </button>
+            </div>
           </div>
-          <div className="max-w-md mx-auto space-y-2">
-            <h3 className="text-lg font-bold text-white font-lexend">No Brand DNA Profiles Configured</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Your API Key is synchronized. Create your first custom Brand DNA profile to establish machine-readable tone guidelines, forbidden buzzwords, and diagnostic metrics.
-            </p>
-          </div>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={() => setIsAiModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer active:scale-95 transition-all"
-            >
-              <Sparkles className="w-4 h-4 text-cyan-200" />
-              <span>Draft Profile with AI</span>
-            </button>
-            <button
-              onClick={() => setIsCreateProfileModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md cursor-pointer active:scale-95 transition-all"
-            >
-              <Plus className="w-4 h-4 text-teal-400" />
-              <span>Blank Profile</span>
-            </button>
-          </div>
-        </div>
+        </BorderGlow>
       ) : (
         <>
           {/* Fallback Notice Banner if Model Fallback Occurred */}
@@ -556,8 +561,13 @@ export const BrandDnaManager: React.FC = () => {
           )}
 
           {/* Profile Selector & Activation Banner */}
-          <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
+          <BorderGlow
+            borderRadius="rounded-3xl"
+            glowColor={currentProfile.lifecycleState === 'ACTIVE' ? 'teal' : 'cyan'}
+            active={currentProfile.lifecycleState === 'ACTIVE'}
+          >
+            <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+              <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
           <label className="text-xs font-bold text-cyan-200 font-lexend shrink-0">Selected Profile:</label>
@@ -674,6 +684,7 @@ export const BrandDnaManager: React.FC = () => {
           )}
         </div>
       </div>
+      </BorderGlow>
 
       {/* 6-Stage Interactive Lifecycle Stepper (Visual Step 1 + 5 Real States) */}
       <LifecycleStepper
@@ -741,18 +752,19 @@ export const BrandDnaManager: React.FC = () => {
 
         {/* Tab 5: Brand Sources & Web Ingestion */}
         {activeTabSub === 'sources' && (
-          <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider font-mono flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-emerald-400" />
-                  <span>Ingested Brand Source URLs</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Add official website pages, press centers, or public brand books. LoomFrog extracts live copy and links them directly to this Brand DNA.
-                </p>
+          <BorderGlow borderRadius="rounded-3xl" glowColor="emerald">
+            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider font-mono flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-emerald-400" />
+                    <span>Ingested Brand Source URLs</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Add official website pages, press centers, or public brand books. LoomFrog extracts live copy and links them directly to this Brand DNA.
+                  </p>
+                </div>
               </div>
-            </div>
 
             {/* Add URL Form */}
             <div className="p-4 rounded-2xl bg-[#02050f]/80 border border-emerald-500/20 space-y-3">
@@ -867,11 +879,13 @@ export const BrandDnaManager: React.FC = () => {
               )}
             </div>
           </div>
+          </BorderGlow>
         )}
 
         {/* Tab 1: Voice & Formality */}
         {activeTabSub === 'voice' && (
-          <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
+          <BorderGlow borderRadius="rounded-3xl" glowColor="cyan">
+            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend">
@@ -986,14 +1000,16 @@ export const BrandDnaManager: React.FC = () => {
               </div>
             </div>
           </div>
+          </BorderGlow>
         )}
 
         {/* Tab 2: Forbidden & Preferred Vocabulary */}
         {activeTabSub === 'vocabulary' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Forbidden Vocabulary */}
-            <div className="p-6 rounded-3xl bg-gradient-to-br from-rose-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-rose-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)]">
-              <div className="flex items-center justify-between">
+            <BorderGlow borderRadius="rounded-3xl" glowColor="rose" className="h-full">
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-rose-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-rose-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)] h-full">
+                <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider font-mono">
                   <AlertTriangle className="w-4 h-4 text-rose-400" />
                   Forbidden Vocabulary ({currentProfile.vocabulary?.forbidden?.length || 0})
@@ -1044,57 +1060,61 @@ export const BrandDnaManager: React.FC = () => {
                 </button>
               </div>
             </div>
+            </BorderGlow>
 
             {/* Preferred Vocabulary */}
-            <div className="p-6 rounded-3xl bg-gradient-to-br from-teal-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-teal-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-teal-300 font-bold text-xs uppercase tracking-wider font-mono">
-                  <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                  Preferred Brand Lexicon ({currentProfile.vocabulary?.preferred?.length || 0})
-                </div>
-                <span className="text-[10px] text-cyan-300/80 font-mono">Semantic Guidance</span>
-              </div>
-
-              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                {currentProfile.vocabulary?.preferred?.map((term, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-2xl bg-[#02050f]/85 border border-teal-500/20 flex items-center justify-between gap-2 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]"
-                  >
-                    <span className="text-xs font-semibold text-teal-200">{term}</span>
-                    <button
-                      onClick={() => handleRemovePreferredTerm(idx)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+            <BorderGlow borderRadius="rounded-3xl" glowColor="teal" className="h-full">
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-teal-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-teal-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)] h-full">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-teal-300 font-bold text-xs uppercase tracking-wider font-mono">
+                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                    Preferred Brand Lexicon ({currentProfile.vocabulary?.preferred?.length || 0})
                   </div>
-                ))}
-              </div>
+                  <span className="text-[10px] text-cyan-300/80 font-mono">Semantic Guidance</span>
+                </div>
 
-              <div className="flex gap-2 pt-2 border-t border-teal-500/20">
-                <input
-                  type="text"
-                  value={newPreferredTerm}
-                  onChange={(e) => setNewPreferredTerm(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddPreferredTerm()}
-                  placeholder="Preferred phrase (e.g. Deterministic reliability)..."
-                  className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                />
-                <button
-                  onClick={handleAddPreferredTerm}
-                  className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 border border-teal-300/40 text-xs font-bold text-white shadow-lg shadow-teal-600/30 transition-all active:scale-95 cursor-pointer"
-                >
-                  Add
-                </button>
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {currentProfile.vocabulary?.preferred?.map((term, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-2xl bg-[#02050f]/85 border border-teal-500/20 flex items-center justify-between gap-2 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]"
+                    >
+                      <span className="text-xs font-semibold text-teal-200">{term}</span>
+                      <button
+                        onClick={() => handleRemovePreferredTerm(idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-teal-500/20">
+                  <input
+                    type="text"
+                    value={newPreferredTerm}
+                    onChange={(e) => setNewPreferredTerm(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddPreferredTerm()}
+                    placeholder="Preferred phrase (e.g. Deterministic reliability)..."
+                    className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
+                  />
+                  <button
+                    onClick={handleAddPreferredTerm}
+                    className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 border border-teal-300/40 text-xs font-bold text-white shadow-lg shadow-teal-600/30 transition-all active:scale-95 cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
-            </div>
+            </BorderGlow>
           </div>
         )}
 
         {/* Tab 3: Colors & Palette */}
         {activeTabSub === 'colors' && (
-          <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
+          <BorderGlow borderRadius="rounded-3xl" glowColor="teal">
+            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold text-cyan-200 uppercase tracking-wider font-mono">
@@ -1202,12 +1222,14 @@ export const BrandDnaManager: React.FC = () => {
               </div>
             </div>
           </div>
+          </BorderGlow>
         )}
 
         {/* Tab 4: Evaluation Rules Matrix */}
         {activeTabSub === 'rules' && (
-          <div className="p-6 rounded-3xl neo-liquid-panel space-y-4">
-            <div className="flex items-center justify-between">
+          <BorderGlow borderRadius="rounded-3xl" glowColor="blue">
+            <div className="p-6 rounded-3xl neo-liquid-panel space-y-4">
+              <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold text-cyan-200 uppercase tracking-wider font-mono">
                   Configurable Evaluation Rules
@@ -1293,6 +1315,7 @@ export const BrandDnaManager: React.FC = () => {
               ))}
             </div>
           </div>
+          </BorderGlow>
         )}
       </div>
         </>

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { LoomFrogLogo, LoomFrogIcon } from '../LoomFrogLogo';
+import GhostFibers from '../GhostFibers/GhostFibers';
 
 export const LandingPage: React.FC = () => {
   const { setActiveTab, setIsKeyModalOpen, setIsOnboardingModalOpen } = useKeyContext();
@@ -41,59 +42,91 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F17] text-[#F3F4F6] selection:bg-cyan-500/30 selection:text-cyan-200 flex flex-col font-sans">
-      {/* STICKY TOP NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 bg-[#0B0F17]/90 backdrop-blur-xl border-b border-cyan-500/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
-          {/* Brandmark / Logo */}
-          <div
-            onClick={scrollToTop}
-            className="cursor-pointer transition-opacity hover:opacity-90"
-            title="LoomFrog — Return to Top"
-          >
-            <LoomFrogLogo size="md" />
+        {/* STICKY TOP NAVIGATION BAR */}
+        <header className="sticky top-0 z-50 bg-[#0B0F17]/90 backdrop-blur-xl border-b border-cyan-500/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+            {/* Brandmark / Logo */}
+            <div
+              onClick={scrollToTop}
+              className="cursor-pointer transition-opacity hover:opacity-90"
+              title="LoomFrog — Return to Top"
+            >
+              <LoomFrogLogo size="md" />
+            </div>
+
+            {/* Center/Right Anchor Links */}
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+              <button
+                onClick={() => scrollToSection('why-loomfrog')}
+                className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
+              >
+                Why LoomFrog
+              </button>
+              <button
+                onClick={() => scrollToSection('how-it-works')}
+                className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
+              >
+                How it Works
+              </button>
+              <button
+                onClick={() => scrollToSection('built-for-real-use')}
+                className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
+              >
+                Built for Real Use
+              </button>
+            </nav>
+
+            {/* Action CTA Button */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleTryLoomFrog}
+                className="neo-liquid-btn-primary inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer active:scale-95 transition-all"
+              >
+                <span>Try LoomFrog</span>
+                <ArrowRight className="w-4 h-4 text-cyan-200" />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* 1. HERO SECTION (Base Shade #0B0F17) */}
+        <section className="relative pt-12 sm:pt-20 pb-20 sm:pb-32 px-4 sm:px-6 lg:px-8 bg-[#0B0F17] overflow-hidden">
+          {/* Ambient GhostFibers Visual Field */}
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+            <GhostFibers
+              lineColor="#140E35"
+              glowColor="#00F0FF"
+              speed={0.2}
+              scale={2}
+              rotation={0}
+              rotationSpeed={0.25}
+              layers={4}
+              waveAmplitude={0.015}
+              waveFrequency={3}
+              waveSpeed={0.15}
+              layerSpeed={0.08}
+              twist={0.1}
+              twistFrequency={5}
+              twistSpeed={1.2}
+              lineFrequency={5}
+              lineSpacing={2}
+              lineSharpness={16}
+              glowFalloff={10}
+              glowIntensity={1.6}
+              brightness={1.8}
+              blueBoost={1.25}
+              vignette={0.8}
+              grain={0.05}
+              dpr={1}
+            />
+            {/* Soft fade overlay to blend seamlessly with surrounding sections */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F17]/50 via-transparent to-[#0B0F17]" />
           </div>
 
-          {/* Center/Right Anchor Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <button
-              onClick={() => scrollToSection('why-loomfrog')}
-              className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
-            >
-              Why LoomFrog
-            </button>
-            <button
-              onClick={() => scrollToSection('how-it-works')}
-              className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
-            >
-              How it Works
-            </button>
-            <button
-              onClick={() => scrollToSection('built-for-real-use')}
-              className="hover:text-cyan-300 transition-colors cursor-pointer py-1"
-            >
-              Built for Real Use
-            </button>
-          </nav>
-
-          {/* Action CTA Button */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleTryLoomFrog}
-              className="neo-liquid-btn-primary inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer active:scale-95 transition-all"
-            >
-              <span>Try LoomFrog</span>
-              <ArrowRight className="w-4 h-4 text-cyan-200" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* 1. HERO SECTION (Base Shade #0B0F17) */}
-      <section className="relative pt-12 sm:pt-20 pb-20 sm:pb-32 px-4 sm:px-6 lg:px-8 bg-[#0B0F17] overflow-hidden">
-        {/* Glow Spheres */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-b from-cyan-500/15 via-teal-500/5 to-transparent rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-48 left-10 w-96 h-96 bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-48 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
+          {/* Glow Spheres */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-b from-cyan-500/15 via-teal-500/5 to-transparent rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-48 left-10 w-96 h-96 bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute top-48 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           {/* Security Pill Badge */}
@@ -346,8 +379,8 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 4. SECTION: BUILT FOR REAL USE, NOT A DEMO (Surface Shade #111827 & #1F2937) */}
-      <section id="built-for-real-use" className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 bg-[#111827] border-t border-slate-800 relative">
-        <div className="max-w-5xl mx-auto text-center">
+      <section id="built-for-real-use" className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 bg-[#111827] border-t border-slate-800 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3 block">
             Enterprise Utility
           </span>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { LifecycleState } from '../../types/brandDna';
 import { Check, ArrowRight, Sparkles, UserCheck, Shield, Flame, AlertCircle, MessageSquare } from 'lucide-react';
+import { BorderGlow } from '../BorderGlow';
 
 interface LifecycleStepperProps {
   currentState: LifecycleState;
@@ -88,8 +89,9 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
   };
 
   return (
-    <div className="p-6 rounded-3xl neo-liquid-panel space-y-4 relative overflow-hidden">
-      <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 via-teal-300/50 to-transparent pointer-events-none" />
+    <BorderGlow borderRadius="rounded-3xl" glowColor="cyan">
+      <div className="p-6 rounded-3xl neo-liquid-panel space-y-4 relative overflow-hidden">
+        <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 via-teal-300/50 to-transparent pointer-events-none" />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -248,6 +250,7 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
         })}
       </div>
     </div>
+    </BorderGlow>
   );
 };
 

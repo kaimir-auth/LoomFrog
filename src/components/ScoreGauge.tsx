@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getScoreColor } from '../services/scoringEngine';
+import { BorderGlow, GlowColor } from './BorderGlow';
 
 interface ScoreGaugeProps {
   score: number;
@@ -47,9 +48,18 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   const strokeDashoffset = circumference - (Math.min(100, Math.max(0, score)) / 100) * circumference;
   const svgSize = (radius + strokeWidth) * 2 + 8;
 
+  const glowColor: GlowColor =
+    score >= 85 ? 'emerald' : score >= 60 ? 'teal' : score >= 40 ? 'amber' : 'rose';
+
   return (
-    <div className="flex flex-col items-center justify-center p-3.5 rounded-2xl neo-liquid-card relative overflow-hidden group">
-      {/* Gauge Ring */}
+    <BorderGlow
+      borderRadius="rounded-2xl"
+      glowColor={glowColor}
+      intensity="subtle"
+      className="h-full w-full"
+    >
+      <div className="flex flex-col items-center justify-center p-3.5 rounded-2xl neo-liquid-card relative overflow-hidden group h-full">
+        {/* Gauge Ring */}
       <div className="relative flex items-center justify-center p-1 rounded-full bg-[#02050f] shadow-[inset_2px_2px_8px_rgba(0,0,0,0.8)]">
         <svg
           width={svgSize}
@@ -102,5 +112,6 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
         <div className="text-[11px] text-slate-400 leading-snug mt-0.5">{description}</div>
       </div>
     </div>
+    </BorderGlow>
   );
 };

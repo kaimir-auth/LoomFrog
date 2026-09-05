@@ -7,6 +7,7 @@ import { scanForbiddenVocabulary } from '../../services/deterministicEngine';
 import { CanvasColorInspector } from './CanvasColorInspector';
 import { DEMO_SAMPLE_DRAFTS } from '../../data/sampleBrandProfiles';
 import { DetectedInputType, DeterministicTextMatch } from '../../types/brandDna';
+import { BorderGlow } from '../BorderGlow';
 
 interface UnifiedInputPanelProps {
   onRunAudit: (text: string, imageDataUrl?: string, inputType?: DetectedInputType, contentContext?: string) => void;
@@ -301,57 +302,60 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
       </div>
 
       {/* Content Context Field (Optional for semantic Tier 2 AI engine) */}
-      <div className="p-3.5 sm:p-4 rounded-2xl neo-liquid-panel border border-cyan-500/20 space-y-1.5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <label htmlFor="content-context-input" className="text-xs font-semibold text-slate-200">
-            Tell us about the content
-          </label>
-          {contentContext && (
-            <button
-              type="button"
-              onClick={() => {
-                setContentContext('');
-                setShowContextNudge(false);
+      <BorderGlow borderRadius="rounded-2xl" glowColor="cyan">
+        <div className="p-3.5 sm:p-4 rounded-2xl neo-liquid-panel border border-cyan-500/20 space-y-1.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <label htmlFor="content-context-input" className="text-xs font-semibold text-slate-200">
+              Tell us about the content
+            </label>
+            {contentContext && (
+              <button
+                type="button"
+                onClick={() => {
+                  setContentContext('');
+                  setShowContextNudge(false);
+                }}
+                className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+              >
+                Clear Context
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <input
+              id="content-context-input"
+              type="text"
+              value={contentContext}
+              onChange={(e) => {
+                setContentContext(e.target.value);
+                if (showContextNudge) setShowContextNudge(false);
               }}
-              className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
-            >
-              Clear Context
-            </button>
-          )}
+              placeholder="e.g. 'Landing page hero copy', 'Client invitation draft', 'Instagram caption'"
+              className="w-full px-4 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none transition-all"
+            />
+          </div>
         </div>
-        <div className="relative">
-          <input
-            id="content-context-input"
-            type="text"
-            value={contentContext}
-            onChange={(e) => {
-              setContentContext(e.target.value);
-              if (showContextNudge) setShowContextNudge(false);
-            }}
-            placeholder="e.g. 'Landing page hero copy', 'Client invitation draft', 'Instagram caption'"
-            className="w-full px-4 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none transition-all"
-          />
-        </div>
-      </div>
+      </BorderGlow>
 
       {/* Main Input Canvas Zone */}
-      <div
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-        className={`relative rounded-3xl transition-all p-5 ${
-          isDragOver
-            ? 'border-2 border-cyan-400 bg-cyan-950/30 shadow-[0_0_30px_rgba(6,182,212,0.4)]'
-            : 'neo-liquid-panel'
-        }`}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".docx,.txt,.md,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp"
-          onChange={handleFileInputChange}
-          className="hidden"
-        />
+      <BorderGlow borderRadius="rounded-3xl" glowColor={isDragOver ? 'teal' : 'cyan'} active={isDragOver}>
+        <div
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          className={`relative rounded-3xl transition-all p-5 ${
+            isDragOver
+              ? 'border-2 border-cyan-400 bg-cyan-950/30 shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+              : 'neo-liquid-panel'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".docx,.txt,.md,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp"
+            onChange={handleFileInputChange}
+            className="hidden"
+          />
 
         {/* MODE 1: AUDIT A URL */}
         {inputMode === 'url' && (
@@ -660,7 +664,8 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </BorderGlow>
 
       {/* Context Nudge Alert Banner (Dismissible) */}
       {showContextNudge && (

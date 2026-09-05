@@ -21,6 +21,7 @@ import { useKeyContext } from '../../context/KeyContext';
 import { extractBrandDNAWithAI, GeminiApiError, AVAILABLE_MODELS } from '../../services/geminiSemanticEngine';
 import { isValidHttpUrl, normalizeUrl } from '../../services/webExtractor';
 import { BrandDNAProfile } from '../../types/brandDna';
+import { BorderGlow } from '../BorderGlow';
 
 interface AiExtractModalProps {
   isOpen: boolean;
@@ -291,8 +292,9 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.95)] overflow-hidden max-h-[92vh] flex flex-col border border-cyan-500/25">
-        {/* Modal Top Header */}
+      <BorderGlow borderRadius="rounded-3xl" glowColor="cyan" className="w-full max-w-2xl">
+        <div className="relative w-full rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.95)] overflow-hidden max-h-[92vh] flex flex-col border border-cyan-500/25">
+          {/* Modal Top Header */}
         <div className="flex items-center justify-between p-5 sm:p-6 border-b border-cyan-500/20 bg-[#030816]/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]">
@@ -654,6 +656,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           </div>
         </div>
       </div>
+      </BorderGlow>
     </div>
   );
 };
