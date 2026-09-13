@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { LoomFrogLogo, LoomFrogIcon } from '../LoomFrogLogo';
-import GhostFibers from '../GhostFibers/GhostFibers';
+import { FrogHero3D } from './FrogHero3D';
 
 export const LandingPage: React.FC = () => {
   const { setActiveTab, setIsKeyModalOpen, setIsOnboardingModalOpen } = useKeyContext();
@@ -90,77 +90,58 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* 1. HERO SECTION */}
-      <section className="relative pt-16 sm:pt-24 pb-20 sm:pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Ambient GhostFibers Visual Field */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <GhostFibers
-            lineColor="#140E35"
-            glowColor="#00F0FF"
-            speed={0.2}
-            scale={2}
-            rotation={0}
-            rotationSpeed={0.25}
-            layers={4}
-            waveAmplitude={0.015}
-            waveFrequency={3}
-            waveSpeed={0.15}
-            layerSpeed={0.08}
-            twist={0.1}
-            twistFrequency={5}
-            twistSpeed={1.2}
-            lineFrequency={5}
-            lineSpacing={2}
-            lineSharpness={16}
-            glowFalloff={10}
-            glowIntensity={1.6}
-            brightness={1.8}
-            blueBoost={1.25}
-            vignette={0.8}
-            grain={0.05}
-            dpr={1}
-          />
-          {/* Soft fade overlay to blend seamlessly with surrounding sections */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/40 via-transparent to-[#020617]" />
-        </div>
+      <section className="relative pt-12 sm:pt-16 lg:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Clean Deep Obsidian Canvas & Ambient Radial Accents */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#030818]/90 to-[#020617] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[550px] bg-cyan-500/[0.08] rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-teal-500/[0.05] rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Ambient Radial Accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-cyan-500/[0.08] rounded-full blur-[140px] pointer-events-none" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* TWO-COLUMN HERO GRID (Desktop Side-by-Side, Mobile Stacked) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 items-center mb-16 sm:mb-20">
+            {/* Left Column: Value Proposition & CTAs */}
+            <div className="lg:col-span-6 xl:col-span-5 text-left flex flex-col items-start">
+              {/* Security Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-200 mb-6 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0 shadow-[0_0_8px_#2dd4bf]" />
+                <span>Zero-Server &bull; Pure Client-Side Brand Governance</span>
+              </div>
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          {/* Security Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-200 mb-8 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0 shadow-[0_0_8px_#2dd4bf]" />
-            <span>Zero-Server &bull; Pure Client-Side Brand Governance</span>
-          </div>
+              {/* Headline */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12] mb-5 font-lexend">
+                Your brand&apos;s voice, verified — <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-200">
+                  with real security
+                </span>
+              </h1>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] mb-6 font-lexend">
-            Your brand&apos;s voice, verified — <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-200">
-              with real security
-            </span>
-          </h1>
+              {/* Subheadline */}
+              <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed mb-8">
+                LoomFrog audits your writing and visual assets against your own Brand DNA — combining instant rule-based checks with AI judgment, entirely in your browser. No account. No cost. For All.
+              </p>
 
-          {/* Subheadline */}
-          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10">
-            LoomFrog audits your writing and visual assets against your own Brand DNA — combining instant rule-based checks with AI judgment, entirely in your browser. No account. No cost. For All.
-          </p>
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+                <button
+                  onClick={handleTryLoomFrog}
+                  className="w-full sm:w-auto neo-liquid-btn-primary inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold cursor-pointer active:scale-95 transition-all shadow-[0_0_25px_rgba(6,182,212,0.35)] font-lexend"
+                >
+                  <span>Try LoomFrog</span>
+                  <ArrowRight className="w-4 h-4 text-[#030818]" />
+                </button>
+                <button
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-medium text-slate-200 bg-[#030818]/60 hover:bg-[#030818]/90 hover:text-white border border-cyan-500/20 hover:border-cyan-500/40 backdrop-blur-md transition-all cursor-pointer font-lexend"
+                >
+                  <span>How it works</span>
+                </button>
+              </div>
+            </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-16">
-            <button
-              onClick={handleTryLoomFrog}
-              className="w-full sm:w-auto neo-liquid-btn-primary inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl text-sm font-semibold cursor-pointer active:scale-95 transition-all shadow-[0_0_25px_rgba(6,182,212,0.35)] font-lexend"
-            >
-              <span>Try LoomFrog</span>
-              <ArrowRight className="w-4 h-4 text-[#030818]" />
-            </button>
-            <button
-              onClick={() => scrollToSection('how-it-works')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl text-sm font-medium text-slate-200 bg-[#030818]/60 hover:bg-[#030818]/90 hover:text-white border border-cyan-500/20 hover:border-cyan-500/40 backdrop-blur-md transition-all cursor-pointer font-lexend"
-            >
-              <span>How it works</span>
-            </button>
+            {/* Right Column: 3D Rotating Frog Visual (Wider box & bigger visual) */}
+            <div className="lg:col-span-6 xl:col-span-7 w-full">
+              <FrogHero3D className="w-full" />
+            </div>
           </div>
 
           {/* Interactive Diagnostic Preview Card */}
