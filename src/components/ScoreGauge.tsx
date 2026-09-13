@@ -58,9 +58,9 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
       intensity="subtle"
       className="h-full w-full"
     >
-      <div className="flex flex-col items-center justify-center p-3.5 rounded-2xl neo-liquid-card relative overflow-hidden group h-full">
+      <div className="flex flex-col items-center justify-center p-4 rounded-2xl neo-liquid-card border border-cyan-500/20 bg-[#030818]/70 backdrop-blur-md relative overflow-hidden group h-full">
         {/* Gauge Ring */}
-      <div className="relative flex items-center justify-center p-1 rounded-full bg-[#02050f] shadow-[inset_2px_2px_8px_rgba(0,0,0,0.8)]">
+      <div className="relative flex items-center justify-center p-1.5 rounded-full bg-[#030818]">
         <svg
           width={svgSize}
           height={svgSize}
@@ -71,7 +71,7 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
             cx={svgSize / 2}
             cy={svgSize / 2}
             r={radius}
-            stroke="rgba(6, 182, 212, 0.12)"
+            stroke="rgba(255, 255, 255, 0.08)"
             strokeWidth={strokeWidth}
             fill="transparent"
           />
@@ -87,9 +87,6 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
             className="transition-all duration-700 ease-out"
-            style={{
-              filter: `drop-shadow(0 0 6px ${colorInfo.hex}88)`
-            }}
           />
         </svg>
 
@@ -100,16 +97,16 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
             {showPercentage && <span className="text-xs text-slate-400 ml-0.5">%</span>}
           </span>
           {mathSymbol && (
-            <span className="text-[10px] font-lexend text-[#5eead4] -mt-0.5 font-medium tracking-wide">
+            <span className="text-[10px] font-mono text-cyan-400 -mt-0.5 font-medium tracking-wide">
               {mathSymbol}
             </span>
           )}
         </div>
       </div>
 
-      <div className="mt-2.5 text-center px-1 w-full">
-        <div className="text-sm font-semibold text-white font-lexend">{label}</div>
-        <div className="text-[11px] text-slate-400 leading-snug mt-0.5">{description}</div>
+      <div className="mt-3 text-center px-1 w-full">
+        <div className="text-xs font-bold text-slate-200 uppercase tracking-wider font-lexend">{label}</div>
+        <div className="text-[11px] text-slate-400 leading-snug mt-0.5 font-sans">{description}</div>
       </div>
     </div>
     </BorderGlow>

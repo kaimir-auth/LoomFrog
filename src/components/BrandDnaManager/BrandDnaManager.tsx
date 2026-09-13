@@ -398,29 +398,29 @@ export const BrandDnaManager: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 animate-fade-in">
       {/* Toast Notification */}
       {statusMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-xs font-bold shadow-[0_8px_32px_rgba(6,182,212,0.4)] animate-fade-in border border-white/20">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-3.5 py-2 rounded-[4px] bg-[#111827] text-white text-xs font-medium border border-cyan-500/40 animate-fade-in shadow-xl">
+          <CheckCircle2 className="w-4 h-4 text-cyan-400" />
           <span>{statusMessage}</span>
         </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {profileToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <BorderGlow borderRadius="rounded-3xl" glowColor="rose" className="w-full max-w-md">
-            <div className="relative w-full rounded-3xl neo-liquid-panel p-6 space-y-4 shadow-2xl border border-rose-500/30">
-              <div className="flex items-center gap-3 text-rose-400">
-                <AlertTriangle className="w-6 h-6" />
-                <h3 className="text-base font-bold text-white">Delete Brand Profile?</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <BorderGlow borderRadius="rounded-[6px]" glowColor="rose" className="w-full max-w-md">
+            <div className="relative w-full rounded-[6px] p-6 space-y-4 border border-[#1F2937] bg-[#111827]">
+              <div className="flex items-center gap-2.5 text-rose-400">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="text-sm font-semibold text-white tracking-tight">Delete Brand Profile?</h3>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-300 leading-relaxed">
                 Are you sure you want to permanently delete <strong className="text-white">&ldquo;{profileToDelete}&rdquo;</strong>? This action cannot be undone.
               </p>
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#1F2937]">
                 <button
                   type="button"
                   onClick={() => setProfileToDelete(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 cursor-pointer"
+                  className="px-3 py-1.5 rounded-[4px] text-xs font-medium text-slate-300 hover:text-white bg-[#0B0F17] border border-[#1F2937] cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -431,7 +431,7 @@ export const BrandDnaManager: React.FC = () => {
                     setProfileToDelete(null);
                     showStatus(`Deleted brand profile.`);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer shadow-lg shadow-rose-600/30"
+                  className="px-3 py-1.5 rounded-[4px] text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 transition-colors cursor-pointer"
                 >
                   Confirm Delete
                 </button>
@@ -452,10 +452,10 @@ export const BrandDnaManager: React.FC = () => {
       {/* Top Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white font-lexend tracking-tight">
+          <h1 className="text-xl font-semibold text-white tracking-tight">
             Brand DNA Manager
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 mt-0.5 font-mono">
             Define, calibrate, and lock machine-readable brand guidelines, rulesets, web sources, and color matrices.
           </p>
         </div>
@@ -464,39 +464,39 @@ export const BrandDnaManager: React.FC = () => {
           {/* AI Extractor Trigger */}
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-cyan-400 hover:bg-cyan-300 transition-colors cursor-pointer shrink-0"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-            Draft Profile with AI
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Draft Profile with AI</span>
           </button>
 
           {/* New Profile */}
           <button
             onClick={() => setIsCreateProfileModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-slate-200 bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] transition-colors cursor-pointer shrink-0"
           >
             <Plus className="w-3.5 h-3.5 text-teal-400" />
-            New Profile
+            <span>New Profile</span>
           </button>
 
           {/* Import / Export */}
-          <label className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md cursor-pointer transition-all active:scale-95 shadow-sm shrink-0">
+          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-slate-300 bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] cursor-pointer transition-colors shrink-0">
             <Upload className="w-3.5 h-3.5 text-cyan-400" />
-            Import JSON
+            <span>Import JSON</span>
             <input type="file" accept=".json" onChange={handleImportJsonFile} className="hidden" />
           </label>
 
           <button
             onClick={handleExportJson}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-slate-300 bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] transition-colors cursor-pointer shrink-0"
           >
             <Download className="w-3.5 h-3.5 text-teal-400" />
-            Export JSON
+            <span>Export JSON</span>
           </button>
 
           <button
             onClick={resetToDefaultProfiles}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#02050f]/80 border border-cyan-500/20 hover:bg-white/[0.08] backdrop-blur-md transition-all cursor-pointer shadow-sm shrink-0"
+            className="p-2 rounded-[4px] text-slate-400 hover:text-white bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] transition-colors cursor-pointer shrink-0"
             title="Reset Profiles to Default"
           >
             <RotateCcw className="w-3.5 h-3.5 text-cyan-300" />
@@ -505,28 +505,28 @@ export const BrandDnaManager: React.FC = () => {
       </div>
 
       {brandProfiles.length === 0 ? (
-        <BorderGlow borderRadius="rounded-3xl" glowColor="cyan" className="max-w-xl mx-auto my-8">
-          <div className="p-10 rounded-3xl neo-liquid-panel text-center space-y-5 border border-cyan-500/20">
-            <div className="w-16 h-16 rounded-3xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.25)]">
-              <Sparkles className="w-8 h-8" />
+        <BorderGlow borderRadius="rounded-[6px]" glowColor="cyan" className="max-w-xl mx-auto my-8">
+          <div className="p-8 sm:p-10 rounded-[6px] neo-liquid-panel text-center space-y-4 border border-[#1F2937]">
+            <div className="w-12 h-12 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] flex items-center justify-center mx-auto text-cyan-400">
+              <Sparkles className="w-6 h-6" />
             </div>
-            <div className="max-w-md mx-auto space-y-2">
-              <h3 className="text-lg font-bold text-white font-lexend">No Brand DNA Profiles Configured</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+            <div className="max-w-md mx-auto space-y-1.5">
+              <h3 className="text-base font-semibold text-white tracking-tight">No Brand DNA Profiles Configured</h3>
+              <p className="text-xs text-slate-400 leading-relaxed font-mono">
                 Your API Key is synchronized. Create your first custom Brand DNA profile to establish machine-readable tone guidelines, forbidden buzzwords, and diagnostic metrics.
               </p>
             </div>
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
                 onClick={() => setIsAiModalOpen(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-cyan-400 hover:bg-cyan-300 cursor-pointer transition-colors"
               >
-                <Sparkles className="w-4 h-4 text-cyan-200" />
+                <Sparkles className="w-4 h-4" />
                 <span>Draft Profile with AI</span>
               </button>
               <button
                 onClick={() => setIsCreateProfileModalOpen(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-medium text-slate-200 bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md cursor-pointer active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[4px] text-xs font-medium text-slate-200 bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] cursor-pointer transition-colors"
               >
                 <Plus className="w-4 h-4 text-teal-400" />
                 <span>Blank Profile</span>
@@ -537,16 +537,17 @@ export const BrandDnaManager: React.FC = () => {
       ) : (
         <>
           {/* Fallback Notice Banner if Model Fallback Occurred */}
+          {/* Fallback Notice Banner if Model Fallback Occurred */}
           {(activeFallbackNotice || currentProfile.fallbackNotice) && (
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/60 via-[#040918] to-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">
-              <div className="flex items-center gap-2.5">
+            <div className="p-3 rounded-[4px] bg-[#111827] border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+              <div className="flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="leading-relaxed font-medium">
+                <span className="font-medium">
                   {activeFallbackNotice || currentProfile.fallbackNotice}
                 </span>
               </div>
               <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-amber-500/10 text-amber-300 border border-amber-500/30">
                   Fallback Model Used
                 </span>
                 <button
@@ -562,527 +563,472 @@ export const BrandDnaManager: React.FC = () => {
 
           {/* Profile Selector & Activation Banner */}
           <BorderGlow
-            borderRadius="rounded-3xl"
+            borderRadius="rounded-[6px]"
             glowColor={currentProfile.lifecycleState === 'ACTIVE' ? 'teal' : 'cyan'}
             active={currentProfile.lifecycleState === 'ACTIVE'}
           >
-            <div className="p-4 sm:p-5 rounded-3xl neo-liquid-panel flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-              <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
+            <div className="p-4 rounded-[6px] border border-[#1F2937] bg-[#111827] flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+                <label className="text-xs font-semibold text-slate-300 font-mono shrink-0 uppercase tracking-wider">Selected Profile:</label>
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                  {isRenaming ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={renameInput}
+                        onChange={(e) => setRenameInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveRename()}
+                        className="px-2.5 py-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs font-medium text-white font-mono"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveRename}
+                        className="p-1 rounded-[4px] bg-teal-500 text-[#0B0F17] hover:bg-teal-400 cursor-pointer"
+                        title="Save Name"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsRenaming(false)}
+                        className="p-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-slate-400 hover:text-white cursor-pointer"
+                        title="Cancel"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <select
+                        value={selectedBrandName}
+                        onChange={(e) => {
+                          setSelectedBrandName(e.target.value);
+                        }}
+                        className="px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs font-medium text-white cursor-pointer w-full sm:w-auto max-w-full truncate font-mono"
+                      >
+                        {brandProfiles.map((p) => (
+                          <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#0B0F17] text-white">
+                            {p.metadata.brandName} (v{p.metadata.brandVersion}) &bull; [{p.lifecycleState}]
+                          </option>
+                        ))}
+                      </select>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
-          <label className="text-xs font-bold text-cyan-200 font-lexend shrink-0">Selected Profile:</label>
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            {isRenaming ? (
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="text"
-                  value={renameInput}
-                  onChange={(e) => setRenameInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSaveRename()}
-                  className="px-3 py-1.5 rounded-xl neo-liquid-input text-xs font-bold text-white font-mono"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={handleSaveRename}
-                  className="p-1.5 rounded-lg bg-teal-500 text-black hover:bg-teal-400 cursor-pointer"
-                  title="Save Name"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsRenaming(false)}
-                  className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
-                  title="Cancel"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                      <button
+                        type="button"
+                        onClick={handleStartRename}
+                        className="p-1.5 rounded-[4px] text-slate-400 hover:text-white bg-[#0B0F17] border border-[#1F2937] transition-colors cursor-pointer"
+                        title="Rename Brand Profile"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  {currentProfile.lifecycleState === 'ACTIVE' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-teal-500/10 text-teal-300 border border-teal-500/30 text-[11px] font-mono font-medium shrink-0">
+                      <Flame className="w-3 h-3 text-teal-400" />
+                      Active Benchmark
+                    </span>
+                  )}
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <select
-                  value={selectedBrandName}
-                  onChange={(e) => {
-                    setSelectedBrandName(e.target.value);
-                  }}
-                  className="px-3.5 py-2 rounded-xl neo-liquid-input text-xs font-bold text-white cursor-pointer w-full sm:w-auto max-w-full truncate"
-                >
-                  {brandProfiles.map((p) => (
-                    <option key={p.metadata.brandName} value={p.metadata.brandName} className="bg-[#040a1b] text-white">
-                      {p.metadata.brandName} (v{p.metadata.brandVersion}) &bull; [{p.lifecycleState}]
-                    </option>
-                  ))}
-                </select>
 
-                <button
-                  type="button"
-                  onClick={handleStartRename}
-                  className="p-2 rounded-xl text-slate-400 hover:text-cyan-300 bg-[#02050f]/80 border border-cyan-500/20 transition-colors"
-                  title="Rename Brand Profile"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                </button>
+              <div className="flex items-center justify-between sm:justify-end gap-2 w-full md:w-auto">
+                {currentProfile.lifecycleState === 'ACTIVE' ? null : currentProfile.lifecycleState === 'APPROVED' ? (
+                  <button
+                    onClick={() => {
+                      setProfileLifecycleState(currentProfile.metadata.brandName, 'ACTIVE');
+                      setActiveProfileById(currentProfile.metadata.brandName);
+                      showStatus(`Set ${currentProfile.metadata.brandName} as ACTIVE benchmark.`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-teal-400 hover:bg-teal-300 transition-colors cursor-pointer"
+                  >
+                    <Flame className="w-3.5 h-3.5" />
+                    Set as Active Benchmark
+                  </button>
+                ) : currentProfile.lifecycleState === 'USER_REVIEW' ? (
+                  <button
+                    onClick={() => {
+                      setProfileLifecycleState(currentProfile.metadata.brandName, 'APPROVED');
+                      showStatus(`Approved ${currentProfile.metadata.brandName}. You can now set it as Active.`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 transition-colors cursor-pointer"
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                    Approve Profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setProfileLifecycleState(currentProfile.metadata.brandName, 'USER_REVIEW');
+                      showStatus(`Moved to User Review stage.`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-teal-300 bg-teal-950/40 border border-teal-500/30 hover:bg-teal-950/70 transition-colors cursor-pointer"
+                    title="AI-generated profiles require human review and approval before becoming Active"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+                    <span>Review to Approve</span>
+                  </button>
+                )}
+
+                {brandProfiles.length > 1 && (
+                  <button
+                    onClick={() => setProfileToDelete(currentProfile.metadata.brandName)}
+                    className="p-1.5 rounded-[4px] text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-[#1F2937] transition-colors cursor-pointer shrink-0"
+                    title="Delete Profile"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-            )}
+            </div>
+          </BorderGlow>
 
-            {currentProfile.lifecycleState === 'ACTIVE' && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/35 text-xs font-bold backdrop-blur-md shadow-sm shrink-0">
-                <Flame className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
-                Active Benchmark
-              </span>
-            )}
-          </div>
-        </div>
+          {/* 6-Stage Interactive Lifecycle Stepper (Visual Step 1 + 5 Real States) */}
+          <LifecycleStepper
+            currentState={currentProfile.lifecycleState}
+            onAdvanceState={(newState: LifecycleState) => {
+              setProfileLifecycleState(currentProfile.metadata.brandName, newState);
+              showStatus(`Advanced stage to ${newState}`);
+            }}
+            onOpenAiExtract={() => setIsAiModalOpen(true)}
+          />
 
-        <div className="flex items-center justify-between sm:justify-end gap-2 w-full md:w-auto">
-          {currentProfile.lifecycleState === 'ACTIVE' ? null : currentProfile.lifecycleState === 'APPROVED' ? (
-            <button
-              onClick={() => {
-                setProfileLifecycleState(currentProfile.metadata.brandName, 'ACTIVE');
-                setActiveProfileById(currentProfile.metadata.brandName);
-                showStatus(`Set ${currentProfile.metadata.brandName} as ACTIVE benchmark.`);
-              }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 hover:from-teal-400 hover:to-cyan-400 shadow-lg shadow-cyan-500/30 border border-white/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <Flame className="w-3.5 h-3.5" />
-              Set as Active Benchmark
-            </button>
-          ) : currentProfile.lifecycleState === 'USER_REVIEW' ? (
-            <button
-              onClick={() => {
-                setProfileLifecycleState(currentProfile.metadata.brandName, 'APPROVED');
-                showStatus(`Approved ${currentProfile.metadata.brandName}. You can now set it as Active.`);
-              }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/25 border border-teal-300/40 transition-all active:scale-95 cursor-pointer"
-            >
-              <Shield className="w-3.5 h-3.5" />
-              Approve Profile
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                setProfileLifecycleState(currentProfile.metadata.brandName, 'USER_REVIEW');
-                showStatus(`Moved to User Review stage.`);
-              }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-teal-500/20 hover:bg-teal-500/30 border border-teal-400/40 transition-all active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(45,212,191,0.2)]"
-              title="AI-generated profiles require human review and approval before becoming Active"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-teal-300" />
-              <span className="text-teal-200">Review to Approve</span>
-            </button>
-          )}
+          {/* Ruleset Editor Sub-Tabs */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-1.5 border-b border-[#1F2937] pb-2.5 overflow-x-auto no-scrollbar">
+              <button
+                onClick={() => setActiveTabSub('voice')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  activeTabSub === 'voice' ? 'bg-[#1F2937] text-white border border-[#374151]' : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Voice &amp; Formality</span>
+              </button>
 
-          {brandProfiles.length > 1 && (
-            <button
-              onClick={() => setProfileToDelete(currentProfile.metadata.brandName)}
-              className="p-2.5 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/30 transition-all cursor-pointer shrink-0"
-              title="Delete Profile"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
-      </BorderGlow>
+              <button
+                onClick={() => setActiveTabSub('vocabulary')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  activeTabSub === 'vocabulary' ? 'bg-[#1F2937] text-white border border-[#374151]' : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-rose-400" />
+                <span>Forbidden &amp; Preferred Vocabulary</span>
+              </button>
 
-      {/* 6-Stage Interactive Lifecycle Stepper (Visual Step 1 + 5 Real States) */}
-      <LifecycleStepper
-        currentState={currentProfile.lifecycleState}
-        onAdvanceState={(newState: LifecycleState) => {
-          setProfileLifecycleState(currentProfile.metadata.brandName, newState);
-          showStatus(`Advanced stage to ${newState}`);
-        }}
-        onOpenAiExtract={() => setIsAiModalOpen(true)}
-      />
+              <button
+                onClick={() => setActiveTabSub('colors')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  activeTabSub === 'colors' ? 'bg-[#1F2937] text-white border border-[#374151]' : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <Palette className="w-3.5 h-3.5 text-teal-400" />
+                <span>Color Palette &amp; Matrix</span>
+              </button>
 
-      {/* Ruleset Editor Sub-Tabs */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-cyan-500/15 pb-3 overflow-x-auto no-scrollbar">
-          <button
-            onClick={() => setActiveTabSub('voice')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
-              activeTabSub === 'voice' ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-            }`}
-          >
-            <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Voice &amp; Formality</span>
-          </button>
+              <button
+                onClick={() => setActiveTabSub('rules')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  activeTabSub === 'rules' ? 'bg-[#1F2937] text-white border border-[#374151]' : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5 text-blue-400" />
+                <span>Evaluation Rules ({currentProfile.rules?.length || 0})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTabSub('vocabulary')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
-              activeTabSub === 'vocabulary' ? 'bg-rose-500/20 text-rose-200 border border-rose-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5 text-rose-400" />
-            <span>Forbidden &amp; Preferred Vocabulary</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTabSub('colors')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
-              activeTabSub === 'colors' ? 'bg-teal-500/20 text-teal-200 border border-teal-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-            }`}
-          >
-            <Palette className="w-3.5 h-3.5 text-teal-400" />
-            <span>Color Palette &amp; Matrix</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTabSub('rules')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
-              activeTabSub === 'rules' ? 'bg-blue-500/20 text-blue-200 border border-blue-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5 text-blue-400" />
-            <span>Evaluation Rules ({currentProfile.rules?.length || 0})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTabSub('sources')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer shrink-0 whitespace-nowrap ${
-              activeTabSub === 'sources' ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Brand Sources &amp; URLs ({currentProfile.sources?.length || 0})</span>
-          </button>
-        </div>
+              <button
+                onClick={() => setActiveTabSub('sources')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  activeTabSub === 'sources' ? 'bg-[#1F2937] text-white border border-[#374151]' : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Brand Sources &amp; URLs ({currentProfile.sources?.length || 0})</span>
+              </button>
+            </div>
 
         {/* Tab 5: Brand Sources & Web Ingestion */}
         {activeTabSub === 'sources' && (
-          <BorderGlow borderRadius="rounded-3xl" glowColor="emerald">
-            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
+          <BorderGlow borderRadius="rounded-[6px]" glowColor="teal">
+            <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider font-mono flex items-center gap-2">
+                  <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono flex items-center gap-2">
                     <Globe className="w-4 h-4 text-emerald-400" />
                     <span>Ingested Brand Source URLs</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-0.5">
                     Add official website pages, press centers, or public brand books. LoomFrog extracts live copy and links them directly to this Brand DNA.
                   </p>
                 </div>
               </div>
 
-            {/* Add URL Form */}
-            <div className="p-4 rounded-2xl bg-[#02050f]/80 border border-emerald-500/20 space-y-3">
-              <label className="block text-xs font-semibold text-slate-200">
-                Add New Public Brand Source URL
-              </label>
-              <div className="flex flex-col sm:flex-row items-stretch gap-2">
-                <input
-                  type="url"
-                  value={newSourceUrl}
-                  onChange={(e) => setNewSourceUrl(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddSource()}
-                  placeholder="https://acme.com or https://acme.com/about"
-                  className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddSource}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Attach Source</span>
-                </button>
+              {/* Add URL Form */}
+              <div className="p-3.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] space-y-2.5">
+                <label className="block text-xs font-medium text-slate-300 font-mono uppercase tracking-wider">
+                  Add New Public Brand Source URL
+                </label>
+                <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                  <input
+                    type="url"
+                    value={newSourceUrl}
+                    onChange={(e) => setNewSourceUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddSource()}
+                    placeholder="https://acme.com or https://acme.com/about"
+                    className="flex-1 px-3 py-1.5 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs text-white placeholder-slate-500 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddSource}
+                    className="px-3.5 py-1.5 rounded-[4px] bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Attach Source</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Sources List */}
+              <div className="space-y-2.5">
+                {!currentProfile.sources || currentProfile.sources.length === 0 ? (
+                  <div className="p-8 text-center border border-dashed border-[#1F2937] rounded-[4px]">
+                    <Globe className="w-6 h-6 text-slate-600 mx-auto mb-1.5" />
+                    <p className="text-xs text-slate-400">No web sources linked to this profile yet.</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Add a URL above to verify tone and consistency across live web properties.</p>
+                  </div>
+                ) : (
+                  currentProfile.sources.map((source) => {
+                    const fetchInfo = sourceFetchStatus[source.id];
+                    return (
+                      <div
+                        key={source.id}
+                        className="p-3.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] space-y-2.5"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 truncate">
+                            <Globe className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <span className="text-xs font-mono text-white font-medium truncate">{source.url}</span>
+                            <a
+                              href={source.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-slate-400 hover:text-cyan-400 transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <button
+                              type="button"
+                              onClick={() => handleTestFetchSource(source.id, source.url)}
+                              disabled={fetchInfo?.loading}
+                              className="px-2.5 py-1 rounded-[4px] bg-[#111827] hover:bg-[#1F2937] border border-[#1F2937] text-cyan-300 text-[11px] font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              {fetchInfo?.loading ? (
+                                <>
+                                  <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
+                                  <span>Testing...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw className="w-3 h-3 text-cyan-400" />
+                                  <span>Test Extraction</span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => removeBrandSource(currentProfile.metadata.brandName, source.id)}
+                              className="p-1 rounded-[4px] text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              title="Remove Source"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Live Inspection Card if fetched */}
+                        {fetchInfo?.data && (
+                          <div className="p-2.5 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs space-y-1 animate-fade-in">
+                            <div className="flex items-center justify-between text-teal-300 font-medium text-[11px]">
+                              <span>Page Title: {fetchInfo.data.title}</span>
+                              <span className="font-mono">{fetchInfo.data.wordCount} words detected</span>
+                            </div>
+                            {fetchInfo.data.headings.length > 0 && (
+                              <p className="text-[11px] text-slate-300 truncate">
+                                <span className="text-slate-400">Headings:</span> {fetchInfo.data.headings.slice(0, 4).join(' • ')}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {fetchInfo?.error && (
+                          <div className="p-2 rounded-[4px] bg-rose-950/30 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
+                            <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                            <span>{fetchInfo.error}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
-
-            {/* Sources List */}
-            <div className="space-y-3">
-              {!currentProfile.sources || currentProfile.sources.length === 0 ? (
-                <div className="p-8 text-center border border-dashed border-slate-800 rounded-2xl">
-                  <Globe className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                  <p className="text-xs text-slate-400">No web sources linked to this profile yet.</p>
-                  <p className="text-[11px] text-slate-500 mt-1">Add a URL above to verify tone and consistency across live web properties.</p>
-                </div>
-              ) : (
-                currentProfile.sources.map((source) => {
-                  const fetchInfo = sourceFetchStatus[source.id];
-                  return (
-                    <div
-                      key={source.id}
-                      className="p-4 rounded-2xl bg-[#02050f]/90 border border-emerald-500/20 space-y-3 shadow-md"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 truncate">
-                          <Globe className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span className="text-xs font-mono text-white font-semibold truncate">{source.url}</span>
-                          <a
-                            href={source.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-slate-400 hover:text-cyan-300"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </div>
-
-                        <div className="flex items-center gap-2 self-end sm:self-auto">
-                          <button
-                            type="button"
-                            onClick={() => handleTestFetchSource(source.id, source.url)}
-                            disabled={fetchInfo?.loading}
-                            className="px-3 py-1 rounded-lg bg-cyan-950/50 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                          >
-                            {fetchInfo?.loading ? (
-                              <>
-                                <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
-                                <span>Testing...</span>
-                              </>
-                            ) : (
-                              <>
-                                <RefreshCw className="w-3 h-3 text-cyan-400" />
-                                <span>Test Web Extraction</span>
-                              </>
-                            )}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => removeBrandSource(currentProfile.metadata.brandName, source.id)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer"
-                            title="Remove Source"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Live Inspection Card if fetched */}
-                      {fetchInfo?.data && (
-                        <div className="p-3 rounded-xl bg-[#030a1c] border border-cyan-500/30 text-xs space-y-1.5 animate-fade-in">
-                          <div className="flex items-center justify-between text-teal-300 font-semibold text-[11px]">
-                            <span>Page Title: {fetchInfo.data.title}</span>
-                            <span className="font-mono">{fetchInfo.data.wordCount} words detected</span>
-                          </div>
-                          {fetchInfo.data.headings.length > 0 && (
-                            <p className="text-[11px] text-slate-300 truncate">
-                              <span className="text-slate-400">Headings:</span> {fetchInfo.data.headings.slice(0, 4).join(' • ')}
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {fetchInfo?.error && (
-                        <div className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                          <span>{fetchInfo.error}</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
           </BorderGlow>
         )}
 
         {/* Tab 1: Voice & Formality */}
         {activeTabSub === 'voice' && (
-          <BorderGlow borderRadius="rounded-3xl" glowColor="cyan">
-            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend">
-                  Brand Name &amp; Version
-                </label>
-                <div className="flex gap-2">
+          <BorderGlow borderRadius="rounded-[6px]" glowColor="cyan">
+            <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5 font-mono uppercase tracking-wider">
+                    Brand Name &amp; Version
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={currentProfile.metadata.brandName}
+                      onChange={(e) =>
+                        handleUpdateProfile({
+                          metadata: { ...currentProfile.metadata, brandName: e.target.value }
+                        })
+                      }
+                      className="flex-1 px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
+                    />
+                    <input
+                      type="text"
+                      value={currentProfile.metadata.brandVersion}
+                      onChange={(e) =>
+                        handleUpdateProfile({
+                          metadata: { ...currentProfile.metadata, brandVersion: e.target.value }
+                        })
+                      }
+                      className="w-24 px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5 font-mono uppercase tracking-wider">
+                    Primary Tone Narrative
+                  </label>
                   <input
                     type="text"
-                    value={currentProfile.metadata.brandName}
+                    value={currentProfile.voice.primaryTone}
                     onChange={(e) =>
                       handleUpdateProfile({
-                        metadata: { ...currentProfile.metadata, brandName: e.target.value }
+                        voice: { ...currentProfile.voice, primaryTone: e.target.value }
                       })
                     }
-                    className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                  />
-                  <input
-                    type="text"
-                    value={currentProfile.metadata.brandVersion}
-                    onChange={(e) =>
-                      handleUpdateProfile({
-                        metadata: { ...currentProfile.metadata, brandVersion: e.target.value }
-                      })
-                    }
-                    className="w-24 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white font-mono"
+                    className="w-full px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
+                    placeholder="e.g. Authoritative, precise, pragmatic and empowering"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-cyan-200 mb-1.5 font-lexend">
-                  Primary Tone Narrative
-                </label>
+              {/* Formality Slider */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">
+                    Formality Calibrator: <span className="text-cyan-400 font-mono">{(currentProfile.voice.formalityScore * 100).toFixed(0)}%</span>
+                  </label>
+                  <span className="text-xs text-slate-400 font-mono">
+                    {currentProfile.voice.formalityScore >= 0.8
+                      ? 'Strict Enterprise & Academic'
+                      : currentProfile.voice.formalityScore >= 0.6
+                      ? 'Professional Business'
+                      : 'Conversational & Casual'}
+                  </span>
+                </div>
                 <input
-                  type="text"
-                  value={currentProfile.voice.primaryTone}
+                  type="range"
+                  min="0.0"
+                  max="1.0"
+                  step="0.05"
+                  value={currentProfile.voice.formalityScore}
                   onChange={(e) =>
                     handleUpdateProfile({
-                      voice: { ...currentProfile.voice, primaryTone: e.target.value }
+                      voice: { ...currentProfile.voice, formalityScore: parseFloat(e.target.value) }
                     })
                   }
-                  className="w-full px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                  placeholder="e.g. Authoritative, precise, pragmatic and empowering"
+                  className="w-full h-1.5 bg-[#0B0F17] rounded appearance-none cursor-pointer accent-cyan-400 border border-[#1F2937]"
                 />
               </div>
-            </div>
 
-            {/* Formality Slider */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-slate-200 font-lexend">
-                  Formality Calibrator: <span className="text-cyan-300 font-bold text-sm">{(currentProfile.voice.formalityScore * 100).toFixed(0)}%</span>
-                </label>
-                <span className="text-xs text-slate-400">
-                  {currentProfile.voice.formalityScore >= 0.8
-                    ? 'Strict Enterprise & Academic'
-                    : currentProfile.voice.formalityScore >= 0.6
-                    ? 'Professional Business'
-                    : 'Conversational & Casual'}
-                </span>
-              </div>
-              <input
-                type="range"
-                min="0.0"
-                max="1.0"
-                step="0.05"
-                value={currentProfile.voice.formalityScore}
-                onChange={(e) =>
-                  handleUpdateProfile({
-                    voice: { ...currentProfile.voice, formalityScore: parseFloat(e.target.value) }
-                  })
-                }
-                className="w-full h-2 bg-[#02050f] rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-cyan-500/20"
-              />
-            </div>
-
-            {/* Tone Attributes Pills */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-200 font-lexend">Tone Attributes</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {currentProfile.voice.toneAttributes?.map((attr, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-br from-cyan-950/40 to-[#020612]/90 border border-cyan-400/30 text-xs text-cyan-200 backdrop-blur-md shadow-sm font-medium"
-                  >
-                    {attr}
-                    <button
-                      onClick={() => handleRemoveToneAttr(idx)}
-                      className="text-slate-400 hover:text-rose-400 ml-1 cursor-pointer"
+              {/* Tone Attributes Pills */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">Tone Attributes</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {currentProfile.voice.toneAttributes?.map((attr, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] bg-[#0B0F17] border border-[#1F2937] text-xs text-slate-200 font-medium"
                     >
-                      &times;
-                    </button>
-                  </span>
-                ))}
-              </div>
+                      <span>{attr}</span>
+                      <button
+                        onClick={() => handleRemoveToneAttr(idx)}
+                        className="text-slate-500 hover:text-rose-400 cursor-pointer transition-colors"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                </div>
 
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newToneAttr}
-                  onChange={(e) => setNewToneAttr(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddToneAttr()}
-                  placeholder="Add attribute (e.g. Tactile, Low latency, Quiet luxury)..."
-                  className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                />
-                <button
-                  onClick={handleAddToneAttr}
-                  className="px-4 py-2 rounded-xl bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/25 text-xs font-bold text-cyan-200 backdrop-blur-md transition-all cursor-pointer shadow-sm"
-                >
-                  Add
-                </button>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newToneAttr}
+                    onChange={(e) => setNewToneAttr(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddToneAttr()}
+                    placeholder="Add attribute (e.g. Tactile, Low latency, Quiet luxury)..."
+                    className="flex-1 px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
+                  />
+                  <button
+                    onClick={handleAddToneAttr}
+                    className="px-3.5 py-1.5 rounded-[4px] bg-[#1F2937] hover:bg-[#374151] border border-[#1F2937] text-xs font-medium text-slate-200 transition-colors cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           </BorderGlow>
         )}
 
         {/* Tab 2: Forbidden & Preferred Vocabulary */}
         {activeTabSub === 'vocabulary' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Forbidden Vocabulary */}
-            <BorderGlow borderRadius="rounded-3xl" glowColor="rose" className="h-full">
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-rose-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-rose-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)] h-full">
+            <BorderGlow borderRadius="rounded-[6px]" glowColor="rose" className="h-full">
+              <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-4 h-full">
                 <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider font-mono">
-                  <AlertTriangle className="w-4 h-4 text-rose-400" />
-                  Forbidden Vocabulary ({currentProfile.vocabulary?.forbidden?.length || 0})
-                </div>
-                <span className="text-[10px] text-cyan-300/80 font-mono">Regex Scanned</span>
-              </div>
-
-              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                {currentProfile.vocabulary?.forbidden?.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-2xl bg-[#02050f]/85 border border-rose-500/20 flex items-center justify-between gap-2 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]"
-                  >
-                    <div>
-                      <div className="font-mono font-bold text-xs text-rose-300">&ldquo;{item.term}&rdquo;</div>
-                      <div className="text-[11px] text-slate-300">{item.reason}</div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveForbiddenTerm(idx)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="flex items-center gap-2 text-rose-400 font-medium text-xs uppercase tracking-wider font-mono">
+                    <AlertTriangle className="w-4 h-4 text-rose-400" />
+                    <span>Forbidden Vocabulary ({currentProfile.vocabulary?.forbidden?.length || 0})</span>
                   </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 pt-2 border-t border-rose-500/20">
-                <input
-                  type="text"
-                  value={newForbiddenTerm}
-                  onChange={(e) => setNewForbiddenTerm(e.target.value)}
-                  placeholder="Forbidden term (e.g. supercharge, magic)..."
-                  className="w-full px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                />
-                <input
-                  type="text"
-                  value={newForbiddenReason}
-                  onChange={(e) => setNewForbiddenReason(e.target.value)}
-                  placeholder="Reason / Recommended alternative..."
-                  className="w-full px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
-                />
-                <button
-                  onClick={handleAddForbiddenTerm}
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 border border-white/20 text-xs font-bold text-white shadow-lg shadow-rose-600/30 transition-all active:scale-95 cursor-pointer"
-                >
-                  Add Forbidden Term
-                </button>
-              </div>
-            </div>
-            </BorderGlow>
-
-            {/* Preferred Vocabulary */}
-            <BorderGlow borderRadius="rounded-3xl" glowColor="teal" className="h-full">
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-teal-950/30 via-[#0c1626]/70 to-[#020612]/90 backdrop-blur-2xl border border-teal-500/30 space-y-4 shadow-[6px_8px_20px_rgba(0,0,0,0.6)] h-full">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-teal-300 font-bold text-xs uppercase tracking-wider font-mono">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                    Preferred Brand Lexicon ({currentProfile.vocabulary?.preferred?.length || 0})
-                  </div>
-                  <span className="text-[10px] text-cyan-300/80 font-mono">Semantic Guidance</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Regex Scanned</span>
                 </div>
 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                  {currentProfile.vocabulary?.preferred?.map((term, idx) => (
+                  {currentProfile.vocabulary?.forbidden?.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-2xl bg-[#02050f]/85 border border-teal-500/20 flex items-center justify-between gap-2 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]"
+                      className="p-2.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] flex items-center justify-between gap-2"
                     >
-                      <span className="text-xs font-semibold text-teal-200">{term}</span>
+                      <div>
+                        <div className="font-mono font-semibold text-xs text-rose-300">&ldquo;{item.term}&rdquo;</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{item.reason}</div>
+                      </div>
                       <button
-                        onClick={() => handleRemovePreferredTerm(idx)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 cursor-pointer"
+                        onClick={() => handleRemoveForbiddenTerm(idx)}
+                        className="p-1 rounded-[4px] text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1090,18 +1036,71 @@ export const BrandDnaManager: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="flex gap-2 pt-2 border-t border-teal-500/20">
+                <div className="space-y-2 pt-2 border-t border-[#1F2937]">
+                  <input
+                    type="text"
+                    value={newForbiddenTerm}
+                    onChange={(e) => setNewForbiddenTerm(e.target.value)}
+                    placeholder="Forbidden term (e.g. supercharge, magic)..."
+                    className="w-full px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
+                  />
+                  <input
+                    type="text"
+                    value={newForbiddenReason}
+                    onChange={(e) => setNewForbiddenReason(e.target.value)}
+                    placeholder="Reason / Recommended alternative..."
+                    className="w-full px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
+                  />
+                  <button
+                    onClick={handleAddForbiddenTerm}
+                    className="w-full py-2 rounded-[4px] bg-rose-600 hover:bg-rose-500 text-xs font-medium text-white transition-colors cursor-pointer"
+                  >
+                    Add Forbidden Term
+                  </button>
+                </div>
+              </div>
+            </BorderGlow>
+
+            {/* Preferred Vocabulary */}
+            <BorderGlow borderRadius="rounded-[6px]" glowColor="teal" className="h-full">
+              <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-4 h-full">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-teal-400 font-medium text-xs uppercase tracking-wider font-mono">
+                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                    <span>Preferred Brand Lexicon ({currentProfile.vocabulary?.preferred?.length || 0})</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">Semantic Guidance</span>
+                </div>
+
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {currentProfile.vocabulary?.preferred?.map((term, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] flex items-center justify-between gap-2"
+                    >
+                      <span className="text-xs font-medium text-teal-300 font-mono">{term}</span>
+                      <button
+                        onClick={() => handleRemovePreferredTerm(idx)}
+                        className="p-1 rounded-[4px] text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-[#1F2937]">
                   <input
                     type="text"
                     value={newPreferredTerm}
                     onChange={(e) => setNewPreferredTerm(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddPreferredTerm()}
                     placeholder="Preferred phrase (e.g. Deterministic reliability)..."
-                    className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white"
+                    className="flex-1 px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white"
                   />
                   <button
                     onClick={handleAddPreferredTerm}
-                    className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 border border-teal-300/40 text-xs font-bold text-white shadow-lg shadow-teal-600/30 transition-all active:scale-95 cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-[4px] bg-teal-600 hover:bg-teal-500 text-xs font-medium text-white transition-colors cursor-pointer"
                   >
                     Add
                   </button>
@@ -1113,208 +1112,208 @@ export const BrandDnaManager: React.FC = () => {
 
         {/* Tab 3: Colors & Palette */}
         {activeTabSub === 'colors' && (
-          <BorderGlow borderRadius="rounded-3xl" glowColor="teal">
-            <div className="p-6 rounded-3xl neo-liquid-panel space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-cyan-200 uppercase tracking-wider font-mono">
-                  Brand Color Palette Matrix
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Used by the HTML5 Canvas visual extractor and Delta-E (ΔE &lt; 16.0) perceptual distance engine.
-                </p>
+          <BorderGlow borderRadius="rounded-[6px]" glowColor="teal">
+            <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono">
+                    Brand Color Palette Matrix
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Used by the HTML5 Canvas visual extractor and Delta-E (ΔE &lt; 16.0) perceptual distance engine.
+                  </p>
+                </div>
+
+                <label className="flex items-center gap-2 cursor-pointer bg-[#0B0F17] px-3 py-1.5 rounded-[4px] border border-[#1F2937]">
+                  <input
+                    type="checkbox"
+                    checked={currentProfile.colors.strictCompliance}
+                    onChange={(e) =>
+                      handleUpdateProfile({
+                        colors: { ...currentProfile.colors, strictCompliance: e.target.checked }
+                      })
+                    }
+                    className="rounded bg-black/60 text-cyan-400 focus:ring-0"
+                  />
+                  <span className="text-xs font-medium text-slate-300">Strict Compliance (Flag &lt;5% area)</span>
+                </label>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer bg-[#02050f]/80 px-3.5 py-2 rounded-xl border border-cyan-500/20 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]">
-                <input
-                  type="checkbox"
-                  checked={currentProfile.colors.strictCompliance}
-                  onChange={(e) =>
-                    handleUpdateProfile({
-                      colors: { ...currentProfile.colors, strictCompliance: e.target.checked }
-                    })
-                  }
-                  className="rounded bg-black/60 text-cyan-400 focus:ring-0"
-                />
-                <span className="text-xs font-semibold text-cyan-200">Strict Compliance (Flag &lt;5% area)</span>
-              </label>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Primary Hex Codes */}
+                <div className="space-y-3">
+                  <label className="block text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">Primary Brand Colors</label>
+                  <div className="flex flex-wrap gap-2">
+                    {currentProfile.colors.primaryHex?.map((hex, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937]"
+                      >
+                        <div className="w-3.5 h-3.5 rounded-[2px] border border-white/30" style={{ backgroundColor: hex }} />
+                        <span className="text-xs font-mono font-medium text-white">{hex}</span>
+                        <button onClick={() => handleRemovePrimaryHex(idx)} className="text-slate-500 hover:text-rose-400 text-xs cursor-pointer ml-1">
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Primary Hex Codes */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-slate-200 font-lexend">Primary Brand Colors</label>
-                <div className="flex flex-wrap gap-2.5">
-                  {currentProfile.colors.primaryHex?.map((hex, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#02050f]/80 border border-cyan-500/25 backdrop-blur-md shadow-sm"
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={newPrimaryHex}
+                      onChange={(e) => setNewPrimaryHex(e.target.value)}
+                      className="w-9 h-8 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={newPrimaryHex}
+                      onChange={(e) => setNewPrimaryHex(e.target.value)}
+                      className="w-28 px-2.5 py-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white font-mono uppercase"
+                    />
+                    <button
+                      onClick={handleAddPrimaryHex}
+                      className="px-3 py-1 rounded-[4px] bg-[#1F2937] hover:bg-[#374151] border border-[#1F2937] text-xs font-medium text-slate-200 transition-colors cursor-pointer"
                     >
-                      <div className="w-4 h-4 rounded-md border border-white/40 shadow-sm" style={{ backgroundColor: hex }} />
-                      <span className="text-xs font-mono font-bold text-white">{hex}</span>
-                      <button onClick={() => handleRemovePrimaryHex(idx)} className="text-slate-400 hover:text-rose-400 text-xs cursor-pointer">
-                        &times;
-                      </button>
-                    </div>
-                  ))}
+                      Add Primary
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={newPrimaryHex}
-                    onChange={(e) => setNewPrimaryHex(e.target.value)}
-                    className="w-10 h-9 rounded-lg bg-[#02050f] border border-cyan-500/30 cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={newPrimaryHex}
-                    onChange={(e) => setNewPrimaryHex(e.target.value)}
-                    className="w-28 px-3 py-1.5 rounded-xl neo-liquid-input text-xs text-white font-mono uppercase"
-                  />
-                  <button
-                    onClick={handleAddPrimaryHex}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/25 text-xs font-bold text-cyan-200 backdrop-blur-md transition-all cursor-pointer shadow-sm"
-                  >
-                    Add Primary
-                  </button>
-                </div>
-              </div>
+                {/* Secondary Hex Codes */}
+                <div className="space-y-3">
+                  <label className="block text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">Secondary / Neutral Colors</label>
+                  <div className="flex flex-wrap gap-2">
+                    {currentProfile.colors.secondaryHex?.map((hex, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937]"
+                      >
+                        <div className="w-3.5 h-3.5 rounded-[2px] border border-white/30" style={{ backgroundColor: hex }} />
+                        <span className="text-xs font-mono font-medium text-white">{hex}</span>
+                        <button onClick={() => handleRemoveSecondaryHex(idx)} className="text-slate-500 hover:text-rose-400 text-xs cursor-pointer ml-1">
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
 
-              {/* Secondary Hex Codes */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-slate-200 font-lexend">Secondary / Neutral Colors</label>
-                <div className="flex flex-wrap gap-2.5">
-                  {currentProfile.colors.secondaryHex?.map((hex, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#02050f]/80 border border-cyan-500/25 backdrop-blur-md shadow-sm"
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={newSecondaryHex}
+                      onChange={(e) => setNewSecondaryHex(e.target.value)}
+                      className="w-9 h-8 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={newSecondaryHex}
+                      onChange={(e) => setNewSecondaryHex(e.target.value)}
+                      className="w-28 px-2.5 py-1 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-white font-mono uppercase"
+                    />
+                    <button
+                      onClick={handleAddSecondaryHex}
+                      className="px-3 py-1 rounded-[4px] bg-[#1F2937] hover:bg-[#374151] border border-[#1F2937] text-xs font-medium text-slate-200 transition-colors cursor-pointer"
                     >
-                      <div className="w-4 h-4 rounded-md border border-white/40 shadow-sm" style={{ backgroundColor: hex }} />
-                      <span className="text-xs font-mono font-bold text-white">{hex}</span>
-                      <button onClick={() => handleRemoveSecondaryHex(idx)} className="text-slate-400 hover:text-rose-400 text-xs cursor-pointer">
-                        &times;
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={newSecondaryHex}
-                    onChange={(e) => setNewSecondaryHex(e.target.value)}
-                    className="w-10 h-9 rounded-lg bg-[#02050f] border border-cyan-500/30 cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={newSecondaryHex}
-                    onChange={(e) => setNewSecondaryHex(e.target.value)}
-                    className="w-28 px-3 py-1.5 rounded-xl neo-liquid-input text-xs text-white font-mono uppercase"
-                  />
-                  <button
-                    onClick={handleAddSecondaryHex}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/25 text-xs font-bold text-cyan-200 backdrop-blur-md transition-all cursor-pointer shadow-sm"
-                  >
-                    Add Secondary
-                  </button>
+                      Add Secondary
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </BorderGlow>
         )}
 
         {/* Tab 4: Evaluation Rules Matrix */}
         {activeTabSub === 'rules' && (
-          <BorderGlow borderRadius="rounded-3xl" glowColor="blue">
-            <div className="p-6 rounded-3xl neo-liquid-panel space-y-4">
+          <BorderGlow borderRadius="rounded-[6px]" glowColor="blue">
+            <div className="p-5 rounded-[6px] border border-[#1F2937] bg-[#111827] space-y-4">
               <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-cyan-200 uppercase tracking-wider font-mono">
-                  Configurable Evaluation Rules
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Assign weights (0.1 to 5.0) and evaluator types (Deterministic vs Semantic) to steer compliance scoring.
-                </p>
-              </div>
-              <button
-                onClick={handleAddRule}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg transition-all active:scale-95 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5 text-cyan-200" />
-                Add Custom Rule
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {currentProfile.rules?.map((rule, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-2xl bg-[#02050f]/85 border border-cyan-500/15 space-y-2.5 hover:border-cyan-400/40 transition-all backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]"
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider font-mono">
+                    Configurable Evaluation Rules
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Assign weights (0.1 to 5.0) and evaluator types (Deterministic vs Semantic) to steer compliance scoring.
+                  </p>
+                </div>
+                <button
+                  onClick={handleAddRule}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-cyan-400 hover:bg-cyan-300 transition-colors cursor-pointer"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={rule.ruleId}
-                        onChange={(e) => handleUpdateRule(idx, { ruleId: e.target.value })}
-                        className="w-28 px-2.5 py-1 rounded-xl bg-black/40 border border-cyan-500/20 text-xs font-mono font-bold text-cyan-300"
-                      />
-                      <select
-                        value={rule.category}
-                        onChange={(e) => handleUpdateRule(idx, { category: e.target.value as any })}
-                        className="px-2.5 py-1 rounded-xl bg-black/40 border border-cyan-500/20 text-xs text-slate-200 cursor-pointer"
-                      >
-                        <option value="Text" className="bg-[#040a1b]">Text</option>
-                        <option value="Visual" className="bg-[#040a1b]">Visual</option>
-                        <option value="Global" className="bg-[#040a1b]">Global</option>
-                      </select>
-                      <select
-                        value={rule.evaluatorType}
-                        onChange={(e) => handleUpdateRule(idx, { evaluatorType: e.target.value as any })}
-                        className="px-2.5 py-1 rounded-xl bg-black/40 border border-cyan-500/20 text-xs font-semibold text-teal-300 cursor-pointer"
-                      >
-                        <option value="Deterministic" className="bg-[#040a1b]">Deterministic (Regex/Canvas)</option>
-                        <option value="Semantic" className="bg-[#040a1b]">Semantic (Gemini API)</option>
-                      </select>
-                    </div>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Custom Rule</span>
+                </button>
+              </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                        <span>Weight:</span>
-                        <span className="font-bold text-white text-sm font-mono">{rule.weight.toFixed(1)}</span>
+              <div className="space-y-2.5">
+                {currentProfile.rules?.map((rule, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] space-y-2"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
                         <input
-                          type="range"
-                          min="0.1"
-                          max="5.0"
-                          step="0.1"
-                          value={rule.weight}
-                          onChange={(e) => handleUpdateRule(idx, { weight: parseFloat(e.target.value) })}
-                          className="w-20 h-1.5 bg-[#02050f] rounded-lg accent-cyan-400 border border-cyan-500/20 cursor-pointer"
+                          type="text"
+                          value={rule.ruleId}
+                          onChange={(e) => handleUpdateRule(idx, { ruleId: e.target.value })}
+                          className="w-28 px-2 py-1 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs font-mono font-medium text-cyan-300"
                         />
+                        <select
+                          value={rule.category}
+                          onChange={(e) => handleUpdateRule(idx, { category: e.target.value as any })}
+                          className="px-2 py-1 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs text-slate-200 cursor-pointer font-mono"
+                        >
+                          <option value="Text" className="bg-[#111827]">Text</option>
+                          <option value="Visual" className="bg-[#111827]">Visual</option>
+                          <option value="Global" className="bg-[#111827]">Global</option>
+                        </select>
+                        <select
+                          value={rule.evaluatorType}
+                          onChange={(e) => handleUpdateRule(idx, { evaluatorType: e.target.value as any })}
+                          className="px-2 py-1 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs font-medium text-teal-300 cursor-pointer font-mono"
+                        >
+                          <option value="Deterministic" className="bg-[#111827]">Deterministic (Regex/Canvas)</option>
+                          <option value="Semantic" className="bg-[#111827]">Semantic (Gemini API)</option>
+                        </select>
                       </div>
 
-                      <button
-                        onClick={() => handleRemoveRule(idx)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+                          <span>Weight:</span>
+                          <span className="font-bold text-white text-xs font-mono">{rule.weight.toFixed(1)}</span>
+                          <input
+                            type="range"
+                            min="0.1"
+                            max="5.0"
+                            step="0.1"
+                            value={rule.weight}
+                            onChange={(e) => handleUpdateRule(idx, { weight: parseFloat(e.target.value) })}
+                            className="w-20 h-1 bg-[#111827] rounded accent-cyan-400 border border-[#1F2937] cursor-pointer"
+                          />
+                        </div>
 
-                  <input
-                    type="text"
-                    value={rule.description}
-                    onChange={(e) => handleUpdateRule(idx, { description: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-cyan-500/15 text-xs text-slate-200 backdrop-blur-sm focus:border-cyan-400"
-                    placeholder="Rule description &amp; diagnostic objective..."
-                  />
-                </div>
-              ))}
+                        <button
+                          onClick={() => handleRemoveRule(idx)}
+                          className="p-1 rounded-[4px] text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={rule.description}
+                      onChange={(e) => handleUpdateRule(idx, { description: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-[4px] bg-[#111827] border border-[#1F2937] text-xs text-slate-200 focus:border-cyan-400"
+                      placeholder="Rule description &amp; diagnostic objective..."
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
           </BorderGlow>
         )}
       </div>

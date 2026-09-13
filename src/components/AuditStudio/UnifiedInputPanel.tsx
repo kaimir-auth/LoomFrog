@@ -205,10 +205,10 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
         <span
           key={`term-${i}-${match.startIndex}`}
           onClick={() => setActiveTooltipTerm(isSelected ? null : match)}
-          className={`inline-block relative px-1.5 py-0.5 mx-0.5 rounded-lg cursor-pointer font-semibold transition-all ${
+          className={`inline-block relative px-1.5 py-0.5 mx-0.5 rounded-md cursor-pointer font-mono font-medium transition-colors ${
             isSelected
-              ? 'bg-rose-500 text-white ring-2 ring-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.8)]'
-              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30'
+              ? 'bg-rose-500 text-white'
+              : 'bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25'
           }`}
           title={`${match.term}: ${match.reason}`}
         >
@@ -238,14 +238,14 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
     <div className="space-y-4">
       {/* Input Mode Selector Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 bg-[#030816] p-1.5 rounded-2xl border border-cyan-500/20 shadow-inner">
+        <div className="flex items-center gap-1.5 bg-[#030818]/60 p-1.5 rounded-2xl border border-cyan-500/20 backdrop-blur-md">
           <button
             type="button"
             onClick={() => setInputMode('text')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               inputMode === 'text'
-                ? 'bg-gradient-to-r from-cyan-500/30 to-teal-500/30 text-cyan-200 border border-cyan-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/10 text-cyan-300 border border-cyan-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white border border-transparent'
             }`}
           >
             <FileText className="w-3.5 h-3.5 text-cyan-400" />
@@ -255,10 +255,10 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
           <button
             type="button"
             onClick={() => setInputMode('url')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               inputMode === 'url'
-                ? 'bg-gradient-to-r from-cyan-500/30 to-teal-500/30 text-cyan-200 border border-cyan-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/10 text-cyan-300 border border-cyan-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white border border-transparent'
             }`}
           >
             <Globe className="w-3.5 h-3.5 text-teal-400" />
@@ -268,10 +268,10 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
           <button
             type="button"
             onClick={() => setInputMode('visual')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               inputMode === 'visual'
-                ? 'bg-gradient-to-r from-cyan-500/30 to-teal-500/30 text-cyan-200 border border-cyan-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/10 text-cyan-300 border border-cyan-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white border border-transparent'
             }`}
           >
             <Image className="w-3.5 h-3.5 text-blue-400" />
@@ -281,18 +281,18 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
         {/* Quick Sample Selector (Visible when in Demo Mode) */}
         {isDemoMode && inputMode === 'text' && (
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <span className="text-[11px] text-slate-400 hidden sm:inline font-medium">Demo:</span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] text-slate-400 font-mono">Demo:</span>
             <button
               onClick={() => handleSelectSample(DEMO_SAMPLE_DRAFTS[0].content)}
-              className="text-[11px] px-2.5 sm:px-3 py-1 rounded-xl bg-[#02050f]/80 text-slate-300 hover:text-white hover:bg-rose-950/40 border border-rose-500/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm shrink-0"
+              className="text-[11px] font-mono px-3 py-1.5 rounded-xl bg-white/[0.04] text-slate-300 hover:text-white hover:border-rose-500/50 border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
               Misaligned Draft
             </button>
             <button
               onClick={() => handleSelectSample(DEMO_SAMPLE_DRAFTS[1].content)}
-              className="text-[11px] px-2.5 sm:px-3 py-1 rounded-xl bg-[#02050f]/80 text-slate-300 hover:text-white hover:bg-teal-950/40 border border-teal-500/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm shrink-0"
+              className="text-[11px] font-mono px-3 py-1.5 rounded-xl bg-white/[0.04] text-slate-300 hover:text-white hover:border-teal-500/50 border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
               Compliant Draft
@@ -303,9 +303,9 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
       {/* Content Context Field (Optional for semantic Tier 2 AI engine) */}
       <BorderGlow borderRadius="rounded-2xl" glowColor="cyan">
-        <div className="p-3.5 sm:p-4 rounded-2xl neo-liquid-panel border border-cyan-500/20 space-y-1.5 shadow-sm">
+        <div className="p-4 rounded-2xl neo-liquid-panel border border-cyan-500/20 space-y-2">
           <div className="flex items-center justify-between">
-            <label htmlFor="content-context-input" className="text-xs font-semibold text-slate-200">
+            <label htmlFor="content-context-input" className="text-xs font-semibold text-slate-300 font-lexend">
               Tell us about the content
             </label>
             {contentContext && (
@@ -331,7 +331,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                 if (showContextNudge) setShowContextNudge(false);
               }}
               placeholder="e.g. 'Landing page hero copy', 'Client invitation draft', 'Instagram caption'"
-              className="w-full px-4 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none transition-all"
             />
           </div>
         </div>
@@ -343,10 +343,10 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          className={`relative rounded-3xl transition-all p-5 ${
+          className={`relative rounded-3xl transition-all p-6 ${
             isDragOver
-              ? 'border-2 border-cyan-400 bg-cyan-950/30 shadow-[0_0_30px_rgba(6,182,212,0.4)]'
-              : 'neo-liquid-panel'
+              ? 'border border-cyan-400 bg-cyan-950/20 shadow-[0_0_30px_rgba(6,182,212,0.3)]'
+              : 'neo-liquid-panel border border-cyan-500/30 shadow-2xl'
           }`}
         >
           <input
@@ -372,7 +372,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="https://example.com/pricing or https://mybrand.com"
-                  className="w-full px-4 py-3 rounded-2xl neo-liquid-input text-sm text-slate-100 placeholder-slate-500 font-sans focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 font-mono focus:outline-none"
                   onKeyDown={(e) => e.key === 'Enter' && handleFetchUrl()}
                 />
               </div>
@@ -381,16 +381,16 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                 type="button"
                 onClick={handleFetchUrl}
                 disabled={isFetchingUrl || !targetUrl.trim()}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border border-teal-500/40 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shrink-0"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-teal-300 border border-cyan-500/30 text-xs font-mono font-medium transition-all disabled:opacity-50 cursor-pointer shrink-0"
               >
                 {isFetchingUrl ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-teal-400" />
-                    <span>Extracting Webpage...</span>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-teal-400" />
+                    <span>Extracting...</span>
                   </>
                 ) : (
                   <>
-                    <Globe className="w-4 h-4 text-teal-400" />
+                    <Globe className="w-3.5 h-3.5 text-teal-400" />
                     <span>Fetch &amp; Extract</span>
                   </>
                 )}
@@ -399,11 +399,11 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
             {/* Error banner */}
             {urlFetchError && (
-              <div className="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-200 flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-rose-950/30 border border-rose-500/30 text-xs text-rose-200 flex items-start gap-2.5">
+                <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="font-semibold">{urlFetchError}</p>
-                  <p className="text-[11px] text-rose-300/80 mt-1">
+                  <p className="text-[11px] text-rose-300/80 mt-1 font-mono">
                     Tip: You can also switch to the &quot;Text &amp; Document&quot; tab and paste the text directly.
                   </p>
                 </div>
@@ -412,40 +412,40 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
             {/* Extracted URL Card Preview */}
             {urlData && (
-              <div className="p-4 rounded-2xl bg-[#030818]/90 border border-teal-500/30 space-y-3 shadow-lg">
+              <div className="p-5 rounded-2xl bg-[#030818]/60 border border-cyan-500/20 space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-teal-300 text-xs font-semibold">
-                    <Check className="w-4 h-4 text-teal-400" />
+                  <div className="flex items-center gap-2 text-teal-300 text-xs font-semibold font-mono">
+                    <Check className="w-3.5 h-3.5 text-teal-400" />
                     <span>Webpage Ingested Successfully</span>
                   </div>
                   <a
                     href={urlData.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-[11px] text-cyan-400 hover:underline"
+                    className="flex items-center gap-1 text-[11px] text-cyan-400 hover:underline font-mono"
                   >
                     <span>Visit Link</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-[#02050f]/80 p-2.5 rounded-xl border border-slate-800">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div className="bg-black/40 p-3 rounded-xl border border-cyan-500/20">
                     <span className="text-[10px] text-slate-400 uppercase font-mono">Page Title:</span>
-                    <p className="font-semibold text-white truncate mt-0.5">{urlData.title}</p>
+                    <p className="font-medium text-white truncate mt-0.5">{urlData.title}</p>
                   </div>
-                  <div className="bg-[#02050f]/80 p-2.5 rounded-xl border border-slate-800">
+                  <div className="bg-black/40 p-3 rounded-xl border border-cyan-500/20">
                     <span className="text-[10px] text-slate-400 uppercase font-mono">Word Count:</span>
-                    <p className="font-semibold text-white mt-0.5 font-mono">{urlData.wordCount} words detected</p>
+                    <p className="font-medium text-white mt-0.5 font-mono">{urlData.wordCount} words detected</p>
                   </div>
                 </div>
 
                 {urlData.headings.length > 0 && (
-                  <div className="text-xs">
+                  <div className="text-xs space-y-1.5">
                     <span className="text-[10px] text-slate-400 uppercase font-mono">Key Headings:</span>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {urlData.headings.slice(0, 6).map((h, i) => (
-                        <span key={i} className="text-[11px] px-2 py-0.5 rounded-lg bg-cyan-950/40 text-cyan-300 border border-cyan-500/20">
+                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-lg bg-black/40 text-cyan-300 border border-cyan-500/20 font-mono">
                           {h}
                         </span>
                       ))}
@@ -454,11 +454,11 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                 )}
 
                 {urlData.ctaButtons.length > 0 && (
-                  <div className="text-xs">
+                  <div className="text-xs space-y-1.5">
                     <span className="text-[10px] text-slate-400 uppercase font-mono">Call to Action Buttons:</span>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {urlData.ctaButtons.slice(0, 6).map((b, i) => (
-                        <span key={i} className="text-[11px] px-2 py-0.5 rounded-lg bg-teal-950/40 text-teal-300 border border-teal-500/20">
+                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-lg bg-black/40 text-teal-300 border border-teal-500/20 font-mono">
                           [{b}]
                         </span>
                       ))}
@@ -466,14 +466,14 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Auditing full extracted content against <strong className="text-white">{activeProfile.metadata.brandName}</strong> DNA.</span>
+                <div className="pt-2.5 border-t border-cyan-500/20 flex items-center justify-between text-xs text-slate-400">
+                  <span className="font-mono text-[11px]">Auditing content against <strong className="text-white">{activeProfile.metadata.brandName}</strong> DNA.</span>
                   <button
                     type="button"
                     onClick={() => {
                       setInputMode('text');
                     }}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold"
+                    className="text-cyan-400 hover:text-cyan-300 font-mono text-xs cursor-pointer"
                   >
                     View / Edit Extracted Copy &rarr;
                   </button>
@@ -494,11 +494,11 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-cyan-500/30 hover:border-cyan-400/60 rounded-2xl p-10 text-center cursor-pointer transition-all bg-[#030818]/60 hover:bg-[#030818]/90 group"
+                className="border border-dashed border-cyan-500/30 hover:border-cyan-400 rounded-2xl p-10 text-center cursor-pointer transition-all bg-[#030818]/40 hover:bg-[#030818]/70 group"
               >
-                <Image className="w-10 h-10 text-cyan-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-semibold text-white mb-1">Click to Upload Brand Visual or Image</p>
-                <p className="text-xs text-slate-400">Supports PNG, JPG, JPEG, WEBP. Loupe color inspection included.</p>
+                <Image className="w-10 h-10 text-cyan-400 mx-auto mb-3 transition-colors group-hover:scale-105" />
+                <p className="text-sm font-semibold text-white mb-1 font-lexend">Upload Brand Visual or Image</p>
+                <p className="text-xs text-slate-400 font-mono">PNG, JPG, JPEG, WEBP &bull; Color cluster &amp; Delta-E sampling</p>
               </div>
             )}
           </div>
@@ -506,18 +506,18 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
         {/* MODE 3: TEXT & DOCUMENT */}
         {inputMode === 'text' && (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {/* File Ingestion Notification Banner */}
             {extractedFileName && (
-              <div className="flex items-center justify-between p-2.5 rounded-2xl bg-[#02050f]/80 border border-cyan-500/30 text-xs shadow-inner">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#030818]/60 border border-cyan-500/20 text-xs">
                 <div className="flex items-center gap-2 text-cyan-300">
                   {detectedType === 'spreadsheet' ? (
-                    <Table className="w-4 h-4 text-teal-400" />
+                    <Table className="w-3.5 h-3.5 text-teal-400" />
                   ) : (
-                    <FileText className="w-4 h-4 text-cyan-400" />
+                    <FileText className="w-3.5 h-3.5 text-cyan-400" />
                   )}
                   <span className="font-medium text-white truncate max-w-[200px]">{extractedFileName}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">client-side extracted</span>
+                  <span className="text-[10px] text-slate-500 font-mono">client-side extracted</span>
                 </div>
                 <button
                   onClick={handleClear}
@@ -531,7 +531,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
             {/* Extraction Error Notice */}
             {extractionError && (
-              <div className="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
                 <span>{extractionError}</span>
               </div>
@@ -539,23 +539,23 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
             {/* Live Inline Forbidden Term Highlights Banner */}
             {liveViolations.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-[#0c1626]/70 to-[#02050f]/90 border border-rose-500/30 text-xs text-rose-200 space-y-2 shadow-md">
+              <div className="p-3.5 rounded-2xl bg-rose-950/20 border border-rose-500/30 text-xs text-rose-200 space-y-2.5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 font-semibold text-rose-300">
-                    <AlertCircle className="w-4 h-4 text-rose-400 animate-pulse shrink-0" />
+                  <div className="flex items-center gap-2 font-semibold text-rose-300 font-mono text-[11px]">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                     <span>
-                      Inline Alert: {liveViolations.length} forbidden term{liveViolations.length > 1 ? 's' : ''} detected
+                      INLINE ALERT: {liveViolations.length} forbidden term{liveViolations.length > 1 ? 's' : ''} detected
                     </span>
                   </div>
 
                   {/* Mode switcher */}
-                  <div className="flex items-center gap-1 bg-[#02050f]/80 p-1 rounded-xl border border-cyan-500/20 self-start sm:self-auto">
+                  <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 self-start sm:self-auto">
                     <button
                       type="button"
                       onClick={() => setViewMode('edit')}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                         viewMode === 'edit'
-                          ? 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/40'
+                          ? 'bg-white/[0.1] text-white'
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
@@ -565,9 +565,9 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                     <button
                       type="button"
                       onClick={() => setViewMode('highlight')}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                         viewMode === 'highlight'
-                          ? 'bg-rose-500/30 text-rose-100 border border-rose-500/40'
+                          ? 'bg-rose-500/30 text-rose-200'
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
@@ -579,13 +579,13 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
                 {/* Interactive Tooltip Card */}
                 {activeTooltipTerm && (
-                  <div className="p-3 rounded-2xl bg-[#02050f]/95 border border-rose-500/40 text-xs space-y-2 animate-fade-in shadow-2xl">
+                  <div className="p-3 rounded-xl bg-black/60 border border-rose-500/30 text-xs space-y-2 animate-fade-in">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded-lg bg-rose-500/25 text-rose-200 font-mono font-bold text-xs border border-rose-500/30">
+                        <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-200 font-mono text-[11px] border border-rose-500/30">
                           {activeTooltipTerm.term}
                         </span>
-                        <span className="text-[11px] text-slate-400">Line {activeTooltipTerm.line}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">Line {activeTooltipTerm.line}</span>
                       </div>
                       <button
                         onClick={() => setActiveTooltipTerm(null)}
@@ -596,19 +596,19 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                     </div>
 
                     <p className="text-[11px] text-slate-300">
-                      <strong className="text-rose-300">Why Banned:</strong> {activeTooltipTerm.reason}
+                      <strong className="text-rose-300 font-medium">Why Banned:</strong> {activeTooltipTerm.reason}
                     </p>
 
                     {/* Preferred alternatives */}
                     {activeProfile.vocabulary?.preferred && activeProfile.vocabulary.preferred.length > 0 && (
-                      <div className="flex items-center flex-wrap gap-1.5 pt-1 border-t border-cyan-500/10">
-                        <span className="text-[10px] text-cyan-300">1-Click Swap:</span>
+                      <div className="flex items-center flex-wrap gap-1.5 pt-1.5 border-t border-white/10">
+                        <span className="text-[10px] text-slate-400 font-mono">Alternative:</span>
                         {activeProfile.vocabulary.preferred.slice(0, 4).map((pref, pIdx) => (
                           <button
                             key={pIdx}
                             type="button"
                             onClick={() => handleQuickSwapWord(activeTooltipTerm.term, pref)}
-                            className="px-2.5 py-0.5 rounded-lg bg-teal-950/40 text-teal-300 hover:bg-teal-900/50 border border-teal-500/30 text-[10px] font-semibold transition-all cursor-pointer active:scale-95"
+                            className="px-2 py-0.5 rounded-md bg-white/[0.06] text-teal-300 hover:text-teal-200 border border-teal-500/30 text-[10px] font-mono transition-colors cursor-pointer"
                           >
                             &rarr; {pref}
                           </button>
@@ -622,10 +622,10 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
             {/* View Mode: Raw Textarea vs Interactive Inline Highlighting */}
             {viewMode === 'highlight' ? (
-              <div className="p-4 rounded-2xl neo-debossed min-h-[220px] max-h-[380px] overflow-y-auto">
-                <div className="text-[11px] text-cyan-300 mb-2 flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl border border-cyan-500/20 bg-[#030818]/60 min-h-[220px] max-h-[380px] overflow-y-auto font-sans">
+                <div className="text-[11px] font-mono text-cyan-300 mb-2 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                  Click any highlighted term to view brand rationale and 1-click swap alternatives.
+                  Click any highlighted term to view brand rationale and swap alternatives.
                 </div>
                 {renderInlineHighlightedText()}
               </div>
@@ -639,27 +639,27 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                   }}
                   rows={10}
                   placeholder="Type or paste your draft copy here, or drop a document (.docx, .txt, .md), spreadsheet (.xlsx, .csv), or image (.png, .jpg, .webp)..."
-                  className="w-full p-4 rounded-2xl neo-liquid-input text-sm text-slate-100 placeholder-slate-500 leading-relaxed resize-y font-sans transition-all"
+                  className="w-full p-4 rounded-2xl neo-liquid-input text-xs sm:text-sm text-slate-100 placeholder-slate-500 leading-relaxed resize-y font-sans transition-all"
                 />
               </div>
             )}
 
             {/* Drag Drop Hint & Drop Zone Trigger */}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-cyan-500/10 text-xs">
+            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-cyan-500/20 text-xs">
               <div className="flex items-center gap-3 text-slate-400 text-[11px]">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition-colors"
+                  className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-medium cursor-pointer transition-colors"
                 >
                   <Upload className="w-3.5 h-3.5 text-cyan-400" />
                   Upload Document (.docx, .txt, .md, .xlsx, .csv)
                 </button>
               </div>
 
-              <div className="text-[11px] font-mono text-slate-300">
-                <strong className="text-white font-bold">{wordCount}</strong> words &bull;{' '}
-                <strong className="text-white font-bold">{charCount}</strong> characters
+              <div className="text-[11px] font-mono text-slate-400">
+                <strong className="text-slate-200 font-semibold">{wordCount}</strong> words &bull;{' '}
+                <strong className="text-slate-200 font-semibold">{charCount}</strong> characters
               </div>
             </div>
           </div>
@@ -669,9 +669,9 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
 
       {/* Context Nudge Alert Banner (Dismissible) */}
       {showContextNudge && (
-        <div className="p-3.5 rounded-2xl bg-[#08182b] border border-cyan-500/40 text-xs text-cyan-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg animate-fade-in">
-          <div className="flex items-start sm:items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5 sm:mt-0" />
+        <div className="p-3.5 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 text-xs text-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-start sm:items-center gap-2">
+            <AlertCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5 sm:mt-0" />
             <span>
               Adding context helps the AI judge tone more accurately. Continue without it?
             </span>
@@ -684,14 +684,14 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                 const el = document.getElementById('content-context-input');
                 el?.focus();
               }}
-              className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-slate-200 text-xs font-medium transition-colors cursor-pointer"
             >
               Add Context
             </button>
             <button
               type="button"
               onClick={() => handleExecuteAudit(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-cyan-500/25 hover:bg-cyan-500/40 text-cyan-200 border border-cyan-400/40 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+              className="px-3.5 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition-colors cursor-pointer"
             >
               Continue Anyway
             </button>
@@ -702,15 +702,15 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
       {/* Bottom Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="text-xs text-slate-400 flex items-center gap-2 truncate">
-          <span className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_6px_rgba(45,212,191,0.8)] shrink-0" />
-          <span className="truncate">Benchmark: <strong className="text-slate-200 font-semibold">{activeProfile.metadata.brandName}</strong></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
+          <span className="truncate">Benchmark: <strong className="text-slate-200 font-medium">{activeProfile.metadata.brandName}</strong></span>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {currentDraftText || extractedImageDataUrl || targetUrl ? (
             <button
               onClick={handleClear}
-              className="px-3.5 py-2.5 rounded-2xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer shadow-sm shrink-0"
+              className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/[0.06] border border-cyan-500/20 transition-all cursor-pointer shrink-0"
             >
               Clear
             </button>
@@ -719,16 +719,16 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
           <button
             onClick={handleExecuteAudit}
             disabled={isAuditing || (!currentDraftText.trim() && !extractedImageDataUrl && !urlData)}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-white neo-liquid-btn-primary active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.35)]"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all cursor-pointer"
           >
             {isAuditing ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                 <span>Executing Dual-Tier Audit...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-cyan-200" />
+                <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
                 <span>Run Brand Consistency Audit</span>
               </>
             )}

@@ -7,11 +7,13 @@
     color: #f8fafc;
     min-height: 100vh;
     overflow-x: hidden;
+    letter-spacing: -0.01em;
   }
 }
 
 .font-lexend {
   font-family: 'Lexend', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .font-georgia {
@@ -23,137 +25,109 @@
 }
 
 /* =========================================================================
-   NEOMORPHIC LIQUID-GLASS DESIGN SYSTEM (CYAN & PRISMARINE OBSIDIAN THEME)
+   NEO-LIQUID GLASSMORPHIC DESIGN SYSTEM
    ========================================================================= */
 
-/* Liquid Glass Deep Convex Panel */
+/* Neo-Liquid Surface Panel */
 .neo-liquid-panel {
-  background: linear-gradient(135deg, rgba(10, 24, 53, 0.72) 0%, rgba(5, 15, 36, 0.82) 50%, rgba(2, 6, 20, 0.94) 100%);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(6, 182, 212, 0.18);
-  box-shadow: 
-    8px 10px 30px rgba(0, 0, 0, 0.75),
-    -3px -3px 10px rgba(255, 255, 255, 0.03),
-    inset 0 1px 1px rgba(255, 255, 255, 0.22),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.8);
+  background: rgba(11, 15, 25, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
 }
 
-/* Liquid Glass Interactive Card */
 .neo-liquid-card {
-  background: linear-gradient(145deg, rgba(12, 30, 64, 0.65) 0%, rgba(6, 16, 38, 0.75) 55%, rgba(2, 7, 22, 0.88) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(6, 182, 212, 0.16);
-  box-shadow: 
-    6px 8px 22px rgba(0, 0, 0, 0.65),
-    -2px -2px 8px rgba(255, 255, 255, 0.025),
-    inset 0 1px 1px rgba(255, 255, 255, 0.16);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
 }
 
 .neo-liquid-card:hover {
-  border-color: rgba(45, 212, 191, 0.45);
-  box-shadow: 
-    0 12px 36px rgba(0, 0, 0, 0.85),
-    0 0 24px rgba(45, 212, 191, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 12px 35px rgba(6, 182, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
 /* Debossed Well / Terminal Inset */
 .neo-debossed {
-  background: #02050f;
-  border: 1px solid rgba(6, 182, 212, 0.12);
-  box-shadow: 
-    inset 4px 4px 12px rgba(0, 0, 0, 0.88),
-    inset -2px -2px 6px rgba(34, 211, 238, 0.04),
-    0 1px 1px rgba(255, 255, 255, 0.05);
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Luminous Action Button (Teal & Cyan) */
+/* Primary Action Button (Liquid Gradient) */
 .neo-liquid-btn-primary {
-  background: linear-gradient(135deg, #0d9488 0%, #06b6d4 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #06B6D4 0%, #0D9488 100%);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 
-    0 4px 20px rgba(6, 182, 212, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.5),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+  transition: all 0.2s ease;
 }
 
 .neo-liquid-btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #14b8a6 0%, #22d3ee 50%, #3b82f6 100%);
-  box-shadow: 
-    0 6px 28px rgba(45, 212, 191, 0.55),
-    inset 0 1px 2px rgba(255, 255, 255, 0.7);
-  transform: translateY(-1.5px);
+  background: linear-gradient(135deg, #22D3EE 0%, #14B8A6 100%);
+  box-shadow: 0 6px 25px rgba(6, 182, 212, 0.5);
+  transform: translateY(-1px);
 }
 
 .neo-liquid-btn-primary:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 
-    0 2px 10px rgba(6, 182, 212, 0.4),
-    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  transform: translateY(0);
 }
 
 /* Secondary Button */
 .neo-liquid-btn-secondary {
-  background: linear-gradient(135deg, rgba(8, 20, 48, 0.75) 0%, rgba(3, 10, 26, 0.9) 100%);
-  border: 1px solid rgba(6, 182, 212, 0.22);
-  color: #e2e8f0;
-  box-shadow: 
-    3px 4px 12px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #E2E8F0;
+  border-radius: 1rem;
   transition: all 0.2s ease;
 }
 
 .neo-liquid-btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(14, 32, 72, 0.85) 0%, rgba(5, 14, 36, 0.95) 100%);
-  border-color: rgba(45, 212, 191, 0.45);
-  color: #ffffff;
-  box-shadow: 
-    0 4px 18px rgba(6, 182, 212, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
 }
 
 /* Active Pill Tab */
 .neo-liquid-pill-active {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(45, 212, 191, 0.2) 100%);
-  border: 1px solid rgba(45, 212, 191, 0.5);
-  box-shadow: 
-    0 0 16px rgba(45, 212, 191, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(20, 184, 166, 0.2) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
 }
 
 /* Input Fields */
 .neo-liquid-input {
-  background: rgba(2, 6, 18, 0.85);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  box-shadow: 
-    inset 2px 2px 6px rgba(0, 0, 0, 0.8),
-    inset -1px -1px 3px rgba(34, 211, 238, 0.05);
-  color: #f8fafc;
-  transition: all 0.25s ease;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  color: #F8FAFC;
+  transition: all 0.2s ease;
 }
 
 .neo-liquid-input:focus {
-  border-color: rgba(45, 212, 191, 0.65);
-  box-shadow: 
-    0 0 18px rgba(45, 212, 191, 0.25),
-    inset 2px 2px 6px rgba(0, 0, 0, 0.85);
+  border-color: #06B6D4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25), 0 0 15px rgba(6, 182, 212, 0.2);
   outline: none;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -161,12 +135,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.25);
+  background: #1e293b;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(45, 212, 191, 0.45);
+  background: #334155;
 }
 
 /* Hide scrollbar utility for smooth horizontal touch navigation on mobile */

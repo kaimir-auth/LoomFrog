@@ -156,19 +156,19 @@ export const CanvasColorInspector: React.FC<CanvasColorInspectorProps> = ({
   return (
     <div className="space-y-4">
       {/* Visual Canvas Container with Interactive Loupe */}
-      <div className="relative rounded-2xl overflow-hidden bg-[#02050f]/90 border border-cyan-500/15 backdrop-blur-md flex flex-col items-center justify-center p-3.5 group shadow-[inset_2px_2px_8px_rgba(0,0,0,0.85)]">
+      <div className="relative rounded-2xl overflow-hidden bg-[#030818]/60 border border-cyan-500/20 flex flex-col items-center justify-center p-4 group">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={handleMouseLeave}
-          className="rounded-xl max-w-full cursor-crosshair shadow-2xl border border-cyan-500/20"
+          className="rounded-xl max-w-full cursor-crosshair border border-cyan-500/30 shadow-md"
         />
 
-        {/* Magnified Eyedropper Loupe (Liquid Neomorphic Tooltip) */}
+        {/* Magnified Eyedropper Loupe */}
         {isHovering && hoverColor && (
           <div
-            className="pointer-events-none absolute z-30 transform -translate-x-1/2 -translate-y-full mb-3 flex flex-col items-center bg-[#040a1b]/95 border border-cyan-400/40 p-3.5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.8),0_0_20px_rgba(6,182,212,0.3)] backdrop-blur-2xl transition-transform min-w-[200px]"
+            className="pointer-events-none absolute z-30 transform -translate-x-1/2 -translate-y-full mb-2 flex flex-col items-center bg-[#030818]/95 border border-cyan-500/40 backdrop-blur-md p-3.5 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-transform min-w-[200px]"
             style={{
               left: `${Math.min(Math.max(hoverColor.x + 12, 100), (canvasRef.current?.width || 400) - 100)}px`,
               top: `${Math.max(hoverColor.y - 12, 60)}px`
@@ -178,88 +178,88 @@ export const CanvasColorInspector: React.FC<CanvasColorInspectorProps> = ({
             <div className="flex items-center gap-2.5 mb-2 w-full justify-between">
               <div className="flex items-center gap-2">
                 <div
-                  className="w-5 h-5 rounded-full border-2 border-white/60 shadow-sm flex-shrink-0"
+                  className="w-4 h-4 rounded-md border border-white/20 shadow-sm flex-shrink-0"
                   style={{ backgroundColor: hoverColor.hex }}
                 />
                 <div>
-                  <div className="font-bold text-xs text-white leading-tight font-lexend">{hoverColor.colorName}</div>
+                  <div className="font-semibold text-xs text-white leading-tight font-mono">{hoverColor.colorName}</div>
                   <div className="font-mono text-[10px] text-cyan-300">{hoverColor.hex}</div>
                 </div>
               </div>
 
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm ${
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
                 hoverColor.isCompliant
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/30'
-                  : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
+                  : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
               }`}>
                 {hoverColor.isCompliant ? 'On-Brand' : 'Drift'}
               </span>
             </div>
 
             {/* Diagnostic metrics */}
-            <div className="text-[11px] text-slate-300 w-full space-y-1 pt-1.5 border-t border-cyan-500/15">
+            <div className="text-[11px] text-slate-300 w-full space-y-1 pt-2 border-t border-cyan-500/20">
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">Area Coverage:</span>
-                <span className="font-mono font-bold text-white">~{hoverColor.coveragePct}%</span>
+                <span className="text-slate-400 font-mono text-[10px]">Coverage:</span>
+                <span className="font-mono font-medium text-white text-[11px]">~{hoverColor.coveragePct}%</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">Color Distance:</span>
-                <span className={`font-mono font-bold ${hoverColor.isCompliant ? 'text-teal-300' : 'text-rose-300'}`}>
+                <span className="text-slate-400 font-mono text-[10px]">Distance:</span>
+                <span className={`font-mono font-medium text-[11px] ${hoverColor.isCompliant ? 'text-teal-300' : 'text-rose-400'}`}>
                   ΔE {hoverColor.deltaE}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[10px]">
-                <span className="text-slate-400">Nearest Brand Hex:</span>
-                <span className="font-mono text-cyan-300 font-semibold">{hoverColor.nearestBrandHex}</span>
+                <span className="text-slate-400 font-mono">Nearest Hex:</span>
+                <span className="font-mono text-cyan-300">{hoverColor.nearestBrandHex}</span>
               </div>
             </div>
           </div>
         )}
 
-        <div className="mt-3 text-center text-[11px] text-slate-400 flex items-center gap-1.5">
+        <div className="mt-3 text-center text-[11px] text-slate-400 flex items-center gap-1.5 font-mono">
           <Pipette className="w-3.5 h-3.5 text-cyan-400" />
-          Hover over the image to inspect exact color, nearest name, area coverage %, and brand ΔE variance.
+          <span>Hover to inspect exact color, coverage %, and brand ΔE variance.</span>
         </div>
       </div>
 
       {/* Extracted Dominant Color Clusters */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-200">
-          <span className="font-lexend font-bold text-cyan-200">Dominant Palette Clusters &amp; Delta-E Analysis</span>
-          <span className="text-[11px] text-cyan-400/80 font-normal font-mono">Instant Local Sampling</span>
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-mono font-semibold text-slate-300 uppercase tracking-wider text-[11px]">Dominant Palette Clusters &amp; Delta-E</span>
+          <span className="text-[10px] text-slate-400 font-mono">Local Sampling</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {clusters.map((cluster, idx) => (
             <div
               key={idx}
-              className={`p-3 rounded-2xl border transition-all backdrop-blur-2xl shadow-[4px_6px_16px_rgba(0,0,0,0.6)] ${
+              className={`p-3 rounded-xl border bg-[#030818]/60 transition-all ${
                 cluster.isCompliant
-                  ? 'bg-gradient-to-br from-teal-950/40 via-[#06182e]/70 to-[#020612]/90 border-teal-500/35 hover:border-teal-400/60 shadow-[0_0_15px_rgba(45,212,191,0.1)]'
-                  : 'bg-gradient-to-br from-rose-950/40 via-[#06182e]/70 to-[#020612]/90 border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_15px_rgba(244,63,94,0.1)]'
+                  ? 'border-cyan-500/20 hover:border-teal-500/40'
+                  : 'border-cyan-500/20 hover:border-rose-500/40'
               }`}
             >
               <div className="flex items-center justify-between gap-1 mb-1.5">
                 <div className="flex items-center gap-2 min-w-0">
                   <div
-                    className="w-4 h-4 rounded-md border border-white/40 shadow-sm flex-shrink-0"
+                    className="w-3.5 h-3.5 rounded-md border border-white/20 shadow-sm flex-shrink-0"
                     style={{ backgroundColor: cluster.hex }}
                   />
                   <div className="truncate">
-                    <div className="text-[11px] font-bold text-white truncate font-lexend">{cluster.name || getNearestColorName(cluster.hex)}</div>
-                    <div className="text-[10px] font-mono text-cyan-200">{cluster.hex}</div>
+                    <div className="text-[11px] font-semibold text-white truncate font-mono">{cluster.name || getNearestColorName(cluster.hex)}</div>
+                    <div className="text-[10px] font-mono text-cyan-300">{cluster.hex}</div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-1 text-[10px] pt-1.5 border-t border-white/[0.08]">
-                <div className="flex justify-between text-slate-300">
-                  <span>Area Coverage:</span>
-                  <span className="font-mono font-bold text-white">{cluster.percentage}%</span>
+              <div className="space-y-0.5 text-[10px] pt-1.5 border-t border-cyan-500/20 font-mono">
+                <div className="flex justify-between text-slate-400">
+                  <span>Coverage:</span>
+                  <span className="text-white">{cluster.percentage}%</span>
                 </div>
-                <div className="flex justify-between text-slate-300">
+                <div className="flex justify-between text-slate-400">
                   <span>Delta-E:</span>
-                  <span className={`font-mono font-bold ${cluster.isCompliant ? 'text-teal-300' : 'text-rose-400'}`}>
+                  <span className={cluster.isCompliant ? 'text-teal-300' : 'text-rose-400'}>
                     ΔE {cluster.deltaE}
                   </span>
                 </div>

@@ -293,19 +293,19 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
       <BorderGlow borderRadius="rounded-3xl" glowColor="cyan" className="w-full max-w-2xl">
-        <div className="relative w-full rounded-3xl neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.95)] overflow-hidden max-h-[92vh] flex flex-col border border-cyan-500/25">
+        <div className="relative w-full rounded-3xl bg-[#030818] neo-liquid-panel shadow-[0_20px_70px_rgba(0,0,0,0.9)] overflow-hidden max-h-[92vh] flex flex-col border border-cyan-500/30">
           {/* Modal Top Header */}
-        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-cyan-500/20 bg-[#030816]/80 shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-cyan-500/20 bg-[#030818]/90 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-              <Sparkles className="w-5 h-5 text-cyan-100" />
+            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-teal-500/10 border border-cyan-500/30 text-cyan-400 shadow-md">
+              <Sparkles className="w-5 h-5 text-cyan-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-white font-lexend">
                   Draft Brand DNA with AI
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/30">
                   Conversational Engine
                 </span>
               </div>
@@ -316,61 +316,61 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Scrollable Form Body */}
-        <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {/* Demo Mode or Live Mode Notification Ribbon */}
           {isDemoMode || !hasApiKey ? (
-            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
-              <div className="flex items-start gap-2.5">
+            <div className="p-3 rounded-[4px] bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-bold text-amber-300">Live AI Synthesis Requires Gemini API Key</div>
-                  <div className="text-[11px] text-amber-200/80 mt-0.5 leading-relaxed">
-                    You are in <strong className="text-amber-200">Demo Mode</strong>. Conversational AI extraction requires a real Gemini API key. Set your API key to draft custom profiles from your inputs, or use the sample demo draft button below.
+                  <div className="font-medium text-amber-300 font-mono text-[11px] uppercase tracking-wider">Live AI Synthesis Requires Gemini API Key</div>
+                  <div className="text-[11px] text-amber-200/80 mt-0.5 leading-relaxed font-mono">
+                    You are in <strong>Demo Mode</strong>. Conversational extraction requires a real Gemini API key. Provide a key or use the sample demo button below.
                   </div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsKeyModalOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/50 text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                className="px-2.5 py-1 rounded-[4px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[11px] font-mono font-medium transition-colors shrink-0 cursor-pointer flex items-center justify-center gap-1"
               >
-                <Key className="w-3.5 h-3.5" />
+                <Key className="w-3 h-3" />
                 <span>Set API Key</span>
               </button>
             </div>
           ) : null}
 
           {/* Visible Model Selector Dropdown Bar */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-[#040918] to-[#02050f] border border-cyan-500/30 text-xs text-cyan-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
-                <Cpu className="w-4 h-4" />
+          <div className="p-3 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] text-xs text-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded-[3px] bg-[#111827] border border-[#1F2937] text-cyan-400 shrink-0">
+                <Cpu className="w-3.5 h-3.5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white font-lexend text-xs">
+                  <span className="font-mono font-medium text-white text-xs">
                     Gemini Engine Model
                   </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-[3px] bg-[#111827] text-cyan-300 border border-[#1F2937]">
                     {hasApiKey && !isDemoMode ? 'Live API' : 'Demo Mode'}
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">
-                  Automatic fallback chain enabled: <span className="font-mono text-cyan-300/80">gemini-3.6-flash &rarr; gemini-2.5-pro &rarr; gemini-3.7-flash</span>
+                <div className="text-[11px] text-slate-400 mt-0.5 font-mono text-[10px]">
+                  Fallback chain: gemini-3.6-flash &rarr; gemini-2.5-pro &rarr; gemini-3.7-flash
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-              <span className="text-[11px] text-slate-300 font-medium">Model:</span>
-              <div className="flex items-center gap-1.5 bg-[#02050f] px-2.5 py-1.5 rounded-xl border border-cyan-500/40 shadow-inner">
+              <span className="text-[11px] text-slate-400 font-mono">Model:</span>
+              <div className="flex items-center gap-1 bg-[#111827] px-2 py-1 rounded-[4px] border border-[#1F2937]">
                 <select
                   id="brand-dna-modal-model-select"
                   value={selectedModel}
@@ -382,7 +382,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                   title="Select AI Model"
                 >
                   {AVAILABLE_MODELS.map((m) => (
-                    <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                    <option key={m.id} value={m.id} className="bg-[#111827] text-white font-mono">
                       {m.id}
                     </option>
                   ))}
@@ -393,24 +393,24 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
           {/* Visible Error Banner */}
           {error && (
-            <div className="p-4 rounded-2xl bg-rose-950/50 border border-rose-500/50 text-xs text-rose-200 space-y-2.5 animate-fade-in shadow-[0_0_20px_rgba(244,63,94,0.15)]">
-              <div className="flex items-start gap-2.5">
+            <div className="p-3 rounded-[4px] bg-rose-950/30 border border-rose-500/40 text-xs text-rose-200 space-y-2 animate-fade-in font-mono">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400 mt-0.5" />
                 <span className="leading-relaxed">{error}</span>
               </div>
               {error.includes('no longer available') && (
-                <div className="pl-6.5 flex items-center gap-2">
-                  <span className="text-[11px] text-slate-300">Choose active model:</span>
+                <div className="pl-6 flex items-center gap-2">
+                  <span className="text-[11px] text-slate-300 font-mono">Choose active model:</span>
                   <select
                     value={selectedModel}
                     onChange={(e) => {
                       setSelectedModel(e.target.value);
                       setError(null);
                     }}
-                    className="bg-[#040918] text-cyan-300 border border-cyan-500/40 text-xs rounded-xl px-2.5 py-1 focus:outline-none cursor-pointer font-mono"
+                    className="bg-[#111827] text-cyan-300 border border-[#1F2937] text-xs rounded-[4px] px-2 py-1 focus:outline-none cursor-pointer font-mono"
                   >
                     {AVAILABLE_MODELS.map((m) => (
-                      <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                      <option key={m.id} value={m.id} className="bg-[#111827] text-white font-mono">
                         {m.id}
                       </option>
                     ))}
@@ -418,13 +418,13 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                 </div>
               )}
               {(isDemoMode || !hasApiKey) && (
-                <div className="pl-6.5">
+                <div className="pl-6">
                   <button
                     type="button"
                     onClick={() => setIsKeyModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 text-[11px] font-bold cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 text-[11px] font-mono cursor-pointer transition-colors"
                   >
-                    <Key className="w-3.5 h-3.5" />
+                    <Key className="w-3 h-3" />
                     <span>Open API Key Settings</span>
                   </button>
                 </div>
@@ -434,11 +434,11 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
           {/* Prominent Loading / Progress State Card */}
           {isExtracting && (
-            <div className="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-3 animate-pulse shadow-[0_0_25px_rgba(6,182,212,0.25)]">
-              <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
-              <div className="space-y-0.5">
-                <div className="font-bold text-white font-lexend">Synthesizing Brand DNA Profile...</div>
-                <div className="text-[11px] text-cyan-300 font-mono">
+            <div className="p-3.5 rounded-[4px] bg-[#0B0F17] border border-cyan-500/40 text-xs text-cyan-200 flex items-center gap-2.5 animate-pulse">
+              <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+              <div className="space-y-0.5 font-mono">
+                <div className="font-medium text-white text-xs">Synthesizing Brand DNA Profile...</div>
+                <div className="text-[10px] text-cyan-300">
                   {extractionStatus || 'Extracting tone attributes, vocabulary rules, and brand palette...'}
                 </div>
               </div>
@@ -448,14 +448,14 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           {/* 1. Freeform Conversational Textarea */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-cyan-200 font-lexend flex items-center gap-1.5">
+              <label className="block text-xs font-mono font-medium text-slate-300 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Describe Your Brand in Plain Language</span>
               </label>
               <button
                 type="button"
                 onClick={() => setFreeformText(SAMPLE_PROMPT)}
-                className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium cursor-pointer transition-colors"
+                className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 cursor-pointer transition-colors"
               >
                 Insert Example
               </button>
@@ -464,19 +464,19 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
               value={freeformText}
               onChange={(e) => setFreeformText(e.target.value)}
               rows={5}
-              placeholder="Tell us about your brand in your own words — what do you build? Who is your audience? How should you sound (e.g. bold, technical, conversational)? What words do you hate or love? What is your visual aesthetic?"
-              className="w-full p-4 rounded-2xl neo-liquid-input text-xs text-white placeholder-slate-500 leading-relaxed focus:outline-none"
+              placeholder="Tell us about your brand in your own words — what do you build? Who is your audience? How should you sound? What words do you avoid? What is your visual aesthetic?"
+              className="w-full p-3 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] focus:border-cyan-500/50 focus:outline-none text-xs text-white placeholder-slate-500 font-mono leading-relaxed transition-colors"
             />
           </div>
 
           {/* 2. Optional Reference URLs (Server-Side Gemini URL Context) */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-teal-200 font-lexend flex items-center gap-1.5">
+              <label className="block text-xs font-mono font-medium text-slate-300 flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5 text-teal-400" />
                 <span>Reference Websites &amp; Links <span className="text-slate-400 font-normal font-sans">(Optional)</span></span>
               </label>
-              <span className="text-[10px] text-teal-300/80 font-mono">Gemini URL Context</span>
+              <span className="text-[10px] text-slate-400 font-mono">Gemini URL Context</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -485,15 +485,15 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
                 placeholder="https://company.com or https://company.com/about"
-                className="flex-1 px-3.5 py-2 rounded-xl neo-liquid-input text-xs text-white placeholder-slate-500"
+                className="flex-1 px-3 py-1.5 rounded-[4px] bg-[#0B0F17] border border-[#1F2937] focus:border-cyan-500/50 focus:outline-none text-xs text-white placeholder-slate-500 font-mono transition-colors"
                 onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
               />
               <button
                 type="button"
                 onClick={handleAddUrl}
-                className="px-3.5 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border border-teal-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-3 py-1.5 rounded-[4px] bg-[#0B0F17] hover:bg-white/[0.05] text-teal-300 border border-[#1F2937] text-xs font-mono font-medium transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3 h-3" />
                 <span>Add URL</span>
               </button>
             </div>
@@ -503,10 +503,10 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                 {urlsList.map((url, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#02050f]/80 border border-teal-500/20 text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#030818]/60 border border-cyan-500/20 text-xs"
                   >
                     <div className="flex items-center gap-2 text-slate-300 truncate">
-                      <Link2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      <Link2 className="w-3 h-3 text-teal-400 shrink-0" />
                       <span className="truncate font-mono text-[11px] text-teal-200">{url}</span>
                     </div>
                     <button
@@ -524,13 +524,13 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           </div>
 
           {/* 3. Optional Reference Images (Multimodal) */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-cyan-200 font-lexend flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-slate-300 flex items-center gap-1.5 font-lexend">
                 <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Brand Visual Assets &amp; Photos <span className="text-slate-400 font-normal font-sans">(Optional)</span></span>
               </label>
-              <span className="text-[10px] text-cyan-300/80 font-mono">Multimodal Extraction</span>
+              <span className="text-[10px] text-slate-400 font-mono">Multimodal Extraction</span>
             </div>
 
             {/* Drop Zone */}
@@ -539,10 +539,10 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={() => fileInputRef.current?.click()}
-              className={`p-4 rounded-2xl border-2 border-dashed transition-all text-center cursor-pointer ${
+              className={`p-5 rounded-2xl border border-dashed transition-all text-center cursor-pointer ${
                 isDragging
-                  ? 'border-cyan-400 bg-cyan-950/30'
-                  : 'border-cyan-500/20 bg-[#02050f]/60 hover:bg-[#02050f]/90 hover:border-cyan-400/40'
+                  ? 'border-cyan-400 bg-cyan-950/20 shadow-[0_0_20px_rgba(6,182,212,0.2)]'
+                  : 'border-cyan-500/30 bg-[#030818]/40 hover:bg-[#030818]/70 hover:border-cyan-400'
               }`}
             >
               <input
@@ -555,10 +555,10 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
               />
               <div className="flex flex-col items-center justify-center gap-1.5">
                 <Upload className="w-5 h-5 text-cyan-400" />
-                <p className="text-xs text-slate-300">
-                  <strong className="text-cyan-300">Click to upload</strong> or drag &amp; drop brand imagery
+                <p className="text-xs text-slate-300 font-sans">
+                  <strong className="text-cyan-300 font-medium">Click to upload</strong> or drag &amp; drop brand imagery
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 font-mono">
                   Logos, marketing assets, or design screenshots (PNG, JPG, WebP up to 5MB)
                 </p>
               </div>
@@ -566,20 +566,20 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
 
             {/* Uploaded Images Thumbnails */}
             {images.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
                 {images.map((img) => (
                   <div
                     key={img.id}
-                    className="relative group rounded-xl bg-[#02050f] border border-cyan-500/30 p-1.5 flex items-center gap-2 overflow-hidden"
+                    className="relative group rounded-xl bg-[#030818]/60 border border-cyan-500/20 p-2 flex items-center gap-2 overflow-hidden"
                   >
                     <img
                       src={img.dataUrl}
                       alt={img.name}
                       referrerPolicy="no-referrer"
-                      className="w-10 h-10 rounded-lg object-cover bg-black/50 shrink-0"
+                      className="w-9 h-9 rounded-lg object-cover bg-black/50 shrink-0 border border-white/10"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[11px] text-slate-200 truncate font-medium">{img.name}</p>
+                      <p className="text-[11px] text-slate-200 truncate font-mono">{img.name}</p>
                       <p className="text-[10px] text-slate-500 font-mono">
                         {(img.size / 1024).toFixed(0)} KB
                       </p>
@@ -590,10 +590,10 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                         e.stopPropagation();
                         handleRemoveImage(img.id);
                       }}
-                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
+                      className="p-1 text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
                       title="Remove image"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
@@ -602,23 +602,23 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
           </div>
 
           {/* Bottom Human-in-the-loop Notification */}
-          <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-[#030818]/60 border border-cyan-500/20 text-[11px] text-slate-400 flex items-center gap-2.5 font-mono">
             <Compass className="w-4 h-4 text-teal-400 shrink-0" />
             <span>
-              The AI drafts a candidate profile at <strong className="text-teal-300">AI-Generated</strong> status. You can review and tune every rule before approving it for live audits.
+              The AI drafts a candidate profile at <strong className="text-teal-300 font-normal">AI-Generated</strong> status. You can review and tune every rule before approving it for live audits.
             </span>
           </div>
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 sm:p-5 border-t border-cyan-500/20 bg-[#030816]/90 shrink-0">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-5 border-t border-cyan-500/20 bg-[#030818]/90 shrink-0">
           <div>
             {(isDemoMode || !hasApiKey) && (
               <button
                 type="button"
                 onClick={handleGenerateDemoSample}
                 disabled={isExtracting}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-teal-300 bg-teal-950/40 hover:bg-teal-900/50 border border-teal-500/40 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-teal-300 bg-teal-950/40 hover:bg-teal-900/50 border border-teal-500/30 transition-all cursor-pointer disabled:opacity-50"
                 title="Generate a sample profile instantly without a Gemini API key"
               >
                 <Sparkles className="w-3.5 h-3.5 text-teal-400" />
@@ -631,7 +631,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isExtracting}
-              className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f] hover:bg-white/[0.08] border border-cyan-500/20 transition-all cursor-pointer disabled:opacity-50"
+              className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] border border-cyan-500/20 transition-all cursor-pointer disabled:opacity-50"
             >
               Cancel
             </button>
@@ -639,16 +639,16 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
               type="button"
               onClick={handleGenerate}
               disabled={isExtracting || !hasAnyInput}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:pointer-events-none transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:pointer-events-none transition-all cursor-pointer"
             >
               {isExtracting ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <RefreshCw className="w-4 h-4 animate-spin" />
                   <span>Synthesizing Profile...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-100" />
+                  <Sparkles className="w-4 h-4 text-cyan-200" />
                   <span>Draft Brand DNA Profile</span>
                 </>
               )}

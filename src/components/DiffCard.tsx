@@ -31,25 +31,25 @@ export const DiffCard: React.FC<DiffCardProps> = ({
         return {
           icon: <AlertCircle className="w-3.5 h-3.5 text-rose-400" />,
           label: 'CRITICAL',
-          classes: 'bg-rose-950/60 border-rose-500/50 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
+          classes: 'bg-rose-950/50 border-rose-500/40 text-rose-300'
         };
       case 'HIGH':
         return {
           icon: <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />,
           label: 'HIGH',
-          classes: 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+          classes: 'bg-rose-950/30 border-rose-500/30 text-rose-300'
         };
       case 'MEDIUM':
         return {
           icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />,
           label: 'MEDIUM',
-          classes: 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+          classes: 'bg-amber-950/30 border-amber-500/30 text-amber-300'
         };
       default:
         return {
           icon: <Info className="w-3.5 h-3.5 text-cyan-400" />,
           label: 'LOW',
-          classes: 'bg-cyan-950/40 border-cyan-500/40 text-cyan-300'
+          classes: 'bg-cyan-950/30 border-cyan-500/30 text-cyan-300'
         };
     }
   };
@@ -93,56 +93,59 @@ export const DiffCard: React.FC<DiffCardProps> = ({
 
   return (
     <BorderGlow
-      borderRadius="rounded-3xl"
+      borderRadius="rounded-2xl"
       glowColor={glowColor}
       active={isApplied}
-      intensity={severity === 'CRITICAL' ? 'strong' : 'medium'}
+      intensity={severity === 'CRITICAL' ? 'strong' : 'subtle'}
     >
-      <div className={`p-5 rounded-3xl transition-all duration-300 ${
+      <div className={`p-5 rounded-2xl border transition-all ${
         isApplied 
-          ? 'border-2 border-teal-400 bg-teal-950/30 shadow-[0_0_30px_rgba(45,212,191,0.4)]' 
-          : 'neo-liquid-card'
+          ? 'border-teal-400 bg-[#030818] shadow-[0_0_30px_rgba(20,184,166,0.3)]' 
+          : 'border-cyan-500/20 bg-[#030818]/80 backdrop-blur-md hover:border-cyan-500/40'
       }`}>
         {/* Top Header with Category Word on left and Severity Badge on right */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2.5">
-          <span className="text-sm font-bold text-white font-lexend tracking-wide">
+          <span className="text-xs font-bold text-white uppercase tracking-wider font-lexend">
             {ruleLabel}
           </span>
-          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${badge.classes}`}>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${badge.classes}`}>
             {badge.icon}
             {badge.label}
+          </span>
+          <span className="text-[10px] font-mono text-slate-400">
+            {ruleId}
           </span>
         </div>
 
         <div className="text-xs font-mono text-slate-400">
-          Confidence: <span className="font-semibold text-white">{Math.round(confidence * 100)}%</span>
+          Confidence: <span className="font-bold text-white">{Math.round(confidence * 100)}%</span>
         </div>
       </div>
 
       {/* Finding Diagnostic Summary */}
-      <p className="text-xs text-slate-200 mb-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: sanitizedSummary }} />
+      <p className="text-xs text-slate-300 mb-3.5 leading-relaxed" dangerouslySetInnerHTML={{ __html: sanitizedSummary }} />
 
       {/* Side-by-Side Visual Diff */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 p-3.5 rounded-2xl bg-[#02050f]/80 border border-cyan-500/10 shadow-inner">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 p-3 rounded-xl bg-black/40 border border-cyan-500/20">
         {/* Flagged Original Text */}
-        <div className="space-y-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-rose-400 flex items-center gap-1.5 font-mono">
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5 font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
             Detected Issue
           </div>
-          <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 text-xs text-rose-200 line-through decoration-rose-400 decoration-1 leading-relaxed">
+          <div className="p-3 rounded-lg bg-rose-950/20 border border-rose-500/20 text-xs text-rose-200 line-through decoration-rose-400 decoration-1 leading-relaxed">
             &ldquo;{sanitizedEvidence}&rdquo;
           </div>
         </div>
 
         {/* Suggested Rewrite */}
-        <div className="space-y-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-teal-400 flex items-center gap-1.5 font-mono">
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5 font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
             Suggested Alignment
           </div>
-          <div className="p-3 rounded-xl bg-teal-950/30 border border-teal-500/40 text-xs text-teal-100 font-medium leading-relaxed shadow-sm">
+          <div className="p-3 rounded-lg bg-teal-950/20 border border-teal-500/30 text-xs text-teal-100 leading-relaxed">
             &ldquo;{sanitizedRewrite}&rdquo;
           </div>
         </div>
@@ -153,10 +156,10 @@ export const DiffCard: React.FC<DiffCardProps> = ({
         <button
           onClick={handleApply}
           disabled={isApplied}
-          className={`inline-flex items-center gap-2 px-5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md ${
             isApplied
-              ? 'bg-teal-600 text-white shadow-[0_0_20px_rgba(45,212,191,0.6)]'
-              : 'neo-liquid-btn-primary shadow-md'
+              ? 'bg-teal-500 text-black'
+              : 'neo-liquid-btn-primary text-white shadow-cyan-500/30'
           }`}
         >
           {isApplied ? (

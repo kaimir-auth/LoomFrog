@@ -217,25 +217,25 @@ export const AuditStudio: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Toast Notification (Liquid Neomorphic) */}
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 text-white text-xs font-bold shadow-[0_8px_32px_rgba(6,182,212,0.4)] animate-fade-in border border-white/20">
-          <Check className="w-4 h-4 text-cyan-200" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-[#030818]/90 border border-cyan-500/30 backdrop-blur-md text-white text-xs font-mono shadow-[0_0_30px_rgba(6,182,212,0.2)] animate-fade-in">
+          <Check className="w-4 h-4 text-teal-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/60 via-[#0a1124]/80 to-[#02050f]/90 border border-rose-500/40 text-xs text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+        <div className="p-4 rounded-2xl bg-rose-950/30 border border-rose-500/30 backdrop-blur-md text-xs text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
           <div className="flex items-start sm:items-center gap-2.5">
             <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5 sm:mt-0" />
-            <span className="leading-relaxed">{errorMessage}</span>
+            <span className="leading-relaxed font-mono">{errorMessage}</span>
           </div>
-          <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
             {errorMessage.includes('no longer available') && (
-              <div className="flex items-center gap-1.5 bg-[#040918] px-2.5 py-1 rounded-xl border border-cyan-500/30">
-                <span className="text-[10px] text-slate-400">Switch:</span>
+              <div className="flex items-center gap-1.5 bg-[#030818]/80 px-2.5 py-1.5 rounded-xl border border-white/10">
+                <span className="text-[10px] text-slate-400 font-mono">Switch:</span>
                 <select
                   value={selectedModel}
                   onChange={(e) => {
@@ -245,7 +245,7 @@ export const AuditStudio: React.FC = () => {
                   className="bg-transparent text-cyan-300 text-xs focus:outline-none cursor-pointer font-mono"
                 >
                   {AVAILABLE_MODELS.map((m) => (
-                    <option key={m.id} value={m.id} className="bg-[#040918] text-white">
+                    <option key={m.id} value={m.id} className="bg-[#030818] text-white font-mono">
                       {m.id}
                     </option>
                   ))}
@@ -254,7 +254,7 @@ export const AuditStudio: React.FC = () => {
             )}
             <button
               onClick={() => setErrorMessage(null)}
-              className="text-rose-300 hover:text-white text-xs font-bold underline cursor-pointer"
+              className="text-rose-400 hover:text-rose-300 text-xs font-mono font-medium underline cursor-pointer"
             >
               Dismiss
             </button>

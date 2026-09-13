@@ -89,19 +89,17 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
   };
 
   return (
-    <BorderGlow borderRadius="rounded-3xl" glowColor="cyan">
-      <div className="p-6 rounded-3xl neo-liquid-panel space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 via-teal-300/50 to-transparent pointer-events-none" />
-
+    <BorderGlow borderRadius="rounded-[6px]" glowColor="cyan">
+      <div className="p-5 rounded-[6px] neo-liquid-panel space-y-4 relative overflow-hidden border border-[#1F2937]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-xs font-bold text-cyan-300 uppercase tracking-wider font-mono flex items-center gap-2">
+          <h3 className="text-xs font-medium text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-2">
             <span>Brand DNA Lifecycle Pipeline</span>
-            <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+            <span className="text-[10px] font-mono font-normal px-2 py-0.5 rounded-[2px] bg-[#0B0F17] text-cyan-300 border border-[#1F2937]">
               6 Visual Stages &bull; 5 State Pipeline
             </span>
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 mt-0.5">
             Guaranteed human-in-the-loop: AI-generated profiles require human review and approval before becoming Active.
           </p>
         </div>
@@ -110,10 +108,10 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
           {onOpenAiExtract && (
             <button
               onClick={onOpenAiExtract}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-cyan-200 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/30 transition-all active:scale-95 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium text-cyan-300 bg-[#0B0F17] hover:bg-white/[0.04] border border-[#1F2937] hover:border-cyan-500/40 transition-colors cursor-pointer"
               title="Open conversational AI drafting interface"
             >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
               <span>Conversational AI Drafter</span>
             </button>
           )}
@@ -121,7 +119,7 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
           {currentStageIndex > 0 && (
             <button
               onClick={handlePrev}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#02050f]/80 hover:bg-white/[0.08] border border-cyan-500/20 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-sm"
+              className="px-3 py-1.5 rounded-[4px] text-xs font-medium text-slate-300 hover:text-white bg-[#0B0F17] hover:bg-white/[0.04] border border-[#1F2937] transition-colors cursor-pointer"
             >
               Previous Stage
             </button>
@@ -130,7 +128,7 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
           {currentState === 'USER_REVIEW' && (
             <button
               onClick={() => onAdvanceState('APPROVED')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 border border-teal-300/40 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[4px] text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 border border-teal-400/40 transition-colors cursor-pointer"
             >
               <Shield className="w-3.5 h-3.5" />
               Approve Profile
@@ -140,7 +138,7 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
           {currentState === 'APPROVED' && (
             <button
               onClick={() => onAdvanceState('ACTIVE')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 hover:from-teal-400 hover:to-cyan-400 shadow-lg shadow-cyan-500/30 border border-white/20 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-cyan-400 hover:bg-cyan-300 border border-cyan-300 transition-colors cursor-pointer"
             >
               <Flame className="w-3.5 h-3.5" />
               Set as Active
@@ -150,9 +148,9 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
           {currentState !== 'USER_REVIEW' && currentState !== 'APPROVED' && currentStageIndex < LIFECYCLE_STAGES.length - 1 && (
             <button
               onClick={handleNext}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white neo-liquid-btn-primary shadow-lg transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[4px] text-xs font-medium text-[#0B0F17] bg-cyan-400 hover:bg-cyan-300 transition-colors cursor-pointer"
             >
-              Advance to {LIFECYCLE_STAGES[currentStageIndex + 1].label}
+              <span>Advance to {LIFECYCLE_STAGES[currentStageIndex + 1].label}</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           )}
@@ -161,16 +159,16 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
 
       {/* Safety Notice if AI_GENERATED */}
       {currentState === 'AI_GENERATED' && (
-        <div className="p-3.5 rounded-2xl bg-teal-500/15 border border-teal-500/35 text-xs text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 backdrop-blur-md shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]">
+        <div className="p-3 rounded-[4px] bg-[#111827] border border-teal-500/40 text-xs text-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-teal-400 flex-shrink-0" />
             <span>
-              <strong className="text-teal-300">Review Required:</strong> This profile was extracted by AI. A human must review and approve it before it can become the Active audit benchmark.
+              <strong className="text-teal-300 font-medium">Review Required:</strong> This profile was extracted by AI. A human must review and approve it before it can become the Active audit benchmark.
             </span>
           </div>
           <button
             onClick={() => onAdvanceState('USER_REVIEW')}
-            className="w-full sm:w-auto text-center px-3 py-1.5 rounded-xl bg-teal-500/25 hover:bg-teal-500/35 text-white font-bold border border-teal-500/45 text-[11px] whitespace-nowrap cursor-pointer transition-all shadow-sm shrink-0"
+            className="w-full sm:w-auto text-center px-3 py-1.5 rounded-[4px] bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 font-medium border border-teal-500/40 text-xs whitespace-nowrap cursor-pointer transition-colors shrink-0"
           >
             Start User Review &rarr;
           </button>
@@ -178,31 +176,31 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
       )}
 
       {/* 6-Step Visual Stepper Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1">
         {/* Step 1 (Visual Only): Describe Your Brand -> Launches AI Extraction Modal */}
         <div
           onClick={() => onOpenAiExtract && onOpenAiExtract()}
-          className={`p-3.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-xl group ${
+          className={`p-3 rounded-[4px] border transition-colors cursor-pointer relative ${
             currentState === 'DRAFT' || currentState === 'AI_GENERATED'
-              ? 'bg-gradient-to-br from-teal-500/20 via-cyan-500/15 to-[#02050f]/90 border-teal-400/50 shadow-[0_0_15px_rgba(20,184,166,0.25)]'
-              : 'bg-[#02050f]/80 border-cyan-500/20 hover:border-cyan-400/50 hover:bg-cyan-950/20 text-slate-200'
+              ? 'bg-[#111827] border-cyan-500/50 text-white'
+              : 'bg-[#0B0F17] border-[#1F2937] hover:border-[#374151] text-slate-300'
           }`}
           title="Click to describe your brand in conversational language with Gemini"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-teal-500/30 to-cyan-500/30 text-teal-300 border border-teal-500/40">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-[2px] bg-[#0B0F17] text-cyan-300 border border-[#1F2937]">
               01
             </span>
-            <div className="text-teal-300 group-hover:scale-110 transition-transform">
+            <div className="text-cyan-400">
               <MessageSquare className="w-3.5 h-3.5" />
             </div>
           </div>
 
-          <div className="font-bold text-xs text-white truncate font-lexend flex items-center gap-1">
+          <div className="font-medium text-xs text-white truncate font-mono uppercase tracking-wider flex items-center gap-1">
             <span>Describe</span>
-            <Sparkles className="w-3 h-3 text-cyan-300 inline shrink-0" />
+            <Sparkles className="w-3 h-3 text-cyan-400 inline shrink-0" />
           </div>
-          <div className="text-[10px] text-teal-300/80 truncate">Conversational AI</div>
+          <div className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">Conversational AI</div>
         </div>
 
         {/* Steps 2-6 (Visual): Mapped to existing 5 real LifecycleState data models */}
@@ -214,36 +212,36 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({
             <div
               key={stage.state}
               onClick={() => handleStageClick(stage.state)}
-              className={`p-3.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-xl ${
+              className={`p-3 rounded-[4px] border transition-colors cursor-pointer relative ${
                 isCurrent
-                  ? 'bg-gradient-to-br from-cyan-500/25 via-teal-500/20 to-[#02050f]/90 border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)]'
+                  ? 'bg-[#111827] border-cyan-400 text-white'
                   : isPassed
-                  ? 'bg-teal-500/10 border-teal-500/30 hover:border-teal-400/50 text-slate-200'
-                  : 'bg-[#02050f]/80 border-cyan-500/10 opacity-60 hover:opacity-90 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.6)]'
+                  ? 'bg-[#111827] border-[#1F2937] hover:border-[#374151] text-slate-200'
+                  : 'bg-[#0B0F17] border-[#1F2937]/50 text-slate-500 hover:border-[#1F2937]'
               }`}
             >
               {/* Top Step Number & Icon */}
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+              <div className="flex items-center justify-between mb-1.5">
+                <span className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-[2px] ${
                   isCurrent
-                    ? 'bg-cyan-500 text-white shadow-sm'
+                    ? 'bg-cyan-500 text-[#0B0F17]'
                     : isPassed
-                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
-                    : 'bg-white/[0.06] text-slate-400'
+                    ? 'bg-[#0B0F17] text-teal-300 border border-[#1F2937]'
+                    : 'bg-[#0B0F17] text-slate-500 border border-[#1F2937]/50'
                 }`}>
                   0{stage.visualStep}
                 </span>
 
-                <div className={isCurrent ? 'text-cyan-300' : isPassed ? 'text-teal-400' : 'text-slate-500'}>
+                <div className={isCurrent ? 'text-cyan-400' : isPassed ? 'text-teal-400' : 'text-slate-500'}>
                   {isPassed ? <Check className="w-3.5 h-3.5" /> : stage.icon}
                 </div>
               </div>
 
-              <div className="font-bold text-xs text-white truncate font-lexend">{stage.label}</div>
-              <div className="text-[10px] text-slate-400 truncate">{stage.sub}</div>
+              <div className="font-medium text-xs text-white truncate font-mono uppercase tracking-wider">{stage.label}</div>
+              <div className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">{stage.sub}</div>
 
               {isCurrent && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 animate-pulse" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-cyan-400" />
               )}
             </div>
           );

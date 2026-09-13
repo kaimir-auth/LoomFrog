@@ -15,7 +15,7 @@ export interface BorderGlowProps {
   className?: string;
   containerClassName?: string;
   glowColor?: GlowColor;
-  borderRadius?: string; // Tailwind class e.g. 'rounded-3xl', 'rounded-2xl', 'rounded-xl'
+  borderRadius?: string; // Tailwind class e.g. 'rounded-md', 'rounded-lg', 'rounded-xl'
   intensity?: 'subtle' | 'medium' | 'strong';
   interactive?: boolean;
   animated?: boolean;
@@ -104,7 +104,7 @@ export const BorderGlow: React.FC<BorderGlowProps> = ({
   className = '',
   containerClassName = '',
   glowColor = 'cyan',
-  borderRadius = 'rounded-3xl',
+  borderRadius = 'rounded-md',
   intensity = 'medium',
   interactive = true,
   animated = false,
