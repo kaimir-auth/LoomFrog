@@ -101,12 +101,6 @@ export const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 items-center mb-16 sm:mb-20">
             {/* Left Column: Value Proposition & CTAs */}
             <div className="lg:col-span-6 xl:col-span-5 text-left flex flex-col items-start">
-              {/* Security Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-200 mb-6 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0 shadow-[0_0_8px_#2dd4bf]" />
-                <span>Zero-Server &bull; Pure Client-Side Brand Governance</span>
-              </div>
-
               {/* Headline */}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12] mb-5 font-lexend">
                 Your brand&apos;s voice, verified — <br className="hidden sm:inline" />
