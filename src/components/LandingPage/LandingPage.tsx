@@ -16,6 +16,7 @@ import {
 import { useKeyContext } from '../../context/KeyContext';
 import { LoomFrogLogo, LoomFrogIcon } from '../LoomFrogLogo';
 import { FrogHero3D } from './FrogHero3D';
+import { GhostFibers } from '../GhostFibers';
 
 export const LandingPage: React.FC = () => {
   const { setActiveTab, setIsKeyModalOpen, setIsOnboardingModalOpen } = useKeyContext();
@@ -91,10 +92,24 @@ export const LandingPage: React.FC = () => {
 
       {/* 1. HERO SECTION */}
       <section className="relative pt-12 sm:pt-16 lg:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Ghost Fibers Living Visual Effect */}
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-60 mix-blend-screen">
+          <GhostFibers
+            lineColor="#140E35"
+            glowColor="#00F0FF"
+            speed={0.2}
+            scale={2}
+            rotationSpeed={0.2}
+            glowIntensity={2.0}
+            brightness={2.0}
+            className="w-full h-full"
+          />
+        </div>
+
         {/* Clean Deep Obsidian Canvas & Ambient Radial Accents */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#030818]/90 to-[#020617] pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[550px] bg-cyan-500/[0.08] rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-teal-500/[0.05] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/50 via-transparent to-[#020617] pointer-events-none z-0" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[550px] bg-cyan-500/[0.08] rounded-full blur-[150px] pointer-events-none z-0" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-teal-500/[0.05] rounded-full blur-[120px] pointer-events-none z-0" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           {/* TWO-COLUMN HERO GRID (Desktop Side-by-Side, Mobile Stacked) */}
