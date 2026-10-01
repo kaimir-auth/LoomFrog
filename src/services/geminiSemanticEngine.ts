@@ -187,7 +187,7 @@ async function callGeminiApi(
   for (let i = 0; i < modelsToTry.length; i++) {
     const currentModel = modelsToTry[i];
     const isLastModel = i === modelsToTry.length - 1;
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
 
     const currentRequestBody: any = {
       contents,
@@ -210,7 +210,8 @@ async function callGeminiApi(
       let response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
         },
         body: JSON.stringify(currentRequestBody)
       });
@@ -220,7 +221,10 @@ async function callGeminiApi(
         delete currentRequestBody.tools;
         const retryRes = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
           body: JSON.stringify(currentRequestBody)
         });
         if (retryRes.ok) {

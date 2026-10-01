@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kaimir-auth.github.io/LoomFrog/sitemap.xml

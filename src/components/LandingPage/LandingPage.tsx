@@ -164,7 +164,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-1.5 text-[11px] font-mono text-cyan-300 bg-cyan-950/40 px-2.5 py-1 rounded-full border border-cyan-500/30">
                 <Shield className="w-3.5 h-3.5 text-teal-400" />
-                <span>100% On-Device Analysis</span>
+                <span>Rule checks run on-device</span>
               </div>
             </div>
 
@@ -260,7 +260,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <h3 className="text-base font-semibold text-white mb-2 tracking-tight font-lexend">Actually private</h3>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                  Your Brand DNA, your drafts, your API key — none of it touches a company server. Your key lives only in memory and disappears the moment you close the tab.
+                  There is no LoomFrog server. Rule-based checks run in your browser, while AI audits send your content to Google&apos;s Gemini API using your own key, and the key is held in memory only.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-cyan-500/20 flex items-center gap-2 text-[11px] font-mono text-teal-300">
@@ -467,8 +467,40 @@ export const LandingPage: React.FC = () => {
             </button>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-5 pt-4 border-t border-cyan-500/10 text-center sm:text-left text-[11px] text-slate-500">
-          &copy; 2026 LoomFrog. Zero-server browser execution. No customer data or credentials stored on external hosts.
+        <div className="max-w-7xl mx-auto mt-5 pt-4 border-t border-cyan-500/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
+          <div>
+            &copy; 2026 LoomFrog. Zero-server browser execution. LoomFrog stores no customer data or credentials.
+          </div>
+          <div className="text-slate-400 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <span>Designed and built by <span className="text-slate-200 font-medium">Amir Asadullah Chowdhury</span></span>
+            <span className="text-slate-600">&bull;</span>
+            <a
+              href="https://github.com/kaimir-auth/LoomFrog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
+            >
+              GitHub
+            </a>
+            <span className="text-slate-600">&bull;</span>
+            <a
+              href="https://www.linkedin.com/in/amir-asadullah-chowdhury-363976429"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
+            >
+              LinkedIn
+            </a>
+            <span className="text-slate-600">&bull;</span>
+            <a
+              href="https://kaiservahid.substack.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
+            >
+              Substack
+            </a>
+          </div>
         </div>
       </footer>
     </div>
