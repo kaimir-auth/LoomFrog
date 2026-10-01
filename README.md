@@ -1,9 +1,4 @@
-<!--
-  README for LoomFrog.
-  Checked against: package.json, vite.config.ts, .env.example, the live site,
-  and a code audit (file paths and quoted lines) produced inside Google AI Studio.
-  Lines marked  <!-- VERIFY: ... -->  are still unconfirmed. Fix them, then delete the comment.
--->
+
 
 <div align="center">
 
