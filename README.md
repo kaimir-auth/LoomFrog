@@ -4,7 +4,7 @@
 
 # 🐸 LoomFrog
 
-### Zero-Server Brand DNA & Tone Consistency Platform
+### Zero-Server Brand DNA & Content Audit Engine
 
 **Audit your writing and visual assets against your own Brand DNA. Instant rule-based checks plus Gemini AI judgment, with no LoomFrog backend.**
 
