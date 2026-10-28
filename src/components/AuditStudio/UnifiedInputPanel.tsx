@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { Upload, FileText, Image, Table, Sparkles, AlertCircle, RefreshCw, X, Eye, Edit3, Globe, ExternalLink, Check, ArrowRight } from 'lucide-react';
 import { useKeyContext } from '../../context/KeyContext';
 import { extractInputData, FileExtractionError } from '../../services/fileExtractor';
-import { extractWebpage, WebExtractionError, ExtractedWebpageData } from '../../services/webExtractor';
+import { extractWebpage, WebExtractionError, WebExtractionCorsBlockedError, ExtractedWebpageData } from '../../services/webExtractor';
 import { scanForbiddenVocabulary } from '../../services/deterministicEngine';
 import { CanvasColorInspector } from './CanvasColorInspector';
 import { DEMO_SAMPLE_DRAFTS } from '../../data/sampleBrandProfiles';
@@ -37,6 +37,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
   const [isFetchingUrl, setIsFetchingUrl] = useState(false);
   const [urlData, setUrlData] = useState<ExtractedWebpageData | null>(null);
   const [urlFetchError, setUrlFetchError] = useState<string | null>(null);
+  const [corsBlockedForProxy, setCorsBlockedForProxy] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -108,6 +109,7 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
     setActiveTooltipTerm(null);
     setUrlData(null);
     setUrlFetchError(null);
+    setCorsBlockedForProxy(false);
     setTargetUrl('');
     onClear?.();
   };
@@ -130,22 +132,31 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
     setActiveTooltipTerm(null);
   };
 
-  const handleFetchUrl = async () => {
+  const handleFetchUrl = async (allowProxy = false) => {
     if (!targetUrl.trim()) return;
     setIsFetchingUrl(true);
     setUrlFetchError(null);
+    if (!allowProxy) {
+      setCorsBlockedForProxy(false);
+    }
     setUrlData(null);
 
     try {
-      const extracted = await extractWebpage(targetUrl);
+      const extracted = await extractWebpage(targetUrl, allowProxy);
       setUrlData(extracted);
       setCurrentDraftText(extracted.fullFormattedText);
       setDetectedType('webpage');
+      setCorsBlockedForProxy(false);
     } catch (err) {
-      if (err instanceof WebExtractionError) {
+      if (err instanceof WebExtractionCorsBlockedError) {
+        setCorsBlockedForProxy(true);
+        setUrlFetchError(null);
+      } else if (err instanceof WebExtractionError) {
         setUrlFetchError(err.message);
+        setCorsBlockedForProxy(false);
       } else {
         setUrlFetchError('Failed to fetch webpage content. Please ensure the URL is accessible.');
+        setCorsBlockedForProxy(false);
       }
     } finally {
       setIsFetchingUrl(false);
@@ -396,6 +407,41 @@ export const UnifiedInputPanel: React.FC<UnifiedInputPanelProps> = ({ onRunAudit
                 )}
               </button>
             </div>
+
+            {/* CORS blocked opt-in proxy prompt */}
+            {corsBlockedForProxy && (
+              <div className="p-4 rounded-2xl bg-[#030818] border border-amber-500/40 text-xs text-amber-200 space-y-3 shadow-lg">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold text-white">Direct connection blocked by website CORS policy</p>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      The target server blocked direct browser reading. Would you like to retry fetching via a public CORS proxy (<code className="text-cyan-300 font-mono">api.allorigins.win</code> or <code className="text-cyan-300 font-mono">corsproxy.io</code>)?
+                    </p>
+                    <p className="text-[10px] text-amber-300/90 font-mono leading-relaxed pt-0.5">
+                      Privacy Notice: The target URL being fetched will be visible to that third-party proxy service. Your Gemini API key is never sent. The proxy is only used if you agree (default is no).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleFetchUrl(true)}
+                    disabled={isFetchingUrl}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold text-xs transition-colors cursor-pointer"
+                  >
+                    Retry via Public Proxy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCorsBlockedForProxy(false)}
+                    className="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white text-xs transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Error banner */}
             {urlFetchError && (

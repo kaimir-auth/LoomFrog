@@ -363,7 +363,7 @@ export const AiExtractModal: React.FC<AiExtractModalProps> = ({
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5 font-mono text-[10px]">
-                  Fallback chain: gemini-3.6-flash &rarr; gemini-2.5-pro &rarr; gemini-3.7-flash
+                  Fallback chain: gemini-3.6-flash &rarr; gemini-3.7-flash
                 </div>
               </div>
             </div>

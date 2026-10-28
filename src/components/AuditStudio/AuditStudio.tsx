@@ -32,6 +32,7 @@ export const AuditStudio: React.FC = () => {
   const [auditPhaseLabel, setAuditPhaseLabel] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -262,6 +263,23 @@ export const AuditStudio: React.FC = () => {
         </div>
       )}
 
+      {/* Active Brand & Audit History Bar */}
+      <div className="flex items-center justify-between pb-2 border-b border-cyan-500/10">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
+            Active Brand: <span className="text-cyan-300">{activeProfile.metadata.brandName}</span>
+          </span>
+        </div>
+        <button
+          onClick={() => setIsHistoryOpen(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#030818]/80 hover:bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-semibold transition-all cursor-pointer shadow-sm active:scale-95"
+        >
+          <History className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Audit History ({auditHistory.length})</span>
+        </button>
+      </div>
+
       {/* Main 2-Column Responsive Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Unified Input Panel (5 cols) */}
@@ -284,6 +302,75 @@ export const AuditStudio: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Slide-over Audit History Drawer */}
+      {isHistoryOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-[#030818] border-l border-cyan-500/30 h-full p-6 flex flex-col space-y-4 shadow-2xl overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20">
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5 text-teal-400" />
+                <h3 className="text-sm font-bold text-white font-lexend">Audit History</h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 font-mono border border-cyan-500/30">
+                  {auditHistory.length} Saved
+                </span>
+              </div>
+              <button
+                onClick={() => setIsHistoryOpen(false)}
+                className="text-slate-400 hover:text-white text-xs font-mono px-2 py-1 rounded-lg hover:bg-white/10 cursor-pointer"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="space-y-3 flex-1 overflow-y-auto">
+              {auditHistory.length === 0 ? (
+                <div className="text-center py-12 text-slate-500 text-xs font-mono">
+                  No audit records saved yet. Run an audit to log entries.
+                </div>
+              ) : (
+                auditHistory.map((h) => (
+                  <div
+                    key={h.id}
+                    onClick={() => {
+                      setCurrentReport(h);
+                      setIsHistoryOpen(false);
+                      showToast(`Loaded audit from ${new Date(h.timestamp).toLocaleTimeString()}`);
+                    }}
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-2 ${
+                      currentReport?.id === h.id
+                        ? 'bg-cyan-950/40 border-cyan-500/50 shadow-md'
+                        : 'bg-[#050D24]/60 border-cyan-500/20 hover:border-cyan-500/40 hover:bg-[#050D24]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white font-lexend">{h.brandName}</span>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                          h.scores.sOverall >= 85
+                            ? 'bg-teal-950 text-teal-300 border border-teal-500/40'
+                            : h.scores.sOverall >= 65
+                            ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                            : 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                        }`}
+                      >
+                        {h.scores.sOverall}%
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 line-clamp-2 font-mono">
+                      {h.inputSnippet || '[Input text unavailable]'}
+                    </p>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1 border-t border-white/5">
+                      <span>{new Date(h.timestamp).toLocaleString()}</span>
+                      <span className="text-cyan-400">{h.usedModel || 'deterministic'}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Pipette, CheckCircle, AlertTriangle, Eye, Sparkles, Layers, Info } from 'lucide-react';
 import { BrandDNAProfile, ExtractedColorCluster } from '../../types/brandDna';
-import { calculateDeltaE, sampleImageColors } from '../../services/deterministicEngine';
+import { calculateDeltaE, sampleImageColors, getColorThreshold } from '../../services/deterministicEngine';
 import { getNearestColorName } from '../../utils/colorNames';
 
 interface CanvasColorInspectorProps {
@@ -126,8 +126,7 @@ export const CanvasColorInspector: React.FC<CanvasColorInspectorProps> = ({
       });
 
       const colorName = getNearestColorName(hex);
-      const strict = activeBrandDNA.colors?.strictCompliance ?? false;
-      const tolerance = strict ? 10.0 : 16.0;
+      const tolerance = getColorThreshold(activeBrandDNA);
 
       setHoverColor({
         hex,

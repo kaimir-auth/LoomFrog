@@ -1,4 +1,17 @@
-import { BrandDNAProfile, DeterministicResult, DeterministicTextMatch, ExtractedColorCluster } from '../types/brandDna';
+import { BrandDNAProfile, DeterministicResult, DeterministicTextMatch, ExtractedColorCluster, PreferredVocabularyResult } from '../types/brandDna';
+
+/**
+ * Color Delta-E tolerance thresholds
+ */
+export const STRICT_COLOR_DELTA_E_THRESHOLD = 10.0;
+export const NORMAL_COLOR_DELTA_E_THRESHOLD = 16.0;
+
+/**
+ * Returns the CIE76 Delta-E compliance tolerance threshold for a Brand DNA profile
+ */
+export function getColorThreshold(profile?: BrandDNAProfile | null): number {
+  return profile?.colors?.strictCompliance ? STRICT_COLOR_DELTA_E_THRESHOLD : NORMAL_COLOR_DELTA_E_THRESHOLD;
+}
 
 /**
  * Converts Hex to RGB
@@ -115,6 +128,67 @@ export function scanForbiddenVocabulary(text: string, profile: BrandDNAProfile):
 }
 
 /**
+ * Scans text content for preferred brand terms using Unicode-aware boundary matching.
+ * Generates an informational, non-penalizing suggested improvement if no preferred terms
+ * appear in a draft of sufficient length (50+ words).
+ */
+export function scanPreferredVocabulary(
+  text: string,
+  profile: BrandDNAProfile
+): PreferredVocabularyResult {
+  const preferredTerms = (profile.vocabulary?.preferred || [])
+    .map((t) => (typeof t === 'string' ? t.trim() : ''))
+    .filter((t) => t.length > 0);
+
+  const words = text ? text.trim().split(/\s+/).filter(Boolean) : [];
+  const wordCount = words.length;
+  const isEligibleForSuggestion = wordCount >= 50 && preferredTerms.length > 0;
+
+  if (!text || preferredTerms.length === 0) {
+    return {
+      preferredTermsConfigured: preferredTerms,
+      matchedTerms: [],
+      hasMatches: false,
+      wordCount,
+      isEligibleForSuggestion
+    };
+  }
+
+  const matchedTerms: string[] = [];
+
+  for (const term of preferredTerms) {
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    try {
+      // Unicode-aware word boundary: lookbehind and lookahead for whitespace, punctuation, symbol, or string boundary
+      const regex = new RegExp(`(?<=^|[\\s\\p{P}\\p{S}])${escapedTerm}(?=$|[\\s\\p{P}\\p{S}])`, 'gui');
+      if (regex.test(text)) {
+        matchedTerms.push(term);
+      }
+    } catch {
+      // Safe fallback if Unicode property escapes are unavailable
+      if (text.toLowerCase().includes(term.toLowerCase())) {
+        matchedTerms.push(term);
+      }
+    }
+  }
+
+  let suggestion: string | undefined;
+  if (isEligibleForSuggestion && matchedTerms.length === 0) {
+    const sampleTerms = preferredTerms.slice(0, 3).map((t) => `"${t}"`).join(', ');
+    suggestion = `Suggested improvement: This draft does not currently incorporate any of your brand's preferred terms (e.g. ${sampleTerms}). Consider weaving in preferred vocabulary where natural to strengthen brand voice.`;
+  }
+
+  return {
+    preferredTermsConfigured: preferredTerms,
+    matchedTerms,
+    hasMatches: matchedTerms.length > 0,
+    wordCount,
+    isEligibleForSuggestion,
+    suggestion
+  };
+}
+
+/**
  * Samples canvas image colors, builds dominant color clusters, and evaluates Delta-E against brand palette
  */
 export async function sampleImageColors(
@@ -186,8 +260,9 @@ export async function sampleImageColors(
           }
         });
 
-        // Compliant if Delta E is within tolerance (e.g., < 16.0)
-        const isCompliant = minDeltaE < 16.0;
+        // Compliant if Delta E is within profile tolerance threshold
+        const threshold = getColorThreshold(profile);
+        const isCompliant = minDeltaE <= threshold;
 
         return {
           hex,
@@ -217,6 +292,7 @@ export async function runTier1DeterministicAudit(
   profile: BrandDNAProfile
 ): Promise<DeterministicResult> {
   const textMatches = scanForbiddenVocabulary(text, profile);
+  const preferredVocabulary = scanPreferredVocabulary(text, profile);
   let colorClusters: ExtractedColorCluster[] | undefined;
 
   if (imageDataUrl) {
@@ -256,6 +332,7 @@ export async function runTier1DeterministicAudit(
     colorClusters,
     score: sDet,
     confidence: 1.0, // Local regex and canvas are 100% deterministic
-    findingsCount
+    findingsCount,
+    preferredVocabulary
   };
 }

@@ -25,6 +25,13 @@ export class WebExtractionError extends Error {
   }
 }
 
+export class WebExtractionCorsBlockedError extends WebExtractionError {
+  constructor(message: string, url?: string) {
+    super(message, url);
+    this.name = 'WebExtractionCorsBlockedError';
+  }
+}
+
 /**
  * Validates whether a string is a well-formed HTTP/HTTPS URL
  */
@@ -49,9 +56,9 @@ export function normalizeUrl(input: string): string {
 }
 
 /**
- * Fetches HTML from a target URL with resilient CORS proxy fallback
+ * Fetches HTML from a target URL with optional, user-consented CORS proxy fallback
  */
-async function fetchHtmlWithFallback(targetUrl: string): Promise<string> {
+async function fetchHtmlWithFallback(targetUrl: string, allowProxy: boolean = false): Promise<string> {
   const normalized = normalizeUrl(targetUrl);
 
   // Strategy 1: Direct fetch (works for same-origin or CORS-enabled sites)
@@ -68,10 +75,18 @@ async function fetchHtmlWithFallback(targetUrl: string): Promise<string> {
       if (html && html.length > 50) return html;
     }
   } catch {
-    // Direct fetch failed (likely CORS), proceed to proxies
+    // Direct fetch failed (likely CORS or network policy)
   }
 
-  // Strategy 2: AllOrigins proxy
+  // If direct fetch fails and proxy is not allowed, throw opt-in prompt error
+  if (!allowProxy) {
+    throw new WebExtractionCorsBlockedError(
+      `Direct connection to "${normalized}" was blocked by the website's CORS policy or server settings.`,
+      normalized
+    );
+  }
+
+  // Strategy 2: AllOrigins proxy (only attempted if user opted in)
   try {
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(normalized)}`;
     const proxyRes = await fetch(proxyUrl, {
@@ -85,7 +100,7 @@ async function fetchHtmlWithFallback(targetUrl: string): Promise<string> {
     // Strategy 2 failed
   }
 
-  // Strategy 3: JSDelivr / CorsProxy fallback
+  // Strategy 3: JSDelivr / CorsProxy fallback (only attempted if user opted in)
   try {
     const fallbackProxy = `https://corsproxy.io/?${encodeURIComponent(normalized)}`;
     const fbRes = await fetch(fallbackProxy, {
@@ -100,7 +115,7 @@ async function fetchHtmlWithFallback(targetUrl: string): Promise<string> {
   }
 
   throw new WebExtractionError(
-    `Unable to retrieve content from "${normalized}". The server may be blocking automated web readers or is offline. You can also copy and paste the page text directly into the Text input.`,
+    `Unable to retrieve content from "${normalized}" via public CORS proxies. The server may be blocking automated web readers or is offline. You can also copy and paste the page text directly into the Text input.`,
     normalized
   );
 }
@@ -221,12 +236,12 @@ export function parseHtmlContent(rawHtml: string, sourceUrl: string): ExtractedW
 /**
  * Main function to fetch and extract content from a URL
  */
-export async function extractWebpage(url: string): Promise<ExtractedWebpageData> {
+export async function extractWebpage(url: string, allowProxy: boolean = false): Promise<ExtractedWebpageData> {
   const normalizedUrl = normalizeUrl(url);
   if (!isValidHttpUrl(normalizedUrl)) {
     throw new WebExtractionError(`"${url}" is not a valid web URL. Please provide a full address such as https://example.com`, url);
   }
 
-  const html = await fetchHtmlWithFallback(normalizedUrl);
+  const html = await fetchHtmlWithFallback(normalizedUrl, allowProxy);
   return parseHtmlContent(html, normalizedUrl);
 }

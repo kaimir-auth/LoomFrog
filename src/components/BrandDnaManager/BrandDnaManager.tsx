@@ -4,7 +4,7 @@ import { LifecycleStepper } from './LifecycleStepper';
 import { AiExtractModal } from './AiExtractModal';
 import { BorderGlow } from '../BorderGlow';
 import { BrandDNAProfile, BrandRule, LifecycleState, BrandSource } from '../../types/brandDna';
-import { extractWebpage, isValidHttpUrl, normalizeUrl, ExtractedWebpageData } from '../../services/webExtractor';
+import { extractWebpage, isValidHttpUrl, normalizeUrl, ExtractedWebpageData, WebExtractionCorsBlockedError } from '../../services/webExtractor';
 import {
   Plus,
   Trash2,
@@ -76,6 +76,7 @@ export const BrandDnaManager: React.FC = () => {
   // Source URL inputs
   const [newSourceUrl, setNewSourceUrl] = useState('');
   const [sourceFetchStatus, setSourceFetchStatus] = useState<Record<string, { loading: boolean; data?: ExtractedWebpageData; error?: string }>>({});
+  const [sourceCorsPrompt, setSourceCorsPrompt] = useState<Record<string, boolean>>({});
 
   const currentProfile =
     brandProfiles.find((p) => p.metadata.brandName === selectedBrandName) || activeProfile;
@@ -138,24 +139,37 @@ export const BrandDnaManager: React.FC = () => {
     showStatus(`Added brand source URL.`);
   };
 
-  const handleTestFetchSource = async (sourceId: string, url: string) => {
+  const handleTestFetchSource = async (sourceId: string, url: string, allowProxy = false) => {
     setSourceFetchStatus((prev) => ({
       ...prev,
       [sourceId]: { loading: true }
     }));
+    if (!allowProxy) {
+      setSourceCorsPrompt((prev) => ({ ...prev, [sourceId]: false }));
+    }
 
     try {
-      const data = await extractWebpage(url);
+      const data = await extractWebpage(url, allowProxy);
+      setSourceCorsPrompt((prev) => ({ ...prev, [sourceId]: false }));
       setSourceFetchStatus((prev) => ({
         ...prev,
         [sourceId]: { loading: false, data }
       }));
       showStatus(`Successfully fetched content for ${url}`);
     } catch (err: any) {
-      setSourceFetchStatus((prev) => ({
-        ...prev,
-        [sourceId]: { loading: false, error: err.message || 'Failed to fetch webpage.' }
-      }));
+      if (err instanceof WebExtractionCorsBlockedError) {
+        setSourceCorsPrompt((prev) => ({ ...prev, [sourceId]: true }));
+        setSourceFetchStatus((prev) => ({
+          ...prev,
+          [sourceId]: { loading: false }
+        }));
+      } else {
+        setSourceCorsPrompt((prev) => ({ ...prev, [sourceId]: false }));
+        setSourceFetchStatus((prev) => ({
+          ...prev,
+          [sourceId]: { loading: false, error: err.message || 'Failed to fetch webpage.' }
+        }));
+      }
     }
   };
 
@@ -850,6 +864,40 @@ export const BrandDnaManager: React.FC = () => {
                             </button>
                           </div>
                         </div>
+
+                        {/* CORS Blocked Opt-in Prompt */}
+                        {sourceCorsPrompt[source.id] && (
+                          <div className="p-3 rounded-[4px] bg-[#030818] border border-amber-500/40 text-xs text-amber-200 space-y-2">
+                            <div className="flex items-start gap-2">
+                              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                              <div className="space-y-1">
+                                <p className="font-semibold text-white">Direct fetch blocked by target CORS policy</p>
+                                <p className="text-[11px] text-slate-300 leading-relaxed">
+                                  Would you like to retry via a public CORS proxy (<code className="text-cyan-300 font-mono">api.allorigins.win</code> or <code className="text-cyan-300 font-mono">corsproxy.io</code>)?
+                                </p>
+                                <p className="text-[10px] text-amber-300/90 font-mono">
+                                  Notice: The URL being fetched will be visible to that third party. Your Gemini API key is never sent.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleTestFetchSource(source.id, source.url, true)}
+                                className="px-3 py-1 rounded-[4px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold text-[11px] cursor-pointer transition-colors"
+                              >
+                                Retry with Public Proxy
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setSourceCorsPrompt((prev) => ({ ...prev, [source.id]: false }))}
+                                className="px-2.5 py-1 rounded-[4px] bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white text-[11px] cursor-pointer transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Live Inspection Card if fetched */}
                         {fetchInfo?.data && (

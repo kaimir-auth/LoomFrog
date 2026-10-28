@@ -96,12 +96,22 @@ export interface ExtractedColorCluster {
   name?: string;
 }
 
+export interface PreferredVocabularyResult {
+  preferredTermsConfigured: string[];
+  matchedTerms: string[];
+  hasMatches: boolean;
+  wordCount: number;
+  isEligibleForSuggestion: boolean;
+  suggestion?: string;
+}
+
 export interface DeterministicResult {
   textMatches: DeterministicTextMatch[];
   colorClusters?: ExtractedColorCluster[];
   score: number; // 0 to 100
   confidence: number; // 0.0 to 1.0
   findingsCount: number;
+  preferredVocabulary?: PreferredVocabularyResult;
 }
 
 export interface SemanticResult {

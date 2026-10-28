@@ -187,7 +187,7 @@ export const PrivacyPanel: React.FC = () => {
             <div>
               <h4 className="font-bold text-blue-300 mb-1 text-xs uppercase tracking-wider">Direct Google Gemini HTTPS Protocol</h4>
               <p className="text-slate-300 leading-relaxed">
-                During an explicit audit action, requests are dispatched straight from your browser to Google’s official Gemini REST endpoints. Payloads are encapsulated inside structural <code className="text-cyan-300 font-mono">&lt;untrusted_user_draft&gt;</code> XML tags with prompt-injection defense directives and structured JSON schema enforcement.
+                During an audit, requests are dispatched directly from your browser to Google&apos;s official Gemini REST endpoints. Payloads are encapsulated inside structural <code className="text-cyan-300 font-mono">&lt;untrusted_user_draft&gt;</code> XML tags with prompt-injection defense directives and structured JSON schema enforcement. By default, Gemini calls are the only network traffic; URL scraping attempts direct fetch first, querying public CORS proxies only if direct fetch is blocked and you explicitly opt in.
               </p>
             </div>
           )}
@@ -264,10 +264,10 @@ export const PrivacyPanel: React.FC = () => {
                   <span>Remote Network Traffic</span>
                 </td>
                 <td className="px-5 py-3.5 text-slate-300">
-                  Nothing is ever sent to any server except Google's Gemini API, and only when you actively trigger an audit. No tracking or telemetry scripts.
+                  By default, Gemini API calls are the only network traffic, dispatched directly when you run an audit. URL scraping attempts a direct fetch to the target site first; public CORS proxies (api.allorigins.win, corsproxy.io) are used only if the direct fetch is blocked and you explicitly opt in. Zero analytics or tracking scripts.
                 </td>
                 <td className="px-5 py-3.5 font-mono text-teal-300 text-[11px] font-bold">
-                  0 Analytics &amp; 0 Trackers
+                  0 Trackers &amp; Opt-In Proxies Only
                 </td>
               </tr>
 

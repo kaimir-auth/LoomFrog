@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { BrandDNAProfile, AuditReport, LifecycleState } from '../types/brandDna';
 import { DEFAULT_BRAND_PROFILES, PRECOMPUTED_DEMO_AUDIT, DEMO_SAMPLE_DRAFTS } from '../data/sampleBrandProfiles';
-import { DEFAULT_MODEL } from '../services/geminiSemanticEngine';
+import { DEFAULT_MODEL, AVAILABLE_MODELS } from '../services/geminiSemanticEngine';
 
 interface KeyContextType {
   // In-Memory API Key (never written to storage)
@@ -156,9 +156,13 @@ export const KeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 3. Model Configuration
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
 
-  // Automatically migrate any legacy/deprecated model selection (e.g. gemini-2.5-flash) to DEFAULT_MODEL
+  // Automatically migrate any legacy/deprecated model selection (e.g. gemini-2.5-pro, gemini-2.5-flash) to DEFAULT_MODEL
   useEffect(() => {
-    if (selectedModel === 'gemini-2.5-flash') {
+    if (
+      selectedModel === 'gemini-2.5-pro' ||
+      selectedModel === 'gemini-2.5-flash' ||
+      !AVAILABLE_MODELS.some((m) => m.id === selectedModel)
+    ) {
       setSelectedModel(DEFAULT_MODEL);
     }
   }, [selectedModel]);
