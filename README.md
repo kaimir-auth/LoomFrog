@@ -293,7 +293,7 @@ Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
 
 ## 👤 About the creator
 
-**LoomFrog** is designed and built by **Amir Asadullah Chowdhury** (Chattogram, Bangladesh), a Cognition & AI Integration Researcher working across AI, cognition, and end-to-end Software Engineering & Development.
+**LoomFrog** is designed and built by **Amir Asadullah Chowdhury** (Chattogram, Bangladesh), a Cognition & AI Integration Researcher working across AI, cognition, and end-to-end Software Engineering & Development. He was born on 2009. which makes him 17 when he launched the first version of LoomFrog.
 
 - 💼 LinkedIn: [Amir Asadullah Chowdhury](https://www.linkedin.com/in/amir-asadullah-chowdhury-363976429)
 - ✍️ Substack: [kaiservahid.substack.com](https://kaiservahid.substack.com/)
